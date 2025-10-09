@@ -103,7 +103,7 @@
                                     <label for="product-image-file" class="block text-sm font-medium text-gray-300">Subir Foto Local (Opcional, máx 500KB)</label>
                                     <input type="file" id="product-image-file" accept="image/*"
                                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-800 file:text-gray-900 hover:file:bg-amber-700">
-                                    <p class="mt-1 text-xs text-gray-500">La imagen se guarda como Base64 en la base de datos. Se recomienda usar imágenes pequeñas.</p>
+                                    <p class="mt-1 text-xs text-gray-500">La imagen se guarda como Base64 en la base de datos. Tamaño máximo 500 KB.</p>
                                 </div>
                                 
                                 <button type="submit"
@@ -297,21 +297,21 @@
             }
         };
 
-        /** Convierte un archivo de imagen local a una cadena Base64. */
-        function fileToBase64(file) {
+        /** * Convierte un archivo de imagen local a una cadena Base64.
+         * @param {File} file - El archivo a convertir.
+         * @param {number} maxSize - El tamaño máximo permitido en bytes.
+         */
+        function fileToBase64(file, maxSize) {
             return new Promise((resolve, reject) => {
                 if (!file) {
                     resolve(null);
                     return;
                 }
+                
+                const maxSizeMB = (maxSize / 1048576).toFixed(0); // 1048576 = 1MB en bytes
 
-                // **********************************************
-                // Límite de 2 MB (2 * 1024 * 1024 bytes)
-                const MAX_FILE_SIZE = 2097152; 
-                // **********************************************
-
-                if (file.size > MAX_FILE_SIZE) {
-                    reject(`El archivo es demasiado grande (${(file.size / 1024 / 1024).toFixed(2)} MB). El límite es de 2 MB.`);
+                if (file.size > maxSize) {
+                    reject(`El archivo es demasiado grande (${(file.size / 1048576).toFixed(2)} MB). El límite es de ${maxSizeMB} MB.`);
                     return;
                 }
 
@@ -327,16 +327,26 @@
         // 2. SUPABASE INICIALIZACIÓN Y GESTIÓN DE DATOS
         // --------------------------------------------------
 
-        /** Inicializa el cliente Supabase y genera el UUID. */
+        /** Inicializa el cliente Supabase y la autenticación local (persistencia de ID). */
         function initializeSupabaseAndAuth() {
             try {
                 // Inicializar el cliente Supabase
                 // @ts-ignore
                 supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-                // Generar UUID único y compatible con el esquema limpio
-                currentUserId = crypto.randomUUID();
+                // --- FIX: PERSISTENCIA DE USER ID (USANDO LOCAL STORAGE) ---
+                const STORAGE_KEY = 'mrphone_user_id';
+                let storedUserId = localStorage.getItem(STORAGE_KEY);
+
+                if (!storedUserId) {
+                    // Generar un nuevo UUID si no existe en localStorage
+                    storedUserId = crypto.randomUUID();
+                    localStorage.setItem(STORAGE_KEY, storedUserId);
+                }
+
+                currentUserId = storedUserId;
                 document.getElementById('user-id').textContent = currentUserId;
+                // --- FIN FIX ---
                 
                 // Iniciar la carga de datos por sondeo
                 startPolling();
@@ -568,9 +578,13 @@
             let finalImageData = null;
 
             try {
+                // Límite para fotos de producto (500 KB)
+                const PRODUCT_MAX_SIZE = 512000; 
+                
                 // 1. CONVERTIR ARCHIVO LOCAL A BASE64
                 if (file) {
-                    finalImageData = await fileToBase64(file);
+                    // Pasar el límite de 500 KB
+                    finalImageData = await fileToBase64(file, PRODUCT_MAX_SIZE); 
                 }
 
                 // 2. Generar placeholder si no se subió archivo
@@ -634,8 +648,11 @@
             }
 
             try {
-                // 1. CONVERTIR ARCHIVO LOCAL A BASE64 (aplica el nuevo límite de 2MB)
-                const logoBase64 = await fileToBase64(file);
+                // Límite para el logo (2 MB)
+                const LOGO_MAX_SIZE = 2097152; 
+                
+                // 1. CONVERTIR ARCHIVO LOCAL A BASE64 (Pasar el límite de 2MB)
+                const logoBase64 = await fileToBase64(file, LOGO_MAX_SIZE);
 
                 // 2. Guardar el logo en la tabla settings usando UPSERT (user_id es PK)
                 const { error } = await supabase
