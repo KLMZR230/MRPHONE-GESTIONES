@@ -267,9 +267,9 @@
         // VARIABLES GLOBALES Y CONFIGURACIÓN INICIAL (SUPABASE)
         // --------------------------------------------------
 
-        // TUS CREDENCIALES DE SUPABASE (REINSERTADAS)
+        // 🟢 CREDENCIALES ACTUALIZADAS CON LOS VALORES PROPORCIONADOS POR EL USUARIO
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuKbuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
         let supabase = null;
         let currentUserId = null;
@@ -395,13 +395,7 @@
         /** Inicializa el cliente Supabase y la autenticación local (persistencia de ID). */
         function initializeSupabaseAndAuth() {
             try {
-                // Verificar que las claves no sean las genéricas de reemplazo
-                if (supabaseUrl.includes('TU_URL_DE_PROYECTO_SUPABASE') || supabaseAnonKey.includes('TU_CLAVE_ANON_SUPABASE')) {
-                    document.getElementById('error-message').textContent = `Error: Debes reemplazar 'TU_URL_DE_PROYECTO_SUPABASE' y 'TU_CLAVE_ANON_SUPABASE' con tus credenciales reales.`;
-                    document.getElementById('error-message').classList.remove('hidden');
-                    document.getElementById('loading-spinner').classList.add('hidden');
-                    return; // Detener la inicialización si las claves son placeholders
-                }
+                // No necesitamos verificar placeholders, ya que se usaron las claves exactas del usuario.
                 
                 // Inicializar el cliente Supabase
                 // @ts-ignore
@@ -426,7 +420,13 @@
                 
             } catch (error) {
                 console.error("Error al inicializar Supabase:", error);
-                document.getElementById('error-message').textContent = `Error al conectar: ${error.message}`;
+                // Mostrar un mensaje específico si el error es de autenticación/API Key
+                let errorMessage = `Error al conectar: ${error.message}`;
+                if (error.message.includes('API key')) {
+                    errorMessage = "Error de conexión: Tu clave API de Supabase parece ser inválida, revocada o no tiene los permisos correctos. Por favor, genera una nueva clave 'Anon Public' en tu panel de Supabase y pégala directamente en el código.";
+                }
+                
+                document.getElementById('error-message').textContent = errorMessage;
                 document.getElementById('error-message').classList.remove('hidden');
                 document.getElementById('loading-spinner').classList.add('hidden');
             }
