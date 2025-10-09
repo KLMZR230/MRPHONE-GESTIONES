@@ -144,3 +144,421 @@
             </section>
         </main>
     </div>
+
+    <div id="modal-add-product" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6 border-2 border-amber-600">
+            <h3 class="text-2xl font-bold text-amber-400 mb-4">Añadir Producto</h3>
+            <form id="add-product-form" class="space-y-4">
+                <div>
+                    <label for="product-name" class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
+                    <input type="text" id="product-name" required
+                        class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white p-3 border focus:ring-amber-500 focus:border-amber-500">
+                </div>
+                <div>
+                    <label for="product-quantity" class="block text-sm font-medium text-gray-300">Cantidad</label>
+                    <input type="number" id="product-quantity" required min="1" value="1"
+                        class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white p-3 border focus:ring-amber-500 focus:border-amber-500">
+                </div>
+                <div>
+                    <label for="product-price" class="block text-sm font-medium text-gray-300">Precio Unitario ($)</label>
+                    <input type="number" id="product-price" required min="0.01" step="0.01"
+                        class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white p-3 border focus:ring-amber-500 focus:border-amber-500">
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="submit"
+                        class="flex-1 bg-amber-600 text-gray-900 p-3 rounded-lg font-bold hover:bg-amber-500 transition-colors shadow-lg">
+                        Agregar
+                    </button>
+                    <button type="button" onclick="closeAddProductModal()"
+                        class="flex-1 bg-gray-700 text-white p-3 rounded-lg font-bold hover:bg-gray-600 transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-message" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div id="modal-message-content" class="bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full p-6 border-2">
+            <h3 id="modal-message-title" class="text-xl font-bold mb-3"></h3>
+            <p id="modal-message-text" class="text-gray-300 mb-6"></p>
+            <button onclick="closeModal()" class="w-full bg-amber-600 text-gray-900 p-3 rounded-lg font-bold hover:bg-amber-500 transition-colors">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'TU_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let inventory = [];
+        let salesHistory = [];
+        let currentUserId = null;
+        let currentView = 'inventory';
+
+        async function initializeUser() {
+            const storedUserId = localStorage.getItem('mrphone_user_id');
+            if (storedUserId) {
+                currentUserId = storedUserId;
+                return;
+            }
+            const newUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('mrphone_user_id', newUserId);
+            currentUserId = newUserId;
+        }
+
+        async function loadInventory() {
+            try {
+                if (!currentUserId) await initializeUser();
+                const { data, error } = await supabase
+                    .from('inventory')
+                    .select('*')
+                    .eq('user_id', currentUserId)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                inventory = data || [];
+                renderInventory();
+                updateSalesProductList();
+            } catch (error) {
+                console.error('Error cargando inventario:', error);
+                showError('Error al cargar el inventario: ' + error.message);
+            }
+        }
+
+        async function loadSalesHistory() {
+            try {
+                if (!currentUserId) await initializeUser();
+                const { data, error } = await supabase
+                    .from('sales')
+                    .select('*')
+                    .eq('user_id', currentUserId)
+                    .order('timestamp', { ascending: false });
+
+                if (error) throw error;
+                salesHistory = data || [];
+                renderSalesHistory();
+                updateTotals();
+            } catch (error) {
+                console.error('Error cargando historial:', error);
+                showError('Error al cargar el historial: ' + error.message);
+            }
+        }
+
+        function updateTotals() {
+            const totalSold = salesHistory.reduce((sum, sale) => sum + (parseFloat(sale.price) || 0), 0);
+            const totalPaid = salesHistory
+                .filter(sale => sale.payment_status === 'paid')
+                .reduce((sum, sale) => sum + (parseFloat(sale.price) || 0), 0);
+
+            document.getElementById('total-sold').textContent = '$' + totalSold.toFixed(2);
+            document.getElementById('total-paid').textContent = '$' + totalPaid.toFixed(2);
+        }
+
+        function renderInventory() {
+            const list = document.getElementById('inventory-list');
+            if (inventory.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-center">No hay productos en el inventario.</p>';
+                return;
+            }
+
+            list.innerHTML = inventory.map(product => `
+                <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors border border-gray-700">
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-semibold text-amber-300">${product.name}</h3>
+                        <p class="text-sm text-gray-400">Cantidad: <span class="font-bold text-white">${product.quantity}</span></p>
+                        <p class="text-sm text-gray-400">Precio: <span class="font-bold text-green-400">$${parseFloat(product.price).toFixed(2)}</span></p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="adjustQuantity('${product.id}', -1)" class="quantity-btn" title="Disminuir">-</button>
+                        <button onclick="adjustQuantity('${product.id}', 1)" class="quantity-btn" title="Aumentar">+</button>
+                        <button onclick="deleteProduct('${product.id}')" class="bg-red-700 hover:bg-red-600 text-white px-3 py-2 rounded-lg font-bold transition-colors shadow-lg" title="Eliminar">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSalesHistory() {
+            const list = document.getElementById('sales-history');
+            if (salesHistory.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-center">No hay ventas registradas.</p>';
+                return;
+            }
+
+            list.innerHTML = salesHistory.map(sale => {
+                const date = new Date(sale.timestamp);
+                const paymentBadge = sale.payment_status === 'paid' 
+                    ? '<span class="px-2 py-1 bg-green-700 text-green-200 text-xs rounded-full">Pagado</span>'
+                    : '<span class="px-2 py-1 bg-yellow-700 text-yellow-200 text-xs rounded-full">Pendiente</span>';
+                
+                return `
+                    <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-amber-300">${sale.product_name}</h3>
+                            ${paymentBadge}
+                        </div>
+                        <p class="text-sm text-gray-400">Cliente: <span class="text-white">${sale.recipient}</span></p>
+                        <p class="text-sm text-gray-400">Precio: <span class="text-green-400 font-bold">$${parseFloat(sale.price).toFixed(2)}</span></p>
+                        <p class="text-xs text-gray-500 mt-2">${date.toLocaleString('es-ES')}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateSalesProductList() {
+            const select = document.getElementById('sale-product-id');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="" data-price="0.00" class="bg-gray-800 text-gray-400">-- Selecciona un producto --</option>' +
+                inventory
+                    .filter(p => p.quantity > 0)
+                    .map(p => `<option value="${p.id}" data-price="${p.price}" class="bg-gray-800">${p.name} (Stock: ${p.quantity})</option>`)
+                    .join('');
+
+            if (currentValue && inventory.find(p => p.id === currentValue && p.quantity > 0)) {
+                select.value = currentValue;
+            }
+        }
+
+        document.getElementById('sale-product-id').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const price = selectedOption.getAttribute('data-price') || '0.00';
+            document.getElementById('sale-price').value = parseFloat(price).toFixed(2);
+        });
+
+        async function handleRecordSale(event) {
+            event.preventDefault();
+            const productId = document.getElementById('sale-product-id').value;
+            const recipient = document.getElementById('sale-recipient').value.trim();
+            const price = parseFloat(document.getElementById('sale-price').value);
+            const paymentStatus = document.getElementById('sale-payment-status').value;
+
+            if (!productId || !recipient || !price || price <= 0) {
+                return showModal("Datos Incompletos", "Todos los campos son requeridos.", "error");
+            }
+
+            const product = inventory.find(p => p.id === productId);
+            if (!product || product.quantity <= 0) {
+                return showModal("Error de Stock", "Producto no disponible.", "error");
+            }
+
+            try {
+                if (!currentUserId) await initializeUser();
+
+                const saleData = {
+                    user_id: currentUserId,
+                    product_name: product.name,
+                    product_id: productId,
+                    recipient: recipient,
+                    price: price,
+                    payment_status: paymentStatus,
+                    timestamp: new Date().toISOString()
+                };
+
+                const { data: saleResult, error: saleError } = await supabase
+                    .from('sales')
+                    .insert([saleData])
+                    .select();
+
+                if (saleError) {
+                    console.error('Error al guardar venta:', saleError);
+                    throw saleError;
+                }
+
+                const { error: updateError } = await supabase
+                    .from('inventory')
+                    .update({ quantity: product.quantity - 1 })
+                    .eq('id', productId);
+
+                if (updateError) {
+                    console.error('Error al actualizar inventario:', updateError);
+                    throw updateError;
+                }
+
+                showModal("✅ Venta Registrada", 
+                    `Venta de "${product.name}" a "${recipient}" por $${price.toFixed(2)} registrada exitosamente.`, 
+                    "success");
+
+                document.getElementById('record-sale-form').reset();
+                document.getElementById('sale-payment-status').value = 'paid';
+                
+                await loadInventory();
+                await loadSalesHistory();
+
+            } catch (error) {
+                console.error('Error completo:', error);
+                showModal("❌ Error", 
+                    "No se pudo registrar la venta. Verifica la conexión a Supabase: " + error.message, 
+                    "error");
+            }
+        }
+
+        async function handleAddProduct(event) {
+            event.preventDefault();
+            const name = document.getElementById('product-name').value.trim();
+            const quantity = parseInt(document.getElementById('product-quantity').value);
+            const price = parseFloat(document.getElementById('product-price').value);
+
+            if (!name || quantity <= 0 || price <= 0) {
+                return showModal("Datos Incompletos", "Todos los campos son requeridos y válidos.", "error");
+            }
+
+            try {
+                if (!currentUserId) await initializeUser();
+
+                const { data, error } = await supabase
+                    .from('inventory')
+                    .insert([{
+                        user_id: currentUserId,
+                        name: name,
+                        quantity: quantity,
+                        price: price,
+                        created_at: new Date().toISOString()
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                showModal("✅ Producto Agregado", `"${name}" agregado al inventario.`, "success");
+                closeAddProductModal();
+                document.getElementById('add-product-form').reset();
+                await loadInventory();
+
+            } catch (error) {
+                console.error('Error al agregar producto:', error);
+                showModal("❌ Error", "No se pudo agregar el producto: " + error.message, "error");
+            }
+        }
+
+        async function adjustQuantity(productId, change) {
+            const product = inventory.find(p => p.id === productId);
+            if (!product) return;
+
+            const newQuantity = product.quantity + change;
+            if (newQuantity < 0) return;
+
+            try {
+                const { error } = await supabase
+                    .from('inventory')
+                    .update({ quantity: newQuantity })
+                    .eq('id', productId);
+
+                if (error) throw error;
+                await loadInventory();
+
+            } catch (error) {
+                console.error('Error al ajustar cantidad:', error);
+                showModal("Error", "No se pudo ajustar la cantidad: " + error.message, "error");
+            }
+        }
+
+        async function deleteProduct(productId) {
+            if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('inventory')
+                    .delete()
+                    .eq('id', productId);
+
+                if (error) throw error;
+                showModal("✅ Producto Eliminado", "Producto eliminado correctamente.", "success");
+                await loadInventory();
+
+            } catch (error) {
+                console.error('Error al eliminar producto:', error);
+                showModal("Error", "No se pudo eliminar el producto: " + error.message, "error");
+            }
+        }
+
+        function changeView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'text-amber-400');
+                btn.classList.add('border-transparent', 'text-gray-400');
+            });
+            document.getElementById(`nav-${view}`).classList.remove('border-transparent', 'text-gray-400');
+            document.getElementById(`nav-${view}`).classList.add('border-amber-500', 'text-amber-400');
+
+            if (view === 'history') {
+                loadSalesHistory();
+            }
+        }
+
+        function openAddProductModal() {
+            document.getElementById('modal-add-product').classList.remove('hidden');
+        }
+
+        function closeAddProductModal() {
+            document.getElementById('modal-add-product').classList.add('hidden');
+            document.getElementById('add-product-form').reset();
+        }
+
+        function showModal(title, message, type = "info") {
+            const modal = document.getElementById('modal-message');
+            const content = document.getElementById('modal-message-content');
+            document.getElementById('modal-message-title').textContent = title;
+            document.getElementById('modal-message-text').textContent = message;
+
+            content.classList.remove('border-amber-600', 'border-red-600', 'border-green-600');
+            if (type === "error") content.classList.add('border-red-600');
+            else if (type === "success") content.classList.add('border-green-600');
+            else content.classList.add('border-amber-600');
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-message').classList.add('hidden');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+        }
+
+        document.getElementById('store-logo-img').addEventListener('click', function() {
+            document.getElementById('logo-file-input').click();
+        });
+
+        document.getElementById('logo-file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const logoImg = document.getElementById('store-logo-img');
+                    logoImg.src = event.target.result;
+                    localStorage.setItem('mrphone_logo', event.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+        document.getElementById('record-sale-form').addEventListener('submit', handleRecordSale);
+
+        async function initApp() {
+            const savedLogo = localStorage.getItem('mrphone_logo');
+            if (savedLogo) {
+                document.getElementById('store-logo-img').src = savedLogo;
+            }
+
+            await initializeUser();
+            await loadInventory();
+            await loadSalesHistory();
+            changeView('inventory');
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
