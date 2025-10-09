@@ -231,7 +231,7 @@
 
 
     <script type="module">
-        // --- CONFIGURACIÓN DE SUPABASE (LA MISMA DE SIEMPRE) ---
+        // --- CONFIGURACIÓN DE SUPABASE (CON SUS CREDENCIALES) ---
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
@@ -240,11 +240,8 @@
             salesHistory = [], 
             pollingIntervalId = null;
 
-        // ESTE ES EL CAMBIO CLAVE: Usamos un ID de tienda fija.
-        // Todos los dispositivos que no tengan un ID propio usarán este para sincronizar.
+        // EL ID COMPARTIDO: Todos los dispositivos nuevos usarán este para sincronizar.
         const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
-
-        // Variable para el ID de sesión actual (será PUBLIC_STORE_ID para todos)
         let currentUserId = null; 
 
         // --- FUNCIONES DE UTILIDAD (MODALES, VISTAS) ---
@@ -335,13 +332,14 @@
                 // 1. Obtiene el ID de sesión guardado (si existe)
                 let userId = localStorage.getItem('mrphone_user_id');
                 
-                if (!userId) {
-                    // Si no hay ID, asigna el ID de tienda pública
+                if (!userId || userId !== PUBLIC_STORE_ID) {
+                    // Si no hay ID, o si el ID es el de una sesión anterior no compartida,
+                    // asigna el ID de tienda pública para forzar la sincronización
                     userId = PUBLIC_STORE_ID;
                     localStorage.setItem('mrphone_user_id', userId);
                 }
 
-                currentUserId = userId; // Asigna el ID (propio o el público)
+                currentUserId = userId; // Asigna el ID (en este caso, el ID público)
                 startPolling(true); // Iniciar la carga de datos
             } catch (error) {
                 document.getElementById('error-message').textContent = `Error de Conexión: ${error.message}`;
@@ -517,7 +515,7 @@
 
                 if (existing) {
                     const newQty = existing.quantity + form.quantity;
-                    response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id);
+                    response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
                     if (response.error) throw response.error; 
                     showModal("Stock Actualizado", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
                 } else {
