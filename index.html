@@ -98,11 +98,14 @@
                     <h2 class="text-2xl font-bold text-amber-400 mb-6">Registrar Venta</h2>
                     <form id="record-sale-form" class="space-y-4">
                         <div>
-                            <label for="sale-product-id" class="block text-sm font-medium text-gray-300">Producto Vendido</label>
-                            <select id="sale-product-id" required
+                            <label for="sale-product-name" class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
+                            <input type="text" id="sale-product-name" required placeholder="Ej: iPhone 15 Pro Max o Reparación de Pantalla"
                                 class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
-                                <option value="" data-price="0.00" class="bg-gray-800 text-gray-400">-- Selecciona un producto --</option>
-                            </select>
+                        </div>
+                        <div>
+                            <label for="sale-quantity" class="block text-sm font-medium text-gray-300">Cantidad Vendida</label>
+                            <input type="number" id="sale-quantity" required min="1" step="1" value="1"
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
                         </div>
                         <div>
                             <label for="sale-recipient" class="block text-sm font-medium text-gray-300">Destinatario / Cliente</label>
@@ -255,7 +258,7 @@
             });
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
             document.getElementById(`nav-${viewId}`).classList.add('text-amber-500', 'border-amber-500');
-            if (viewId === 'sales') renderSaleProductOptions();
+            // Ya no es necesario renderSaleProductOptions aquí
         };
 
         const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
@@ -309,7 +312,7 @@
             if (error) throw error;
             inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
             renderInventoryList();
-            renderSaleProductOptions();
+            // Eliminada la llamada a renderSaleProductOptions
         };
         const loadSalesHistory = async () => {
             const { data, error } = await supabase.from('sales').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
@@ -331,7 +334,7 @@
             logoImg.onerror = () => { logoImg.src = placeholder; };
         };
         
-        // NUEVA FUNCIÓN PARA CALCULAR Y MOSTRAR LOS TOTALES
+        // FUNCIÓN PARA CALCULAR Y MOSTRAR LOS TOTALES
         const renderSalesSummary = () => {
             const totalSold = salesHistory.length;
             const totalRevenue = salesHistory.reduce((sum, sale) => sum + parseFloat(sale.price), 0);
@@ -339,7 +342,6 @@
             document.getElementById('total-sold-count').textContent = totalSold;
             document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
         };
-        // FIN NUEVA FUNCIÓN
 
         const renderInventoryList = () => {
             const list = document.getElementById('inventory-list');
@@ -371,13 +373,8 @@
                 list.appendChild(item);
             });
         };
-        const renderSaleProductOptions = () => {
-            const select = document.getElementById('sale-product-id');
-            select.innerHTML = '<option value="" data-price="0.00">-- Selecciona un producto --</option>';
-            inventory.filter(p => p.quantity > 0).forEach(p => {
-                select.innerHTML += `<option value="${p.id}" data-price="${p.price}" class="bg-gray-800">${p.name} (Stock: ${p.quantity})</option>`;
-            });
-        };
+        // Eliminada la función renderSaleProductOptions
+
         const renderSalesHistory = () => {
             const tbody = document.getElementById('sales-history-body');
             tbody.innerHTML = '';
@@ -451,26 +448,60 @@
             finally { event.target.value = ''; } // Reset input
         }
 
-        // FUNCIÓN handleRecordSale REVISADA (LA LÓGICA ES CORRECTA)
+        // FUNCIÓN handleRecordSale MODIFICADA
         async function handleRecordSale(event) {
             event.preventDefault();
-            const productId = document.getElementById('sale-product-id').value;
+            const productName = document.getElementById('sale-product-name').value.trim();
+            const saleQuantity = parseInt(document.getElementById('sale-quantity').value, 10);
             const recipient = document.getElementById('sale-recipient').value.trim();
             const price = parseFloat(document.getElementById('sale-price').value);
-            if (!productId || !recipient || !price || price <= 0) return showModal("Datos Incompletos", "Todos los campos son requeridos.", "error");
-            const product = inventory.find(p => p.id === productId);
-            if (!product || product.quantity <= 0) return showModal("Error de Stock", "Producto no disponible.", "error");
+
+            if (!productName || !recipient || !price || price <= 0 || saleQuantity <= 0) {
+                return showModal("Datos Incompletos", "El nombre del producto, la cantidad vendida, el cliente y el precio son obligatorios.", "error");
+            }
+            
+            // Buscar el producto en el inventario por nombre (ignorando mayúsculas/minúsculas)
+            const product = inventory.find(p => p.name.toLowerCase() === productName.toLowerCase());
+
+            let productId = null;
+            
+            if (product) {
+                // Producto existe en inventario
+                if (product.quantity < saleQuantity) {
+                    return showModal("Error de Stock", `Solo hay ${product.quantity} unidades de '${product.name}' en stock. No puedes vender ${saleQuantity}.`, "error");
+                }
+                productId = product.id; // Guardamos el ID para referenciar el inventario
+            } else {
+                // El producto NO existe en inventario (asumimos que es un servicio o un artículo no rastreado por stock)
+                showModal("Aviso", `El producto '${productName}' no está en tu inventario. Se registrará la venta sin modificar el stock.`, "success");
+                // productID se mantiene null. No hay acción de decremento de stock.
+            }
+
             try {
                 // 1. Registrar la venta
-                await supabase.from('sales').insert([{ user_id: currentUserId, product_name: product.name, product_id: productId, recipient, price, timestamp: new Date() }]);
+                await supabase.from('sales').insert([{ 
+                    user_id: currentUserId, 
+                    product_name: productName, 
+                    // Usamos el ID solo si existe en inventario, sino, es NULL
+                    product_id: productId, 
+                    recipient, 
+                    price, 
+                    timestamp: new Date() 
+                }]);
                 
-                // 2. Decrementar el stock
-                await supabase.from('inventory').update({ quantity: product.quantity - 1 }).eq('id', productId);
+                // 2. Decrementar el stock SOLO si el producto fue encontrado y se vendió cantidad > 0
+                if (productId) {
+                    await supabase.from('inventory').update({ quantity: product.quantity - saleQuantity }).eq('id', productId);
+                }
                 
-                showModal("Venta Exitosa", `Venta de '${product.name}' registrada.`, "success");
+                showModal("Venta Exitosa", `Venta de '${productName}' x${saleQuantity} registrada.`, "success");
                 document.getElementById('record-sale-form').reset();
-            } catch (e) { showModal("Error de Venta", `No se pudo completar la transacción. Revise la consola y sus políticas RLS en Supabase. Error: ${e.message}`, "error"); }
-            finally { loadAllData(false); }
+            } catch (e) { 
+                showModal("Error de Venta", `No se pudo completar la transacción. Revise la consola y sus políticas RLS en Supabase. Error: ${e.message}`, "error"); 
+            }
+            finally { 
+                loadAllData(false); // Recargar todos los datos (incluyendo totales y stock)
+            }
         }
 
         window.updateInventoryQuantity = async (id, delta, name) => {
@@ -501,18 +532,23 @@
         };
 
         window.deleteSale = (id, name) => {
-            showModal("Confirmar Reversión", `¿Seguro que quieres revertir la venta de '${name}'? Se devolverá 1 unidad al stock.`, "error");
+            showModal("Confirmar Reversión", `¿Seguro que quieres revertir la venta de '${name}'? Si el producto estaba en inventario, se restaurará el stock.`, "error");
             document.getElementById('modal-button').textContent = 'Confirmar Reversión';
             document.getElementById('modal-button').onclick = async () => {
                 const sale = salesHistory.find(s => s.id === id);
                 if (!sale) return showModal("Error", "Venta no encontrada.", "error");
                 try {
                     await supabase.from('sales').delete().eq('id', id);
-                    const product = inventory.find(p => p.id === sale.product_id);
-                    if (product) {
-                        await supabase.from('inventory').update({ quantity: product.quantity + 1 }).eq('id', product.id);
+                    // Solo restaurar stock si product_id no es NULL (es decir, estaba en el inventario)
+                    if (sale.product_id) {
+                        const product = inventory.find(p => p.id === sale.product_id);
+                        if (product) {
+                            // Asumimos que la cantidad vendida era 1 al no haber campo de cantidad en el historial
+                            // Si se implementa un campo de cantidad en 'sales', este valor debe usarse aquí.
+                            await supabase.from('inventory').update({ quantity: product.quantity + 1 }).eq('id', product.id);
+                        }
                     }
-                    showModal("Venta Revertida", "La venta fue eliminada y el stock restaurado.", "success");
+                    showModal("Venta Revertida", "La venta fue eliminada y, si correspondía, el stock fue restaurado.", "success");
                 } catch(e) { showModal("Error", e.message, "error"); }
                 finally {
                     loadAllData(false);
@@ -530,10 +566,8 @@
             document.getElementById('record-sale-form').addEventListener('submit', handleRecordSale);
             document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click());
             document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect);
-            document.getElementById('sale-product-id').addEventListener('change', (e) => {
-                const price = e.target.options[e.target.selectedIndex].dataset.price || '0.00';
-                document.getElementById('sale-price').value = parseFloat(price).toFixed(2);
-            });
+            
+            // Eliminado el listener del select de producto, ya no existe.
         };
     </script>
 </body>
