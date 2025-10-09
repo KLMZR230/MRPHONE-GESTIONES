@@ -103,7 +103,7 @@
                                     <label for="product-image-file" class="block text-sm font-medium text-gray-300">Subir Foto Local (Opcional, máx 500KB)</label>
                                     <input type="file" id="product-image-file" accept="image/*"
                                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-800 file:text-gray-900 hover:file:bg-amber-700">
-                                    <p class="mt-1 text-xs text-gray-500">La imagen se guarda como Base64 en la base de datos.</p>
+                                    <p class="mt-1 text-xs text-gray-500">La imagen se guarda como Base64 en la base de datos. Se recomienda usar imágenes pequeñas.</p>
                                 </div>
                                 
                                 <button type="submit"
@@ -119,10 +119,10 @@
                             <h2 class="text-2xl font-bold text-amber-400 mb-4">Logo de la Tienda</h2>
                             <form id="upload-logo-form" class="space-y-4">
                                 <div>
-                                    <label for="store-logo-file" class="block text-sm font-medium text-gray-300">Subir Logo (máx 500KB)</label>
+                                    <label for="store-logo-file" class="block text-sm font-medium text-gray-300">Subir Logo (máximo 2 MB)</label>
                                     <input type="file" id="store-logo-file" accept="image/*" required
                                         class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-amber-400 hover:file:bg-gray-700/80">
-                                    <p class="mt-1 text-xs text-gray-500">Se guarda como Base64. Tamaño máximo 500KB.</p>
+                                    <p class="mt-1 text-xs text-gray-500">Se guarda como Base64. Tamaño máximo 2 MB.</p>
                                 </div>
                                 <button type="submit"
                                     class="w-full bg-gray-600 text-amber-400 p-3 rounded-lg font-bold hover:bg-gray-700 transition-colors shadow-md shadow-gray-900/50">
@@ -194,7 +194,7 @@
                             <tbody id="sales-history-body" class="bg-gray-700 divide-y divide-gray-600 text-white">
                                 <!-- Las ventas se insertarán aquí por JavaScript -->
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-400">
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-400 bg-gray-800 rounded-b-lg">
                                         No hay ventas registradas.
                                     </td>
                                 </tr>
@@ -305,9 +305,13 @@
                     return;
                 }
 
-                const MAX_FILE_SIZE = 512000; 
+                // **********************************************
+                // Límite de 2 MB (2 * 1024 * 1024 bytes)
+                const MAX_FILE_SIZE = 2097152; 
+                // **********************************************
+
                 if (file.size > MAX_FILE_SIZE) {
-                    reject(`El archivo es demasiado grande (${(file.size / 1024 / 1024).toFixed(2)} MB). El límite es de ${(MAX_FILE_SIZE / 1024).toFixed(0)} KB.`);
+                    reject(`El archivo es demasiado grande (${(file.size / 1024 / 1024).toFixed(2)} MB). El límite es de 2 MB.`);
                     return;
                 }
 
@@ -373,7 +377,10 @@
                 console.error("Error general en la carga de datos:", error);
             } finally {
                 document.getElementById('loading-spinner').classList.add('hidden');
-                // changeView('inventory'); // No es necesario si ya se llama en la carga inicial
+                // Asegurar que la vista inicial se cargue después de los datos
+                if (document.querySelector('.view-content.hidden') !== null) {
+                    changeView('inventory'); 
+                }
             }
         }
 
@@ -427,7 +434,6 @@
 
             if (error && error.code !== 'PGRST116') { // PGRST116 = No rows returned (es normal si no hay config)
                 console.error("Error al cargar configuración:", error);
-                // No mostramos modal de error, pero sí en consola.
             }
 
             if (data && data.store_logo_url) {
@@ -628,7 +634,7 @@
             }
 
             try {
-                // 1. CONVERTIR ARCHIVO LOCAL A BASE64
+                // 1. CONVERTIR ARCHIVO LOCAL A BASE64 (aplica el nuevo límite de 2MB)
                 const logoBase64 = await fileToBase64(file);
 
                 // 2. Guardar el logo en la tabla settings usando UPSERT (user_id es PK)
