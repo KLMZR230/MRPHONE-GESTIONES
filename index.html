@@ -258,7 +258,6 @@
             });
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
             document.getElementById(`nav-${viewId}`).classList.add('text-amber-500', 'border-amber-500');
-            // Ya no es necesario renderSaleProductOptions aquí
         };
 
         const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
@@ -312,7 +311,6 @@
             if (error) throw error;
             inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
             renderInventoryList();
-            // Eliminada la llamada a renderSaleProductOptions
         };
         const loadSalesHistory = async () => {
             const { data, error } = await supabase.from('sales').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
@@ -373,7 +371,6 @@
                 list.appendChild(item);
             });
         };
-        // Eliminada la función renderSaleProductOptions
 
         const renderSalesHistory = () => {
             const tbody = document.getElementById('sales-history-body');
@@ -419,7 +416,8 @@
                 closeAddProductModal();
                 document.getElementById('add-product-form').reset();
             } catch (e) { showModal("Error", e.message, "error"); }
-            finally { loadInventory(); }
+            // CORRECCIÓN: Usar 'await' para asegurar que el inventario se recargue después de la operación.
+            finally { await loadInventory(); } 
         }
 
         async function handleEditProduct(event) {
@@ -433,7 +431,7 @@
                 closeEditModal();
                 showModal("Éxito", "Producto actualizado correctamente.", "success");
             } catch (e) { showModal("Error", e.message, "error"); }
-            finally { loadInventory(); }
+            finally { await loadInventory(); }
         }
 
         async function handleLogoFileSelect(event) {
@@ -448,7 +446,7 @@
             finally { event.target.value = ''; } // Reset input
         }
 
-        // FUNCIÓN handleRecordSale MODIFICADA
+        // FUNCIÓN handleRecordSale (Lógica de venta manual mantenida)
         async function handleRecordSale(event) {
             event.preventDefault();
             const productName = document.getElementById('sale-product-name').value.trim();
@@ -460,21 +458,17 @@
                 return showModal("Datos Incompletos", "El nombre del producto, la cantidad vendida, el cliente y el precio son obligatorios.", "error");
             }
             
-            // Buscar el producto en el inventario por nombre (ignorando mayúsculas/minúsculas)
             const product = inventory.find(p => p.name.toLowerCase() === productName.toLowerCase());
 
             let productId = null;
             
             if (product) {
-                // Producto existe en inventario
                 if (product.quantity < saleQuantity) {
                     return showModal("Error de Stock", `Solo hay ${product.quantity} unidades de '${product.name}' en stock. No puedes vender ${saleQuantity}.`, "error");
                 }
-                productId = product.id; // Guardamos el ID para referenciar el inventario
+                productId = product.id;
             } else {
-                // El producto NO existe en inventario (asumimos que es un servicio o un artículo no rastreado por stock)
                 showModal("Aviso", `El producto '${productName}' no está en tu inventario. Se registrará la venta sin modificar el stock.`, "success");
-                // productID se mantiene null. No hay acción de decremento de stock.
             }
 
             try {
@@ -482,14 +476,13 @@
                 await supabase.from('sales').insert([{ 
                     user_id: currentUserId, 
                     product_name: productName, 
-                    // Usamos el ID solo si existe en inventario, sino, es NULL
                     product_id: productId, 
                     recipient, 
                     price, 
                     timestamp: new Date() 
                 }]);
                 
-                // 2. Decrementar el stock SOLO si el producto fue encontrado y se vendió cantidad > 0
+                // 2. Decrementar el stock SOLO si el producto fue encontrado
                 if (productId) {
                     await supabase.from('inventory').update({ quantity: product.quantity - saleQuantity }).eq('id', productId);
                 }
@@ -500,7 +493,7 @@
                 showModal("Error de Venta", `No se pudo completar la transacción. Revise la consola y sus políticas RLS en Supabase. Error: ${e.message}`, "error"); 
             }
             finally { 
-                loadAllData(false); // Recargar todos los datos (incluyendo totales y stock)
+                await loadAllData(false); // Asegurar que los totales y el stock se recarguen
             }
         }
 
@@ -512,7 +505,7 @@
             try {
                 await supabase.from('inventory').update({ quantity: newQty }).eq('id', id);
             } catch (e) { showModal("Error de Stock", e.message, "error"); }
-            finally { loadInventory(); }
+            finally { await loadInventory(); }
         };
 
         window.deleteProduct = (id, name) => {
@@ -524,7 +517,7 @@
                     showModal("Eliminado", `'${name}' fue eliminado.`, "success");
                 } catch(e) { showModal("Error", e.message, "error"); }
                 finally {
-                    loadInventory();
+                    await loadInventory();
                     document.getElementById('modal-button').textContent = 'Cerrar';
                     document.getElementById('modal-button').onclick = closeModal;
                 }
@@ -539,19 +532,17 @@
                 if (!sale) return showModal("Error", "Venta no encontrada.", "error");
                 try {
                     await supabase.from('sales').delete().eq('id', id);
-                    // Solo restaurar stock si product_id no es NULL (es decir, estaba en el inventario)
                     if (sale.product_id) {
                         const product = inventory.find(p => p.id === sale.product_id);
                         if (product) {
-                            // Asumimos que la cantidad vendida era 1 al no haber campo de cantidad en el historial
-                            // Si se implementa un campo de cantidad en 'sales', este valor debe usarse aquí.
+                            // Al no guardar la cantidad vendida en 'sales', asumimos 1 unidad vendida para la reversión
                             await supabase.from('inventory').update({ quantity: product.quantity + 1 }).eq('id', product.id);
                         }
                     }
                     showModal("Venta Revertida", "La venta fue eliminada y, si correspondía, el stock fue restaurado.", "success");
                 } catch(e) { showModal("Error", e.message, "error"); }
                 finally {
-                    loadAllData(false);
+                    await loadAllData(false);
                     document.getElementById('modal-button').textContent = 'Cerrar';
                     document.getElementById('modal-button').onclick = closeModal;
                 }
@@ -566,8 +557,6 @@
             document.getElementById('record-sale-form').addEventListener('submit', handleRecordSale);
             document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click());
             document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect);
-            
-            // Eliminado el listener del select de producto, ya no existe.
         };
     </script>
 </body>
