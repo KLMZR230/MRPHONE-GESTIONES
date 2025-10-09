@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRPHONE PRODUCTOS Y VENTAS (Luxury Gold)</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga del SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Estilo de Fuente -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Fondo principal oscuro (Luxury Black) */
+            background-color: #111827; 
+            color: #d1d5db; /* Texto base claro */
+        }
+        /* Ajuste para que los inputs se vean bien sobre fondo oscuro */
+        input:focus, select:focus {
+            --tw-ring-color: #d97706; /* amber-600 */
+            border-color: #d97706;
+        }
+        .luxury-card {
+             /* Gris oscuro profundo para los elementos de UI */
+            background-color: #1f2937;
+            border: 1px solid #4b5563; /* Borde sutil */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div id="app" class="flex-grow p-4 md:p-8">
+        <!-- Encabezado y Navegación -->
+        <header class="mb-6 md:mb-10 luxury-card p-4 rounded-xl shadow-2xl shadow-yellow-900/20">
+            <div class="flex items-center justify-center md:justify-start mb-4">
+                <!-- Contenedor del Logo -->
+                <div id="store-logo-container" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mr-4">
+                    <!-- Placeholder de logo inicial -->
+                    <img id="store-logo-img" src="https://placehold.co/64x64/d97706/1f2937?text=MR" alt="Store Logo" 
+                         class="w-full h-full object-cover rounded-full border-2 border-amber-500">
+                </div>
+                <h1 class="text-3xl font-extrabold text-amber-500 text-center flex-grow">
+                    MRPHONE PRODUCTOS Y VENTAS
+                </h1>
+            </div>
+            
+            <nav class="flex justify-around space-x-2 border-b border-gray-700">
+                <button onclick="changeView('inventory')" id="nav-inventory"
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent hover:border-amber-500 text-gray-400 hover:text-amber-400 focus:outline-none">
+                    Inventario
+                </button>
+                <button onclick="changeView('sales')" id="nav-sales"
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent hover:border-amber-500 text-gray-400 hover:text-amber-400 focus:outline-none">
+                    Registrar Venta
+                </button>
+                <button onclick="changeView('history')" id="nav-history"
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent hover:border-amber-500 text-gray-400 hover:text-amber-400 focus:outline-none">
+                    Historial de Ventas
+                </button>
+            </nav>
+        </header>
+        
+        <!-- Contenido Principal -->
+        <main>
+            <!-- Loader y Mensajes -->
+            <div id="loading-spinner" class="text-center p-8 hidden">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-amber-500 mx-auto"></div>
+                <p class="mt-4 text-amber-500">Conectando a Supabase...</p>
+            </div>
+            <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden"></div>
+
+            <!-- ID de Usuario (Para colaboración y seguridad) -->
+            <div class="text-sm text-gray-400 mb-4 text-center">
+                <p>ID de Usuario (UUID): <span id="user-id" class="font-mono text-xs bg-gray-800 p-1 rounded border border-gray-700">Cargando...</span></p>
+            </div>
+
+
+            <!-- VISTA DE INVENTARIO -->
+            <section id="view-inventory" class="view-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Columna 1: Formularios (Producto y Logo) -->
+                    <div class="lg:col-span-1 space-y-8">
+                        <!-- Formulario para Agregar Producto -->
+                        <div class="p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
+                            <h2 class="text-2xl font-bold text-amber-400 mb-4">Añadir Nuevo Producto</h2>
+                            <form id="add-product-form" class="space-y-4">
+                                <div>
+                                    <label for="product-name" class="block text-sm font-medium text-gray-300">Nombre del Producto (Ej: iPhone 15 Pro)</label>
+                                    <input type="text" id="product-name" required
+                                        class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                                </div>
+                                <div>
+                                    <label for="product-quantity" class="block text-sm font-medium text-gray-300">Cantidad Inicial</label>
+                                    <input type="number" id="product-quantity" required min="1" value="1"
+                                        class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                                </div>
+                                <!-- CAMPO DE FOTO DE PRODUCTO -->
+                                <div>
+                                    <label for="product-image-file" class="block text-sm font-medium text-gray-300">Subir Foto Local (Opcional, máx 500KB)</label>
+                                    <input type="file" id="product-image-file" accept="image/*"
+                                        class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-800 file:text-gray-900 hover:file:bg-amber-700">
+                                    <p class="mt-1 text-xs text-gray-500">La imagen se guarda como Base64 en la base de datos.</p>
+                                </div>
+                                
+                                <button type="submit"
+                                    class="w-full bg-amber-600 text-gray-900 p-3 rounded-lg font-bold hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/50">
+                                    Guardar Producto
+                                </button>
+                                <p id="inventory-message" class="text-sm mt-2 text-green-400"></p>
+                            </form>
+                        </div>
+                        
+                        <!-- Formulario para Subir Logo -->
+                        <div class="p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
+                            <h2 class="text-2xl font-bold text-amber-400 mb-4">Logo de la Tienda</h2>
+                            <form id="upload-logo-form" class="space-y-4">
+                                <div>
+                                    <label for="store-logo-file" class="block text-sm font-medium text-gray-300">Subir Logo (máx 500KB)</label>
+                                    <input type="file" id="store-logo-file" accept="image/*" required
+                                        class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-amber-400 hover:file:bg-gray-700/80">
+                                    <p class="mt-1 text-xs text-gray-500">Se guarda como Base64. Tamaño máximo 500KB.</p>
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-gray-600 text-amber-400 p-3 rounded-lg font-bold hover:bg-gray-700 transition-colors shadow-md shadow-gray-900/50">
+                                    Guardar Logo
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- Columna 2: Lista de Inventario -->
+                    <div class="lg:col-span-2 p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
+                        <h2 class="text-2xl font-bold text-amber-400 mb-6">Stock Actual</h2>
+                        <div id="inventory-list" class="space-y-4">
+                            <!-- Los productos se insertarán aquí por JavaScript -->
+                            <p class="text-gray-500 text-center">Cargando inventario...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA DE REGISTRAR VENTA -->
+            <section id="view-sales" class="view-content hidden">
+                <div class="max-w-xl mx-auto p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
+                    <h2 class="text-2xl font-bold text-amber-400 mb-6">Registrar Venta</h2>
+                    <form id="record-sale-form" class="space-y-4">
+                        <div>
+                            <label for="sale-product-id" class="block text-sm font-medium text-gray-300">Producto Vendido</label>
+                            <select id="sale-product-id" required
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                                <option value="" class="bg-gray-800 text-gray-400">-- Selecciona un producto --</option>
+                                <!-- Opciones cargadas dinámicamente -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="sale-recipient" class="block text-sm font-medium text-gray-300">Destinatario / Cliente</label>
+                            <input type="text" id="sale-recipient" required
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                        </div>
+                        <div>
+                            <label for="sale-price" class="block text-sm font-medium text-gray-300">Precio de Venta ($)</label>
+                            <input type="number" id="sale-price" required min="0.01" step="0.01"
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-red-700 text-white p-3 rounded-lg font-bold hover:bg-red-800 transition-colors shadow-lg shadow-red-900/50">
+                            Confirmar Venta
+                        </button>
+                        <p id="sales-message" class="text-sm mt-2 text-red-600"></p>
+                    </form>
+                </div>
+            </section>
+
+            <!-- VISTA DE HISTORIAL DE VENTAS -->
+            <section id="view-history" class="view-content hidden">
+                <div class="p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
+                    <h2 class="text-2xl font-bold text-amber-400 mb-6">Historial de Transacciones</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-700">
+                            <thead>
+                                <tr class="bg-gray-800">
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-amber-400 uppercase tracking-wider">Producto</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-amber-400 uppercase tracking-wider">Destinatario</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-amber-400 uppercase tracking-wider">Precio</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-amber-400 uppercase tracking-wider">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-history-body" class="bg-gray-700 divide-y divide-gray-600 text-white">
+                                <!-- Las ventas se insertarán aquí por JavaScript -->
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-400">
+                                        No hay ventas registradas.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modales para mensajes de éxito/error -->
+    <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+        <div id="modal-content" class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-all border-l-4 border-amber-500">
+            <h3 id="modal-title" class="text-xl font-bold mb-3 text-amber-400"></h3>
+            <p id="modal-body" class="text-gray-300 mb-4"></p>
+            <button onclick="closeModal()" class="w-full py-2 rounded-lg text-gray-900 font-semibold transition-colors bg-amber-500 hover:bg-amber-400" id="modal-button"></button>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // --------------------------------------------------
+        // VARIABLES GLOBALES Y CONFIGURACIÓN INICIAL (SUPABASE)
+        // --------------------------------------------------
+
+        // TUS CREDENCIALES DE SUPABASE (INCLUIDAS AQUÍ PARA LA CONEXIÓN DIRECTA)
+        const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+        
+        let supabase = null;
+        let currentUserId = null;
+        let inventory = [];     // State for product inventory
+        let salesHistory = [];  // State for sales log
+        let pollingIntervalId = null; // ID para el sondeo periódico
+
+        // --------------------------------------------------
+        // 1. UTILS Y MANEJO DE VISTAS/MODAL
+        // --------------------------------------------------
+
+        /** Muestra una ventana modal de mensaje */
+        window.showModal = (title, body, type = 'success') => {
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalButton = document.getElementById('modal-button');
+            const modalContent = document.getElementById('modal-content');
+            const modalContainer = document.getElementById('modal-container');
+
+            modalTitle.textContent = title;
+            modalBody.textContent = body;
+            modalContainer.classList.remove('hidden');
+
+            // Configurar estilos según el tipo (Luxury Gold Theme)
+            modalButton.className = 'w-full py-2 rounded-lg font-semibold transition-colors';
+            modalContent.classList.remove('border-red-500', 'border-amber-500');
+
+            if (type === 'error') {
+                modalTitle.classList.remove('text-amber-400');
+                modalTitle.classList.add('text-red-400');
+                modalButton.classList.add('bg-red-700', 'hover:bg-red-800', 'text-white');
+                modalContent.classList.add('border-l-4', 'border-red-500');
+                modalButton.textContent = 'Entendido';
+            } else {
+                modalTitle.classList.remove('text-red-400');
+                modalTitle.classList.add('text-amber-400');
+                modalButton.classList.add('bg-amber-500', 'hover:bg-amber-400', 'text-gray-900');
+                modalContent.classList.add('border-l-4', 'border-amber-500');
+                modalButton.textContent = 'Cerrar';
+            }
+        };
+
+        /** Cierra la ventana modal */
+        window.closeModal = () => {
+            document.getElementById('modal-container').classList.add('hidden');
+        };
+
+
+        /** Cambia la vista actual (Inventario, Ventas, Historial) */
+        window.changeView = (viewId) => {
+            document.querySelectorAll('.view-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.querySelectorAll('nav button').forEach(button => {
+                button.classList.remove('text-amber-500', 'border-amber-500');
+                button.classList.add('text-gray-400', 'border-transparent');
+            });
+
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById(`nav-${viewId}`).classList.add('text-amber-500', 'border-amber-500');
+
+            // Asegurar que la lista de productos para la venta esté actualizada
+            if (viewId === 'sales') {
+                renderSaleProductOptions();
+            }
+            if (viewId === 'inventory') {
+                renderInventoryList();
+            }
+            if (viewId === 'history') {
+                renderSalesHistory();
+            }
+        };
+
+        /** Convierte un archivo de imagen local a una cadena Base64. */
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) {
+                    resolve(null);
+                    return;
+                }
+
+                const MAX_FILE_SIZE = 512000; 
+                if (file.size > MAX_FILE_SIZE) {
+                    reject(`El archivo es demasiado grande (${(file.size / 1024 / 1024).toFixed(2)} MB). El límite es de ${(MAX_FILE_SIZE / 1024).toFixed(0)} KB.`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject("Error al leer el archivo.");
+            });
+        }
+
+
+        // --------------------------------------------------
+        // 2. SUPABASE INICIALIZACIÓN Y GESTIÓN DE DATOS
+        // --------------------------------------------------
+
+        /** Inicializa el cliente Supabase y genera el UUID. */
+        function initializeSupabaseAndAuth() {
+            try {
+                // Inicializar el cliente Supabase
+                // @ts-ignore
+                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+                // Generar UUID único y compatible con el esquema limpio
+                currentUserId = crypto.randomUUID();
+                document.getElementById('user-id').textContent = currentUserId;
+                
+                // Iniciar la carga de datos por sondeo
+                startPolling();
+                
+            } catch (error) {
+                console.error("Error al inicializar Supabase:", error);
+                document.getElementById('error-message').textContent = `Error al conectar: ${error.message}`;
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('loading-spinner').classList.add('hidden');
+            }
+        }
+
+        /** Inicia el sondeo (polling) para simular tiempo real */
+        function startPolling() {
+            if (pollingIntervalId) {
+                clearInterval(pollingIntervalId);
+            }
+            // Ejecutar la carga inicial inmediatamente
+            loadAllData();
+            // Luego, establecer el intervalo de sondeo (cada 5 segundos)
+            pollingIntervalId = setInterval(loadAllData, 5000); 
+        }
+
+        /** Carga todos los datos necesarios (inventario, ventas, settings) */
+        async function loadAllData() {
+            if (!supabase || !currentUserId) return;
+
+            document.getElementById('loading-spinner').classList.remove('hidden');
+
+            try {
+                await Promise.all([
+                    loadInventory(),
+                    loadSalesHistory(),
+                    loadSettings()
+                ]);
+            } catch (error) {
+                // Los errores específicos ya se manejan en cada función de carga.
+                console.error("Error general en la carga de datos:", error);
+            } finally {
+                document.getElementById('loading-spinner').classList.add('hidden');
+                // changeView('inventory'); // No es necesario si ya se llama en la carga inicial
+            }
+        }
+
+        /** Carga el inventario usando Supabase Select */
+        async function loadInventory() {
+            const { data, error } = await supabase
+                .from('inventory')
+                .select('*')
+                .eq('user_id', currentUserId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error al cargar inventario:", error);
+                document.getElementById('error-message').textContent = `Error al cargar inventario: ${error.message}`;
+                document.getElementById('error-message').classList.remove('hidden');
+                throw error;
+            }
+
+            inventory = data || [];
+            renderInventoryList();
+            renderSaleProductOptions();
+        }
+
+        /** Carga el historial de ventas usando Supabase Select */
+        async function loadSalesHistory() {
+            const { data, error } = await supabase
+                .from('sales')
+                .select('*')
+                .eq('user_id', currentUserId)
+                .order('timestamp', { ascending: false });
+
+            if (error) {
+                console.error("Error al cargar ventas:", error);
+                document.getElementById('error-message').textContent = `Error al cargar ventas: ${error.message}`;
+                document.getElementById('error-message').classList.remove('hidden');
+                throw error;
+            }
+
+            salesHistory = data || [];
+            renderSalesHistory();
+        }
+        
+        /** Carga la configuración (Logo) usando Supabase Select */
+        async function loadSettings() {
+            // Como user_id es la PK, esperamos un solo registro
+            const { data, error } = await supabase
+                .from('settings')
+                .select('store_logo_url')
+                .eq('user_id', currentUserId)
+                .single(); 
+
+            if (error && error.code !== 'PGRST116') { // PGRST116 = No rows returned (es normal si no hay config)
+                console.error("Error al cargar configuración:", error);
+                // No mostramos modal de error, pero sí en consola.
+            }
+
+            if (data && data.store_logo_url) {
+                renderStoreLogo(data.store_logo_url);
+            }
+        }
+
+
+        // --------------------------------------------------
+        // 3. RENDERIZACIÓN
+        // --------------------------------------------------
+        
+        /** Renderiza el logo de la tienda en el encabezado */
+        function renderStoreLogo(logoUrl) {
+            const logoImg = document.getElementById('store-logo-img');
+            // Placeholder de logo Gold/Dark
+            const defaultPlaceholder = "https://placehold.co/64x64/d97706/1f2937?text=MR"; 
+            if (logoImg) {
+                logoImg.src = logoUrl || defaultPlaceholder;
+                logoImg.onerror = () => { logoImg.src = defaultPlaceholder; };
+            }
+        }
+
+
+        /** Renderiza la lista de productos en la vista de Inventario */
+        function renderInventoryList() {
+            const listContainer = document.getElementById('inventory-list');
+            listContainer.innerHTML = ''; 
+            
+            if (inventory.length === 0) {
+                listContainer.innerHTML = '<p class="text-gray-400 text-center p-4 bg-gray-800 rounded-lg border border-gray-700">No hay productos en el inventario.</p>';
+                return;
+            }
+
+            inventory.forEach(product => {
+                const stockColor = product.quantity < 5 ? 'text-red-400 font-bold' : 'text-amber-400';
+                
+                // Generar placeholder por defecto (usa iniciales, color Gold)
+                const initials = product.name.split(' ').map(n => n[0]).join('').substring(0, 3).toUpperCase();
+                const defaultPlaceholder = `https://placehold.co/80x80/d97706/1f2937?text=${encodeURIComponent(initials)}&font=inter`;
+                
+                const finalImageSrc = product.image_url ? product.image_url : defaultPlaceholder;
+
+                const productItem = document.createElement('div');
+                productItem.className = 'flex items-center p-4 luxury-card rounded-xl shadow-md hover:shadow-lg transition-shadow border border-gray-700';
+                productItem.innerHTML = `
+                    <img src="${finalImageSrc}" alt="Foto de ${product.name}" 
+                         class="w-16 h-16 object-cover rounded-lg mr-4 border-2 border-amber-500/50"
+                         onerror="this.onerror=null; this.src='${defaultPlaceholder}'">
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-semibold text-white">${product.name}</h3>
+                        <p class="text-sm text-gray-400">ID: ${product.id.substring(0, 8)}...</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xl ${stockColor}">Stock: ${product.quantity}</p>
+                        ${product.quantity < 5 ? '<span class="text-xs text-red-400">¡Bajo stock!</span>' : ''}
+                    </div>
+                `;
+                listContainer.appendChild(productItem);
+            });
+        }
+
+        /** Renderiza las opciones de productos en el selector de la vista de Ventas */
+        function renderSaleProductOptions() {
+            const select = document.getElementById('sale-product-id');
+            const currentSelected = select.value;
+            select.innerHTML = '<option value="" class="bg-gray-800 text-gray-400">-- Selecciona un producto --</option>';
+
+            inventory.filter(p => p.quantity > 0).forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} (Stock: ${product.quantity})`;
+                option.className = 'bg-gray-800 text-white'; // Estilo para opciones oscuras
+                if (product.id === currentSelected) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+
+        /** Renderiza la tabla en la vista de Historial de Ventas */
+        function renderSalesHistory() {
+            const tbody = document.getElementById('sales-history-body');
+            tbody.innerHTML = '';
+
+            if (salesHistory.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-gray-400 bg-gray-800 rounded-b-lg">
+                            No hay ventas registradas.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            salesHistory.forEach(sale => {
+                // Supabase retorna la fecha como string ISO
+                const date = new Date(sale.timestamp).toLocaleDateString('es-ES', { 
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                });
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-600 transition-colors';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-amber-300">${sale.product_name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-300">${sale.recipient}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-green-400 font-semibold">$${parseFloat(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-400 text-sm">${date}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // --------------------------------------------------
+        // 4. LÓGICA DE SUPABASE (CRUD)
+        // --------------------------------------------------
+
+        /** Maneja el envío del formulario para agregar un nuevo producto */
+        async function handleAddProduct(event) {
+            event.preventDefault();
+            const name = document.getElementById('product-name').value.trim();
+            const quantity = parseInt(document.getElementById('product-quantity').value, 10);
+            const fileInput = document.getElementById('product-image-file'); 
+            const file = fileInput.files[0]; 
+            
+            if (!name || quantity <= 0 || !supabase || !currentUserId) {
+                showModal("Error de Formulario", "Asegúrate de que el nombre no esté vacío y la cantidad sea positiva.", "error");
+                return;
+            }
+
+            let finalImageData = null;
+
+            try {
+                // 1. CONVERTIR ARCHIVO LOCAL A BASE64
+                if (file) {
+                    finalImageData = await fileToBase64(file);
+                }
+
+                // 2. Generar placeholder si no se subió archivo
+                if (!finalImageData) {
+                    const initials = name.split(' ').map(n => n[0]).join('').substring(0, 3).toUpperCase();
+                    // Placeholder gold/dark
+                    finalImageData = `https://placehold.co/100x100/d97706/1f2937?text=${encodeURIComponent(initials)}&font=inter`; 
+                }
+
+                // 3. Verificar si el producto ya existe (por nombre)
+                const existingProduct = inventory.find(p => p.name.toLowerCase() === name.toLowerCase());
+
+                if (existingProduct) {
+                    // Si existe, actualizar la cantidad
+                    const newQuantity = existingProduct.quantity + quantity;
+                    const { error } = await supabase
+                        .from('inventory')
+                        .update({ quantity: newQuantity })
+                        .eq('id', existingProduct.id);
+
+                    if (error) throw error;
+                    
+                    showModal("Stock Actualizado", `Se han añadido ${quantity} unidades a ${name}. Stock total: ${newQuantity}`, "success");
+
+                } else {
+                    // Si no existe, agregar uno nuevo
+                    const { error } = await supabase
+                        .from('inventory')
+                        .insert([{
+                            user_id: currentUserId,
+                            name: name,
+                            quantity: quantity,
+                            image_url: finalImageData, 
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) throw error;
+                    
+                    showModal("Producto Agregado", `El producto '${name}' fue añadido con ${quantity} unidades.`, "success");
+                }
+
+                document.getElementById('add-product-form').reset();
+            } catch (e) {
+                console.error("Error al procesar la imagen o guardar el documento: ", e);
+                const errorMessage = typeof e === 'string' ? e : `Ocurrió un error al guardar el producto. Detalle: ${e.message || e}`;
+                showModal("Error", errorMessage, "error");
+            } finally {
+                loadInventory(); // Refrescar inmediatamente
+            }
+        }
+        
+        /** Maneja el envío del formulario para subir el logo */
+        async function handleLogoUpload(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('store-logo-file'); 
+            const file = fileInput.files[0]; 
+
+            if (!file || !supabase || !currentUserId) {
+                showModal("Error", "Debes seleccionar un archivo para el logo.", "error");
+                return;
+            }
+
+            try {
+                // 1. CONVERTIR ARCHIVO LOCAL A BASE64
+                const logoBase64 = await fileToBase64(file);
+
+                // 2. Guardar el logo en la tabla settings usando UPSERT (user_id es PK)
+                const { error } = await supabase
+                    .from('settings')
+                    .upsert({
+                        user_id: currentUserId,
+                        store_logo_url: logoBase64,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'user_id' }); // Conflict en user_id para actualizar el registro
+
+                if (error) throw error;
+
+                showModal("Logo Guardado", "El logo de la tienda ha sido actualizado exitosamente.", "success");
+                document.getElementById('upload-logo-form').reset();
+                renderStoreLogo(logoBase64); // Actualizar inmediatamente el logo
+            } catch (e) {
+                console.error("Error al subir el logo:", e);
+                const errorMessage = typeof e === 'string' ? e : `Ocurrió un error al guardar el logo. Detalle: ${e.message || e}`;
+                showModal("Error de Logo", errorMessage, "error");
+            }
+        }
+
+
+        /** Maneja el envío del formulario para registrar una venta */
+        async function handleRecordSale(event) {
+            event.preventDefault();
+            const productId = document.getElementById('sale-product-id').value;
+            const recipient = document.getElementById('sale-recipient').value.trim();
+            const price = parseFloat(document.getElementById('sale-price').value);
+
+            if (!productId || !recipient || isNaN(price) || price <= 0 || !supabase || !currentUserId) {
+                showModal("Datos Incompletos", "Por favor, selecciona un producto, ingresa un destinatario y un precio válido.", "error");
+                return;
+            }
+
+            const productToSell = inventory.find(p => p.id === productId);
+
+            if (!productToSell || productToSell.quantity <= 0) {
+                showModal("Error de Stock", "El producto seleccionado no está disponible en stock o la cantidad es cero.", "error");
+                return;
+            }
+
+            try {
+                // 1. Registrar la venta
+                const { error: saleError } = await supabase
+                    .from('sales')
+                    .insert([{
+                        user_id: currentUserId,
+                        product_name: productToSell.name,
+                        product_id: productId,
+                        recipient: recipient,
+                        price: price,
+                        timestamp: new Date().toISOString()
+                    }]);
+                
+                if (saleError) throw saleError;
+
+
+                // 2. Actualizar el inventario (restar 1 unidad)
+                const newQuantity = productToSell.quantity - 1;
+                const { error: inventoryError } = await supabase
+                    .from('inventory')
+                    .update({ quantity: newQuantity })
+                    .eq('id', productId);
+                
+                if (inventoryError) throw inventoryError;
+
+
+                showModal("Venta Exitosa", `Venta de '${productToSell.name}' registrada. Quedan ${newQuantity} unidades en stock.`, "success");
+                document.getElementById('record-sale-form').reset();
+                
+            } catch (e) {
+                console.error("Error recording sale: ", e);
+                const errorMessage = `Ocurrió un error de Transacción. Detalle: ${e.message || e}`;
+                showModal("Error de Transacción", errorMessage, "error");
+            } finally {
+                loadAllData(); // Refrescar todos los datos inmediatamente
+            }
+        }
+
+        // --------------------------------------------------
+        // 5. EVENT LISTENERS
+        // --------------------------------------------------
+        
+        // Ejecutar inicialización al cargar la ventana
+        window.onload = () => {
+            initializeSupabaseAndAuth();
+            
+            // Asignar listeners a los formularios
+            document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+            document.getElementById('record-sale-form').addEventListener('submit', handleRecordSale);
+            document.getElementById('upload-logo-form').addEventListener('submit', handleLogoUpload);
+
+            // Establecer la vista inicial
+            changeView('inventory');
+        };
+
+    </script>
+</body>
+</html>
