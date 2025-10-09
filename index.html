@@ -26,7 +26,6 @@
             @apply bg-amber-700 text-white hover:bg-amber-600 transition-colors shadow-lg shadow-amber-900/50
                    rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold p-0.5;
         }
-        /* Añadido para que el cursor sobre el logo sea un puntero */
         #store-logo-img {
             cursor: pointer;
         }
@@ -38,6 +37,7 @@
 
     <div id="app" class="flex-grow p-4 md:p-8">
         <header class="mb-6 md:mb-10 luxury-card p-4 rounded-xl shadow-2xl shadow-yellow-900/20">
+            
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                 <div class="flex items-center mb-4 sm:mb-0">
                     <div id="store-logo-container" title="Haz clic para cambiar el logo" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mr-4">
@@ -80,7 +80,7 @@
         <main>
             <div id="loading-spinner" class="text-center p-8 hidden">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-amber-500 mx-auto"></div>
-                <p class="mt-4 text-amber-500">Conectando a Supabase...</p>
+                <p class="mt-4 text-amber-500">Conectando a Supabase y sincronizando datos...</p>
             </div>
             <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden"></div>
 
@@ -231,11 +231,23 @@
 
 
     <script type="module">
+        // --- CONFIGURACIÓN DE SUPABASE (LA MISMA DE SIEMPRE) ---
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
-        let supabase = null, currentUserId = null, inventory = [], salesHistory = [], pollingIntervalId = null;
+        
+        let supabase = null, 
+            inventory = [], 
+            salesHistory = [], 
+            pollingIntervalId = null;
 
-        // --- MANEJO DE MODALES Y VISTAS ---
+        // ESTE ES EL CAMBIO CLAVE: Usamos un ID de tienda fija.
+        // Todos los dispositivos que no tengan un ID propio usarán este para sincronizar.
+        const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
+
+        // Variable para el ID de sesión actual (será PUBLIC_STORE_ID para todos)
+        let currentUserId = null; 
+
+        // --- FUNCIONES DE UTILIDAD (MODALES, VISTAS) ---
         window.showModal = (title, body, type = 'success') => {
             const modal = {
                 title: document.getElementById('modal-title'),
@@ -264,7 +276,6 @@
         };
         window.closeModal = () => {
             document.getElementById('modal-container').classList.add('hidden');
-            // Restablecer el botón principal del modal
             document.getElementById('modal-button').textContent = 'Cerrar';
             document.getElementById('modal-button').onclick = closeModal;
         }
@@ -281,7 +292,6 @@
         window.openAddProductModal = () => document.getElementById('add-product-modal-container').classList.remove('hidden');
         window.closeAddProductModal = () => document.getElementById('add-product-modal-container').classList.add('hidden');
 
-        // NUEVAS FUNCIONES DE MODAL DE ESTADO
         window.openStatusModal = (id, currentStatus) => {
             document.getElementById('status-sale-id').value = id;
             const select = document.getElementById('new-sale-status');
@@ -316,17 +326,23 @@
             reader.onerror = () => reject("Error al leer archivo.");
         });
 
-        // --- LÓGICA DE DATOS (SUPABASE) ---
+        // --- INICIALIZACIÓN Y GESTIÓN DEL ID DE TIENDA COMPARTIDO ---
+
         const initializeApp = () => {
             try {
                 supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+                
+                // 1. Obtiene el ID de sesión guardado (si existe)
                 let userId = localStorage.getItem('mrphone_user_id');
+                
                 if (!userId) {
-                    userId = crypto.randomUUID();
+                    // Si no hay ID, asigna el ID de tienda pública
+                    userId = PUBLIC_STORE_ID;
                     localStorage.setItem('mrphone_user_id', userId);
                 }
-                currentUserId = userId;
-                startPolling(true);
+
+                currentUserId = userId; // Asigna el ID (propio o el público)
+                startPolling(true); // Iniciar la carga de datos
             } catch (error) {
                 document.getElementById('error-message').textContent = `Error de Conexión: ${error.message}`;
                 document.getElementById('error-message').classList.remove('hidden');
@@ -337,17 +353,22 @@
         const startPolling = (initialLoad = false) => {
             clearInterval(pollingIntervalId);
             loadAllData(initialLoad);
-            pollingIntervalId = setInterval(() => loadAllData(false), 5000);
+            // Sincronización continua cada 5 segundos
+            pollingIntervalId = setInterval(() => loadAllData(false), 5000); 
         };
 
         async function loadAllData(showSpinner = false) {
-            if (!supabase) return;
+            if (!supabase || !currentUserId) return;
             if (showSpinner) document.getElementById('loading-spinner').classList.remove('hidden');
             try {
-                // Se solicita el campo 'status' en la tabla 'sales'
+                // Todos los métodos de carga usan 'currentUserId', que ahora es el ID de tienda compartida.
                 await Promise.all([loadInventory(), loadSalesHistory(), loadSettings()]); 
-                renderSalesSummary(); // Renderizar resumen de ventas después de cargar el historial
-            } catch (e) { console.error("Error cargando datos:", e); }
+                renderSalesSummary();
+            } catch (e) { 
+                console.error("Error cargando datos:", e);
+                document.getElementById('error-message').textContent = `Error al cargar datos. Asegúrate que las políticas RLS permitan acceso a este ID de tienda (${currentUserId}).`;
+                document.getElementById('error-message').classList.remove('hidden'); 
+            }
             finally {
                 if (showSpinner) document.getElementById('loading-spinner').classList.add('hidden');
                 if (!document.querySelector('.view-content:not(.hidden)')) changeView('inventory');
@@ -368,7 +389,7 @@
         };
         const loadSettings = async () => {
             const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', currentUserId).single();
-            if (error && error.code !== 'PGRST116') throw error;
+            if (error && error.code !== 'PGRST116') {/* PGRST116 = No Rows, no es un error */ }
             if (data?.store_logo_url) renderStoreLogo(data.store_logo_url);
         };
 
@@ -380,7 +401,6 @@
             logoImg.onerror = () => { logoImg.src = placeholder; };
         };
         
-        // FUNCIÓN PARA CALCULAR Y MOSTRAR LOS TOTALES
         const renderSalesSummary = () => {
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
             
@@ -389,10 +409,7 @@
                 return saleDate === today;
             });
 
-            // Total Vendido HOY (Ingreso total de ventas de hoy, independientemente del estado)
             const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
-            
-            // Total Pagado HOY (Ingreso solo de las ventas con status 'Pagado' de hoy)
             const todayPaidTotal = todaySales
                 .filter(sale => (sale.status || 'Pagado') === 'Pagado')
                 .reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
@@ -401,9 +418,8 @@
             document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
         };
 
-        // Función para obtener el badge de estado
         const getStatusBadge = (status) => {
-            const s = status || 'Pagado'; // Fallback por si la columna no existe o es nula
+            const s = status || 'Pagado'; 
             let colorClass = 'bg-gray-600';
             let colorText = 'text-white';
 
@@ -420,9 +436,7 @@
             }
             return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${colorClass} ${colorText}">${s}</span>`;
         };
-
-
-        // CAMBIO CLAVE: Renderiza la lista de inventario en formato de tarjeta (card)
+        
         const renderInventoryList = () => {
             const list = document.getElementById('inventory-list');
             list.innerHTML = '';
@@ -434,7 +448,7 @@
                 const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
                 const placeholder = `https://placehold.co/150x150/d97706/1f2937?text=${initials}&font=inter`;
                 const item = document.createElement('div');
-                // Clase de la tarjeta: Centrada, sombra, hover elegante
+                
                 item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
                 
                 item.innerHTML = `
@@ -457,34 +471,34 @@
                 list.appendChild(item);
             });
         };
-        // FIN CAMBIO CLAVE
 
         const renderSalesHistory = () => {
             const tbody = document.getElementById('sales-history-body');
             tbody.innerHTML = '';
+            salesHistory.forEach(sale => {
+                const date = new Date(sale.timestamp).toLocaleDateString();
+                const statusBadge = getStatusBadge(sale.status);
+                const row = tbody.insertRow();
+                row.className = 'hover:bg-gray-600 transition-colors';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${sale.product_name} (x${sale.quantity || 1})</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${sale.recipient}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold">$${parseFloat(sale.price).toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="openStatusModal('${sale.id}', '${sale.status || 'Pagado'}')" class="text-amber-500 hover:text-amber-400 mr-3">Estado</button>
+                        <button onclick="deleteSale('${sale.id}', '${sale.product_name}')" class="text-red-500 hover:text-red-400">Eliminar</button>
+                    </td>
+                `;
+            });
             if (salesHistory.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">No hay ventas registradas.</td></tr>';
-                return;
             }
-            salesHistory.forEach(s => {
-                const date = new Date(s.timestamp).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
-                // Fallback de estado a 'Pagado' si el campo no existe o es nulo
-                const status = s.status || 'Pagado'; 
-                tbody.innerHTML += `<tr class="hover:bg-gray-600">
-                    <td class="px-6 py-4 font-medium text-amber-300">${s.product_name}</td>
-                    <td class="px-6 py-4">${s.recipient}</td>
-                    <td class="px-6 py-4 text-green-400 font-semibold">$${parseFloat(s.price).toFixed(2)}</td>
-                    <td class="px-6 py-4 text-sm text-gray-400">${date}</td>
-                    <td class="px-6 py-4">${getStatusBadge(status)}</td>
-                    <td class="px-6 py-4 text-center whitespace-nowrap">
-                        <button onclick="openStatusModal('${s.id}', '${status}')" class="text-amber-500 hover:text-amber-300 text-sm font-medium mr-3">Cambiar Estado</button>
-                        <button onclick="deleteSale('${s.id}', '${s.product_name}')" class="text-red-500 hover:text-red-400 text-sm font-medium">Eliminar</button>
-                    </td>
-                </tr>`;
-            });
         };
         
-        // --- MANEJADORES DE ACCIONES ---
+        // --- MANEJADORES DE ACCIONES (TODOS USAN currentUserId) ---
         async function handleAddProduct(event) {
             event.preventDefault();
             const form = {
@@ -522,7 +536,7 @@
                 document.getElementById('add-product-form').reset();
 
             } catch (e) { 
-                const errorBody = e.message || "Error desconocido. Revise la consola y sus políticas RLS en Supabase.";
+                const errorBody = e.message || "Error desconocido.";
                 showModal("Error al Guardar Producto", `No se pudo completar la operación. Mensaje: ${errorBody}`, "error"); 
             }
             finally { 
@@ -536,8 +550,9 @@
             const newName = document.getElementById('edit-product-name').value.trim();
             const newPrice = parseFloat(document.getElementById('edit-product-price').value);
             if (!id || !newName || newPrice <= 0) return showModal("Error", "Nombre y precio válidos son requeridos.", "error");
+
             try {
-                const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice }).eq('id', id);
+                const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error; 
                 closeEditModal();
                 showModal("Éxito", "Producto actualizado correctamente.", "success");
@@ -548,6 +563,7 @@
         async function handleLogoFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
+
             try {
                 const logoBase64 = await fileToBase64(file, 2097152);
                 const { error } = await supabase.from('settings').upsert({ user_id: currentUserId, store_logo_url: logoBase64 }, { onConflict: 'user_id' });
@@ -555,20 +571,19 @@
                 renderStoreLogo(logoBase64);
                 showModal("Logo Actualizado", "El logo de la tienda se guardó con éxito.", "success");
             } catch (e) { showModal("Error de Logo", e.message, "error"); }
-            finally { event.target.value = ''; } // Reset input
+            finally { event.target.value = ''; }
         }
 
-        // FUNCIÓN handleRecordSale (Lógica de venta manual - CON STOCK Y STATUS)
         async function handleRecordSale(event) {
             event.preventDefault();
             const productName = document.getElementById('sale-product-name').value.trim();
             const saleQuantity = parseInt(document.getElementById('sale-quantity').value, 10);
             const recipient = document.getElementById('sale-recipient').value.trim();
             const price = parseFloat(document.getElementById('sale-price').value);
-            const status = document.getElementById('sale-status').value; // Obtener status
+            const status = document.getElementById('sale-status').value;
 
             if (!productName || !recipient || !price || price <= 0 || saleQuantity <= 0) {
-                return showModal("Datos Incompletos", "El nombre del producto, la cantidad vendida, el cliente, el precio y el estado son obligatorios.", "error");
+                return showModal("Datos Incompletos", "Todos los campos son obligatorios.", "error");
             }
             
             const product = inventory.find(p => p.name.toLowerCase() === productName.toLowerCase());
@@ -580,8 +595,6 @@
                     return showModal("Error de Stock", `Solo hay ${product.quantity} unidades de '${product.name}' en stock. No puedes vender ${saleQuantity}.`, "error");
                 }
                 productId = product.id;
-            } else {
-                // NOTA: No mostrar aviso si el producto no existe, solo registrar la venta sin descontar stock
             }
 
             try {
@@ -593,28 +606,27 @@
                     recipient, 
                     price, 
                     status: status, 
-                    quantity: saleQuantity, // Asegurar que la cantidad vendida se registra para la lógica de stock de devolución
+                    quantity: saleQuantity, 
                     timestamp: new Date() 
                 }]);
                 if (saleError) throw saleError;
                 
                 // 2. Descontar el stock (solo si el producto fue encontrado)
                 if (productId) {
-                    const { error: stockError } = await supabase.from('inventory').update({ quantity: product.quantity - saleQuantity }).eq('id', productId);
+                    const { error: stockError } = await supabase.from('inventory').update({ quantity: product.quantity - saleQuantity }).eq('id', productId).eq('user_id', currentUserId);
                     if (stockError) throw stockError;
                 }
                 
                 showModal("Venta Exitosa", `Venta de '${productName}' x${saleQuantity} registrada.`, "success");
                 document.getElementById('record-sale-form').reset();
             } catch (e) { 
-                showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}. Asegúrate de que la tabla 'sales' tiene las columnas 'status' (text), 'quantity' (int) y 'product_id' (text/uuid).`, "error"); 
+                showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error"); 
             }
             finally { 
-                await loadAllData(false); // Asegurar que los totales y el stock se recarguen
+                await loadAllData(false); 
             }
         }
 
-        // FUNCIÓN: Actualizar estado de venta (con lógica de stock para devoluciones)
         async function updateSaleStatus(saleId, newStatus) {
             const sale = salesHistory.find(s => s.id === saleId);
             if (!sale) return showModal("Error", "Venta no encontrada.", "error");
@@ -622,42 +634,36 @@
             const oldStatus = sale.status || 'Pagado';
             const isInventorySale = sale.product_id;
 
-            if (oldStatus === newStatus) return; // Si no hay cambio, no hacer nada
+            if (oldStatus === newStatus) return; 
 
             try {
                 let stockChange = 0;
-                const saleQuantity = sale.quantity || 1; // Usar la cantidad registrada en la venta
+                const saleQuantity = sale.quantity || 1; 
+                let product = null;
 
-                // 1. Determinar el cambio de stock si es un producto de inventario
                 if (isInventorySale) {
-                    // Usamos la información del inventario cargada localmente
-                    const product = inventory.find(p => p.id === sale.product_id);
+                    product = inventory.find(p => p.id === sale.product_id);
                     if (!product) { console.warn("Producto no encontrado en inventario local."); }
 
-                    // Transición HACIA 'Devuelto' (Restaurar stock)
                     if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') {
                         stockChange = saleQuantity; 
                     } 
-                    // Transición DESDE 'Devuelto' (Reducir stock nuevamente, si se había devuelto)
                     else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
                         stockChange = -saleQuantity;
                         
-                        // Verificación de stock para evitar stock negativo
                         if (product && (product.quantity + stockChange) < 0) {
                             return showModal("Error de Stock", `No hay suficiente stock para cambiar de Devuelto a ${newStatus}. Stock actual: ${product.quantity}.`, "error");
                         }
                     }
 
-                    // 2. Actualizar inventario si hubo cambio de stock
                     if (stockChange !== 0 && product) {
                         const newQty = product.quantity + stockChange;
-                        const { error: stockError } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', product.id);
+                        const { error: stockError } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', product.id).eq('user_id', currentUserId);
                         if (stockError) throw stockError;
                     }
                 }
 
-                // 3. Actualizar el estado de la venta en la base de datos
-                const { error: updateError } = await supabase.from('sales').update({ status: newStatus }).eq('id', saleId);
+                const { error: updateError } = await supabase.from('sales').update({ status: newStatus }).eq('id', saleId).eq('user_id', currentUserId);
                 if (updateError) throw updateError;
                 
                 const stockMsg = (stockChange !== 0 && isInventorySale) ? `(Stock ${stockChange > 0 ? 'restaurado' : 'reducido'}).` : '';
@@ -670,17 +676,27 @@
             }
         }
 
-
         window.updateInventoryQuantity = async (id, delta, name) => {
             const product = inventory.find(p => p.id === id);
             if (!product) return;
+
             const newQty = product.quantity + delta;
-            if (newQty < 0) return;
+            if (newQty < 0) {
+                return showModal("Error de Stock", `El stock de '${name}' no puede ser negativo.`, "error");
+            }
+            
             try {
-                const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id);
+                const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
-            } catch (e) { showModal("Error de Stock", e.message, "error"); }
-            finally { await loadInventory(); }
+                
+                showModal("Stock Actualizado", `El stock de '${name}' ha sido modificado en ${delta}. Nuevo stock: ${newQty}`, "success");
+
+            } catch (e) { 
+                showModal("Error de Stock", e.message, "error"); 
+            }
+            finally { 
+                await loadInventory(); 
+            }
         };
 
         window.deleteProduct = (id, name) => {
@@ -688,30 +704,29 @@
             document.getElementById('modal-button').textContent = 'Confirmar Eliminación';
             document.getElementById('modal-button').onclick = async () => {
                 try {
-                    const { error } = await supabase.from('inventory').delete().eq('id', id);
+                    const { error } = await supabase.from('inventory').delete().eq('id', id).eq('user_id', currentUserId);
                     if (error) throw error;
                     showModal("Eliminado", `'${name}' fue eliminado.`, "success");
                 } catch(e) { showModal("Error", e.message, "error"); }
                 finally {
                     await loadInventory();
-                    closeModal(); // Se agrega closeModal para limpiar el estado del botón.
+                    closeModal(); 
                 }
             };
         };
 
-        // deleteSale (Eliminación permanente del historial, SIN afectar el stock)
         window.deleteSale = (id, name) => {
-            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar completamente la venta de '${name}' del historial? **Esta acción NO modifica el stock.** Si deseas devolver stock, primero usa la opción 'Cambiar Estado' a 'Devuelto'.`, "error");
+            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar completamente la venta de '${name}' del historial? **Esta acción NO modifica el stock.**`, "error");
             document.getElementById('modal-button').textContent = 'Confirmar Eliminación';
             document.getElementById('modal-button').onclick = async () => {
                 try {
-                    const { error: deleteError } = await supabase.from('sales').delete().eq('id', id);
+                    const { error: deleteError } = await supabase.from('sales').delete().eq('id', id).eq('user_id', currentUserId);
                     if (deleteError) throw deleteError;
                     showModal("Venta Eliminada", "La venta fue eliminada permanentemente del historial.", "success");
                 } catch(e) { showModal("Error", e.message, "error"); }
                 finally {
                     await loadAllData(false);
-                    closeModal(); // Se agrega closeModal para limpiar el estado del botón.
+                    closeModal(); 
                 }
             };
         };
