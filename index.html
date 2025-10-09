@@ -26,7 +26,6 @@
             @apply bg-amber-700 text-white hover:bg-amber-600 transition-colors shadow-lg shadow-amber-900/50
                    rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold p-0.5;
         }
-        /* Añadido para que el cursor sobre el logo sea un puntero */
         #store-logo-img {
             cursor: pointer;
         }
@@ -39,11 +38,6 @@
     <div id="app" class="flex-grow p-4 md:p-8">
         <header class="mb-6 md:mb-10 luxury-card p-4 rounded-xl shadow-2xl shadow-yellow-900/20">
             
-            <div class="text-xs text-right text-gray-500 mb-2">
-                ID de Sesión: 
-                <span id="session-user-id" class="font-mono text-amber-500 truncate w-32 inline-block">Cargando...</span>
-                <button onclick="promptForUserId()" class="text-amber-600 hover:text-amber-500 ml-2 font-semibold text-sm">Sincronizar ID</button>
-            </div>
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                 <div class="flex items-center mb-4 sm:mb-0">
                     <div id="store-logo-container" title="Haz clic para cambiar el logo" class="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center mr-4">
@@ -86,7 +80,7 @@
         <main>
             <div id="loading-spinner" class="text-center p-8 hidden">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-amber-500 mx-auto"></div>
-                <p class="mt-4 text-amber-500">Conectando a Supabase...</p>
+                <p class="mt-4 text-amber-500">Conectando a Supabase y sincronizando datos...</p>
             </div>
             <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden"></div>
 
@@ -237,11 +231,21 @@
 
 
     <script type="module">
+        // --- CONFIGURACIÓN DE SUPABASE ---
+        // CLAVES PROPORCIONADAS POR EL USUARIO
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
-        let supabase = null, currentUserId = null, inventory = [], salesHistory = [], pollingIntervalId = null;
+        
+        let supabase = null, 
+            inventory = [], 
+            salesHistory = [], 
+            pollingIntervalId = null;
 
-        // --- MANEJO DE MODALES Y VISTAS ---
+        // ID COMPARTIDO: Todos los dispositivos usan este ID para leer/escribir.
+        const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
+        let currentUserId = null; 
+
+        // --- FUNCIONES DE UTILIDAD (MODALES, VISTAS) ---
         window.showModal = (title, body, type = 'success') => {
             const modal = {
                 title: document.getElementById('modal-title'),
@@ -270,7 +274,6 @@
         };
         window.closeModal = () => {
             document.getElementById('modal-container').classList.add('hidden');
-            // Restablecer el botón principal del modal
             document.getElementById('modal-button').textContent = 'Cerrar';
             document.getElementById('modal-button').onclick = closeModal;
         }
@@ -287,7 +290,6 @@
         window.openAddProductModal = () => document.getElementById('add-product-modal-container').classList.remove('hidden');
         window.closeAddProductModal = () => document.getElementById('add-product-modal-container').classList.add('hidden');
 
-        // NUEVAS FUNCIONES DE MODAL DE ESTADO
         window.openStatusModal = (id, currentStatus) => {
             document.getElementById('status-sale-id').value = id;
             const select = document.getElementById('new-sale-status');
@@ -315,51 +317,25 @@
 
         const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
             if (!file) return resolve(null);
-            if (file.size > maxSize) return reject(`Archivo demasiado grande. Límite: ${(maxSize / 1048576).toFixed(0)} MB.`);
+            // Límite de 2MB
+            if (file.size > maxSize) return reject(`Archivo demasiado grande. Límite: ${(maxSize / 1048576).toFixed(0)} MB.`); 
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => reject("Error al leer archivo.");
         });
 
-        // --- LÓGICA DE DATOS (SUPABASE) ---
-        const renderUserId = () => {
-            const userIdSpan = document.getElementById('session-user-id');
-            if (userIdSpan) {
-                userIdSpan.textContent = currentUserId;
-                userIdSpan.title = `Este es tu ID de sesión. Cópialo y pégalo en el otro dispositivo para sincronizar los datos.`;
-            }
-        };
-
-        // Función para cambiar el ID de Sesión manualmente (Solución para Multi-Dispositivo)
-        window.promptForUserId = () => {
-            const newId = prompt("Ingresa el ID de sesión (código de usuario) de tu otro dispositivo:", currentUserId);
-            if (newId && newId.trim() !== currentUserId) {
-                // Si el usuario introduce un nuevo ID, lo guarda y recarga.
-                localStorage.setItem('mrphone_user_id', newId.trim());
-                window.location.reload(); 
-            } else if (newId === currentUserId) {
-                 // Si el usuario simplemente cancela o usa el mismo ID, no hace nada
-                 alert("El ID ingresado es el mismo. No se requiere sincronización.");
-            } else if (newId) {
-                // Si el usuario introduce algo vacío o cancela
-                alert("Sincronización cancelada o ID inválido.");
-            }
-        };
+        // --- INICIALIZACIÓN Y GESTIÓN DEL ID DE TIENDA COMPARTIDO ---
 
         const initializeApp = () => {
             try {
                 supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-                // 1. Obtiene o crea un ID de sesión único (sin login)
-                let userId = localStorage.getItem('mrphone_user_id');
-                if (!userId) {
-                    // Crea un ID único y lo guarda
-                    userId = crypto.randomUUID();
-                    localStorage.setItem('mrphone_user_id', userId);
-                }
-                currentUserId = userId;
-                renderUserId(); // Mostrar el ID en la UI
-                startPolling(true);
+                
+                // Forzamos el uso del ID de tienda pública para sincronización universal
+                currentUserId = PUBLIC_STORE_ID; 
+                localStorage.setItem('mrphone_user_id', currentUserId); // Guardamos la ID para futuras cargas
+
+                startPolling(true); // Iniciar la carga de datos
             } catch (error) {
                 document.getElementById('error-message').textContent = `Error de Conexión: ${error.message}`;
                 document.getElementById('error-message').classList.remove('hidden');
@@ -375,20 +351,23 @@
         };
 
         async function loadAllData(showSpinner = false) {
-            if (!supabase || !currentUserId) return; // Asegurarse de tener ID
+            if (!supabase || !currentUserId) return;
             if (showSpinner) document.getElementById('loading-spinner').classList.remove('hidden');
             try {
-                // Se solicitan los datos filtrados por el currentUserId
                 await Promise.all([loadInventory(), loadSalesHistory(), loadSettings()]); 
-                renderSalesSummary(); // Renderizar resumen de ventas después de cargar el historial
-            } catch (e) { console.error("Error cargando datos:", e); }
+                renderSalesSummary();
+            } catch (e) { 
+                console.error("Error cargando datos:", e);
+                // Si la migración falló por alguna razón, este mensaje ayuda a diagnosticar
+                document.getElementById('error-message').textContent = `Error al cargar datos. Mensaje: ${e.message}`;
+                document.getElementById('error-message').classList.remove('hidden'); 
+            }
             finally {
                 if (showSpinner) document.getElementById('loading-spinner').classList.add('hidden');
                 if (!document.querySelector('.view-content:not(.hidden)')) changeView('inventory');
             }
         }
         const loadInventory = async () => {
-            // Filtrar por el ID de Sesión
             const { data, error } = await supabase.from('inventory').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
             if (error) throw error;
             inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
@@ -396,16 +375,15 @@
         };
         
         const loadSalesHistory = async () => {
-            // Filtrar por el ID de Sesión
             const { data, error } = await supabase.from('sales').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
             if (error) throw error;
             salesHistory = data || [];
             renderSalesHistory();
         };
         const loadSettings = async () => {
-            // Filtrar por el ID de Sesión
             const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', currentUserId).single();
-            if (error && error.code !== 'PGRST116') throw error;
+            // PGRST116 = No Rows, lo cual es normal si no ha cargado logo
+            if (error && error.code !== 'PGRST116') { console.error("Error cargando settings:", error); } 
             if (data?.store_logo_url) renderStoreLogo(data.store_logo_url);
         };
 
@@ -417,7 +395,6 @@
             logoImg.onerror = () => { logoImg.src = placeholder; };
         };
         
-        // FUNCIÓN PARA CALCULAR Y MOSTRAR LOS TOTALES
         const renderSalesSummary = () => {
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
             
@@ -426,10 +403,7 @@
                 return saleDate === today;
             });
 
-            // Total Vendido HOY (Ingreso total de ventas de hoy, independientemente del estado)
             const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
-            
-            // Total Pagado HOY (Ingreso solo de las ventas con status 'Pagado' de hoy)
             const todayPaidTotal = todaySales
                 .filter(sale => (sale.status || 'Pagado') === 'Pagado')
                 .reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
@@ -438,9 +412,8 @@
             document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
         };
 
-        // Función para obtener el badge de estado
         const getStatusBadge = (status) => {
-            const s = status || 'Pagado'; // Fallback por si la columna no existe o es nula
+            const s = status || 'Pagado'; 
             let colorClass = 'bg-gray-600';
             let colorText = 'text-white';
 
@@ -457,9 +430,7 @@
             }
             return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${colorClass} ${colorText}">${s}</span>`;
         };
-
-
-        // Renderiza la lista de inventario en formato de tarjeta (card)
+        
         const renderInventoryList = () => {
             const list = document.getElementById('inventory-list');
             list.innerHTML = '';
@@ -471,7 +442,7 @@
                 const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
                 const placeholder = `https://placehold.co/150x150/d97706/1f2937?text=${initials}&font=inter`;
                 const item = document.createElement('div');
-                // Clase de la tarjeta: Centrada, sombra, hover elegante
+                
                 item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
                 
                 item.innerHTML = `
@@ -531,7 +502,6 @@
                 file: document.getElementById('product-image-file').files[0]
             };
             if (!form.name || form.quantity <= 0 || form.price <= 0) return showModal("Error", "Nombre, cantidad y precio son obligatorios.", "error");
-            if (!currentUserId) return showModal("Error", "No se encontró el ID de usuario. Recarga la página.", "error");
             
             try {
                 const imageData = form.file ? await fileToBase64(form.file, 512000) : null;
@@ -541,12 +511,12 @@
 
                 if (existing) {
                     const newQty = existing.quantity + form.quantity;
-                    response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id);
+                    response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
                     if (response.error) throw response.error; 
                     showModal("Stock Actualizado", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
                 } else {
                     response = await supabase.from('inventory').insert([{ 
-                        user_id: currentUserId, // Usar el ID de sesión
+                        user_id: currentUserId, 
                         name: form.name, 
                         quantity: form.quantity, 
                         price: form.price, 
@@ -560,7 +530,7 @@
                 document.getElementById('add-product-form').reset();
 
             } catch (e) { 
-                const errorBody = e.message || "Error desconocido. Revise la consola y sus políticas RLS en Supabase.";
+                const errorBody = e.message || "Error desconocido.";
                 showModal("Error al Guardar Producto", `No se pudo completar la operación. Mensaje: ${errorBody}`, "error"); 
             }
             finally { 
@@ -574,10 +544,8 @@
             const newName = document.getElementById('edit-product-name').value.trim();
             const newPrice = parseFloat(document.getElementById('edit-product-price').value);
             if (!id || !newName || newPrice <= 0) return showModal("Error", "Nombre y precio válidos son requeridos.", "error");
-            if (!currentUserId) return;
 
             try {
-                // Asegurar que solo se edita el producto del usuario actual
                 const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error; 
                 closeEditModal();
@@ -589,32 +557,29 @@
         async function handleLogoFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-            if (!currentUserId) return;
 
             try {
-                const logoBase64 = await fileToBase64(file, 2097152);
-                // Usar upsert para actualizar o insertar la configuración del usuario
+                const logoBase64 = await fileToBase64(file, 2097152); // Límite de 2MB
+                // Usamos upsert para crear o actualizar la fila de settings con nuestro ID compartido
                 const { error } = await supabase.from('settings').upsert({ user_id: currentUserId, store_logo_url: logoBase64 }, { onConflict: 'user_id' });
                 if (error) throw error;
                 renderStoreLogo(logoBase64);
                 showModal("Logo Actualizado", "El logo de la tienda se guardó con éxito.", "success");
             } catch (e) { showModal("Error de Logo", e.message, "error"); }
-            finally { event.target.value = ''; } // Reset input
+            finally { event.target.value = ''; }
         }
 
-        // FUNCIÓN handleRecordSale (Lógica de venta manual - CON STOCK Y STATUS)
         async function handleRecordSale(event) {
             event.preventDefault();
             const productName = document.getElementById('sale-product-name').value.trim();
             const saleQuantity = parseInt(document.getElementById('sale-quantity').value, 10);
             const recipient = document.getElementById('sale-recipient').value.trim();
             const price = parseFloat(document.getElementById('sale-price').value);
-            const status = document.getElementById('sale-status').value; // Obtener status
+            const status = document.getElementById('sale-status').value;
 
             if (!productName || !recipient || !price || price <= 0 || saleQuantity <= 0) {
-                return showModal("Datos Incompletos", "El nombre del producto, la cantidad vendida, el cliente, el precio y el estado son obligatorios.", "error");
+                return showModal("Datos Incompletos", "Todos los campos son obligatorios.", "error");
             }
-            if (!currentUserId) return;
             
             const product = inventory.find(p => p.name.toLowerCase() === productName.toLowerCase());
 
@@ -630,7 +595,7 @@
             try {
                 // 1. Registrar la venta
                 const { error: saleError } = await supabase.from('sales').insert([{ 
-                    user_id: currentUserId, // Usar el ID de sesión
+                    user_id: currentUserId, 
                     product_name: productName, 
                     product_id: productId, 
                     recipient, 
@@ -657,11 +622,9 @@
             }
         }
 
-        // FUNCIÓN: Actualizar estado de venta (con lógica de stock para devoluciones)
         async function updateSaleStatus(saleId, newStatus) {
             const sale = salesHistory.find(s => s.id === saleId);
             if (!sale) return showModal("Error", "Venta no encontrada.", "error");
-            if (!currentUserId || sale.user_id !== currentUserId) return showModal("Error", "Permiso denegado.", "error");
 
             const oldStatus = sale.status || 'Pagado';
             const isInventorySale = sale.product_id;
@@ -673,26 +636,21 @@
                 const saleQuantity = sale.quantity || 1; 
                 let product = null;
 
-                // 1. Determinar el cambio de stock si es un producto de inventario
                 if (isInventorySale) {
                     product = inventory.find(p => p.id === sale.product_id);
                     if (!product) { console.warn("Producto no encontrado en inventario local."); }
 
-                    // Transición HACIA 'Devuelto' (Restaurar stock)
                     if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') {
                         stockChange = saleQuantity; 
                     } 
-                    // Transición DESDE 'Devuelto' (Reducir stock nuevamente)
                     else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
                         stockChange = -saleQuantity;
                         
-                        // Verificación de stock para evitar stock negativo
                         if (product && (product.quantity + stockChange) < 0) {
                             return showModal("Error de Stock", `No hay suficiente stock para cambiar de Devuelto a ${newStatus}. Stock actual: ${product.quantity}.`, "error");
                         }
                     }
 
-                    // 2. Actualizar inventario si hubo cambio de stock
                     if (stockChange !== 0 && product) {
                         const newQty = product.quantity + stockChange;
                         const { error: stockError } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', product.id).eq('user_id', currentUserId);
@@ -700,7 +658,6 @@
                     }
                 }
 
-                // 3. Actualizar el estado de la venta en la base de datos
                 const { error: updateError } = await supabase.from('sales').update({ status: newStatus }).eq('id', saleId).eq('user_id', currentUserId);
                 if (updateError) throw updateError;
                 
@@ -714,38 +671,30 @@
             }
         }
 
-        // Función para actualizar stock
         window.updateInventoryQuantity = async (id, delta, name) => {
             const product = inventory.find(p => p.id === id);
             if (!product) return;
-            if (!currentUserId) return;
 
             const newQty = product.quantity + delta;
-
-            // Validar para evitar stock negativo
             if (newQty < 0) {
-                return showModal("Error de Stock", `El stock de '${name}' no puede ser negativo. Stock actual: ${product.quantity}.`, "error");
+                return showModal("Error de Stock", `El stock de '${name}' no puede ser negativo.`, "error");
             }
             
             try {
-                // 1. Actualizar la cantidad en la base de datos
                 const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
                 
-                // 2. Notificación de éxito
                 showModal("Stock Actualizado", `El stock de '${name}' ha sido modificado en ${delta}. Nuevo stock: ${newQty}`, "success");
 
             } catch (e) { 
                 showModal("Error de Stock", e.message, "error"); 
             }
             finally { 
-                // 3. Recargar el inventario para actualizar la UI inmediatamente
                 await loadInventory(); 
             }
         };
 
         window.deleteProduct = (id, name) => {
-            if (!currentUserId) return;
             showModal("Confirmar", `¿Seguro que quieres eliminar '${name}'?`, "error");
             document.getElementById('modal-button').textContent = 'Confirmar Eliminación';
             document.getElementById('modal-button').onclick = async () => {
@@ -756,15 +705,13 @@
                 } catch(e) { showModal("Error", e.message, "error"); }
                 finally {
                     await loadInventory();
-                    closeModal(); // Se agrega closeModal para limpiar el estado del botón.
+                    closeModal(); 
                 }
             };
         };
 
-        // deleteSale (Eliminación permanente del historial, SIN afectar el stock)
         window.deleteSale = (id, name) => {
-            if (!currentUserId) return;
-            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar completamente la venta de '${name}' del historial? **Esta acción NO modifica el stock.** Si deseas devolver stock, primero usa la opción 'Cambiar Estado' a 'Devuelto'.`, "error");
+            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar completamente la venta de '${name}' del historial? **Esta acción NO modifica el stock.**`, "error");
             document.getElementById('modal-button').textContent = 'Confirmar Eliminación';
             document.getElementById('modal-button').onclick = async () => {
                 try {
@@ -774,7 +721,7 @@
                 } catch(e) { showModal("Error", e.message, "error"); }
                 finally {
                     await loadAllData(false);
-                    closeModal(); // Se agrega closeModal para limpiar el estado del botón.
+                    closeModal(); 
                 }
             };
         };
