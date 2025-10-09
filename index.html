@@ -74,7 +74,7 @@
 
             <!-- ID de Usuario (Para colaboración y seguridad) -->
             <div class="text-sm text-gray-400 mb-4 text-center">
-                <p>ID de Usuario (UUID): <span id="user-id" class="font-mono text-xs bg-gray-800 p-1 rounded border border-gray-700">Cargando...</span></p>
+                <p>ID de Usuario (UUID Persistente): <span id="user-id" class="font-mono text-xs bg-gray-800 p-1 rounded border border-gray-700">Cargando...</span></p>
             </div>
 
 
@@ -349,7 +349,7 @@
                 // --- FIN FIX ---
                 
                 // Iniciar la carga de datos por sondeo
-                startPolling();
+                startPolling(true); // Inicia la carga inicial con el spinner
                 
             } catch (error) {
                 console.error("Error al inicializar Supabase:", error);
@@ -359,22 +359,31 @@
             }
         }
 
-        /** Inicia el sondeo (polling) para simular tiempo real */
-        function startPolling() {
+        /** * Inicia el sondeo (polling) para simular tiempo real.
+         * @param {boolean} initialLoad - Indica si es la carga inicial (para mostrar el spinner).
+         */
+        function startPolling(initialLoad = false) {
             if (pollingIntervalId) {
                 clearInterval(pollingIntervalId);
             }
-            // Ejecutar la carga inicial inmediatamente
-            loadAllData();
-            // Luego, establecer el intervalo de sondeo (cada 5 segundos)
-            pollingIntervalId = setInterval(loadAllData, 5000); 
+            // Ejecutar la carga inicial inmediatamente (mostrar spinner solo en la primera carga)
+            loadAllData(initialLoad); 
+            
+            // Luego, establecer el intervalo de sondeo (cada 5 segundos, sin spinner)
+            // Se usa una función anónima para pasar el flag 'false'
+            pollingIntervalId = setInterval(() => loadAllData(false), 5000); 
         }
 
-        /** Carga todos los datos necesarios (inventario, ventas, settings) */
-        async function loadAllData() {
+        /** * Carga todos los datos necesarios (inventario, ventas, settings).
+         * @param {boolean} showSpinner - Si debe mostrar u ocultar el spinner de carga.
+         */
+        async function loadAllData(showSpinner = false) {
             if (!supabase || !currentUserId) return;
 
-            document.getElementById('loading-spinner').classList.remove('hidden');
+            // FIX: Solo mostrar el spinner si se solicita (primera carga)
+            if (showSpinner) {
+                document.getElementById('loading-spinner').classList.remove('hidden');
+            }
 
             try {
                 await Promise.all([
@@ -386,9 +395,18 @@
                 // Los errores específicos ya se manejan en cada función de carga.
                 console.error("Error general en la carga de datos:", error);
             } finally {
-                document.getElementById('loading-spinner').classList.add('hidden');
-                // Asegurar que la vista inicial se cargue después de los datos
-                if (document.querySelector('.view-content.hidden') !== null) {
+                // FIX: Solo ocultar el spinner si se mostró
+                if (showSpinner) {
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                }
+                
+                // Asegurar que la vista inicial se cargue después de los datos, 
+                // solo si aún no se ha seleccionado ninguna vista.
+                const isAnyViewActive = document.querySelector('#view-inventory').classList.contains('hidden') &&
+                                       document.querySelector('#view-sales').classList.contains('hidden') &&
+                                       document.querySelector('#view-history').classList.contains('hidden');
+
+                if (isAnyViewActive) {
                     changeView('inventory'); 
                 }
             }
@@ -729,7 +747,7 @@
                 const errorMessage = `Ocurrió un error de Transacción. Detalle: ${e.message || e}`;
                 showModal("Error de Transacción", errorMessage, "error");
             } finally {
-                loadAllData(); // Refrescar todos los datos inmediatamente
+                loadAllData(false); // Refrescar todos los datos inmediatamente sin mostrar el spinner
             }
         }
 
@@ -746,8 +764,7 @@
             document.getElementById('record-sale-form').addEventListener('submit', handleRecordSale);
             document.getElementById('upload-logo-form').addEventListener('submit', handleLogoUpload);
 
-            // Establecer la vista inicial
-            changeView('inventory');
+            // Nota: changeView('inventory') se llama dentro de loadAllData() al finalizar la carga inicial.
         };
 
     </script>
