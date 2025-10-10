@@ -246,7 +246,7 @@
                 </div>
                 <div class="flex space-x-4 pt-4">
                     <button type="button" onclick="closeAddProductModal()" class="flex-1 py-2 rounded-lg text-amber-400 font-semibold border border-amber-400 hover:bg-gray-700 transition-colors">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-amber-600 text-gray-900 p-3 rounded-lg font-bold hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/50">Guardar Producto</button>
+                    <button type="submit" id="add-product-submit-button" class="flex-1 bg-amber-600 text-gray-900 p-3 rounded-lg font-bold hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/50">Guardar Producto</button>
                 </div>
             </form>
         </div>
@@ -315,7 +315,10 @@
         };
         window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
         window.openAddProductModal = () => document.getElementById('add-product-modal-container').classList.remove('hidden');
-        window.closeAddProductModal = () => document.getElementById('add-product-modal-container').classList.add('hidden');
+        window.closeAddProductModal = () => {
+            document.getElementById('add-product-modal-container').classList.add('hidden');
+            document.getElementById('add-product-form').reset(); // Reset form on close
+        }
 
         window.handleStatusChange = async (selectElement, saleId) => {
             const newStatus = selectElement.value;
@@ -434,13 +437,17 @@
                 item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
                 item.innerHTML = `
                     <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" class="w-32 h-32 object-cover rounded-lg mb-3 border-2 border-amber-500/50 flex-shrink-0">
-                    <h3 class="text-xl font-bold text-white text-center truncate w-full px-2">${p.name}</h3>
-                    ${p.category ? `<p class="text-xs text-amber-400/80 mb-2 bg-gray-800 px-2 py-0.5 rounded-full">${p.category}</p>` : ''}
+                    <h3 class="text-xl font-bold text-white text-center truncate w-full px-2 mb-2">${p.name}</h3>
                     <p class="text-sm text-gray-400 mb-4">Precio: <span class="text-green-400 font-bold">$${parseFloat(p.price).toFixed(2)}</span></p>
-                    <div class="flex items-center space-x-4 mb-4">
-                        <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : 'text-amber-400'}">Stock: ${p.quantity}</p>
-                        <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}')" title="Restar Stock" class="quantity-btn ${p.quantity<=0 ? 'opacity-50' : ''}" ${p.quantity<=0 ? 'disabled' : ''}>&minus;</button>
-                        <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}')" title="Añadir Stock" class="quantity-btn">&#x2b;</button>
+                    <div class="flex items-center space-x-3 mb-4 w-full px-2">
+                        <div class="flex-grow text-center pr-3 border-r border-gray-600">
+                            <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : 'text-amber-400'}">Stock: ${p.quantity}</p>
+                            ${p.category ? `<p class="text-xs text-amber-400/80 -mt-1 truncate" title="${p.category}">${p.category}</p>` : '<p class="text-xs text-gray-500 -mt-1">Sin categoría</p>'}
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}')" title="Restar Stock" class="quantity-btn ${p.quantity<=0 ? 'opacity-50' : ''}" ${p.quantity<=0 ? 'disabled' : ''}>&minus;</button>
+                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}')" title="Añadir Stock" class="quantity-btn">&#x2b;</button>
+                        </div>
                     </div>
                     <div class="flex space-x-4 w-full justify-center text-sm">
                         <button onclick="openEditModal('${p.id}')" class="text-amber-500 hover:text-amber-300 font-medium p-1">Editar</button>
@@ -499,6 +506,7 @@
         // --- MANEJADORES DE ACCIONES ---
         async function handleAddProduct(event) {
             event.preventDefault();
+            const submitButton = document.getElementById('add-product-submit-button');
             const form = {
                 name: document.getElementById('product-name').value.trim(),
                 category: document.getElementById('product-category').value,
@@ -510,6 +518,9 @@
                 return showModal("Error", "Nombre, categoría, cantidad y precio son obligatorios.", "error");
             }
             
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<div class="flex items-center justify-center"><div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-3"></div><span>Guardando...</span></div>`;
+
             try {
                 const imageData = form.file ? await fileToBase64(form.file, 512000) : null;
                 const existing = inventory.find(p => p.name.toLowerCase() === form.name.toLowerCase());
@@ -532,11 +543,14 @@
                     showModal("Producto Agregado", `El producto '${form.name}' fue añadido con éxito.`, "success");
                 }
                 closeAddProductModal();
-                document.getElementById('add-product-form').reset();
             } catch (e) { 
                 const errorBody = e.message || "Error desconocido.";
                 showModal("Error al Guardar Producto", `No se pudo completar la operación. Mensaje: ${errorBody}`, "error"); 
-            } finally { await loadInventory(); }
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Guardar Producto';
+                await loadInventory(); 
+            }
         }
 
         async function handleEditProduct(event) {
