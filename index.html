@@ -214,22 +214,6 @@
         </div>
     </div>
 
-    <div id="status-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-        <div class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-all border-l-4 border-amber-500">
-            <h3 class="text-xl font-bold mb-4 text-amber-400">Cambiar Estado de Venta</h3>
-            <p class="text-gray-300 mb-4">Selecciona el nuevo estado para la venta:</p>
-            <input type="hidden" id="status-sale-id">
-            <select id="new-sale-status" class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border mb-4">
-                <option value="Pagado">Pagado</option>
-                <option value="Pendiente">Pendiente</option>
-                <option value="Devuelto">Devuelto</option>
-            </select>
-            <button onclick="confirmStatusChange()" class="w-full bg-amber-600 text-gray-900 p-3 rounded-lg font-bold hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/50">Confirmar</button>
-            <button onclick="closeStatusModal()" class="w-full mt-2 py-2 rounded-lg text-amber-400 font-semibold border border-amber-400 hover:bg-gray-700 transition-colors">Cancelar</button>
-        </div>
-    </div>
-
-
     <script type="module">
         // --- CONFIGURACIÓN DE SUPABASE ---
         // CLAVES PROPORCIONADAS POR EL USUARIO
@@ -290,19 +274,9 @@
         window.openAddProductModal = () => document.getElementById('add-product-modal-container').classList.remove('hidden');
         window.closeAddProductModal = () => document.getElementById('add-product-modal-container').classList.add('hidden');
 
-        window.openStatusModal = (id, currentStatus) => {
-            document.getElementById('status-sale-id').value = id;
-            const select = document.getElementById('new-sale-status');
-            select.value = currentStatus;
-            document.getElementById('status-modal-container').classList.remove('hidden');
-        };
-        window.closeStatusModal = () => document.getElementById('status-modal-container').classList.add('hidden');
-
-        window.confirmStatusChange = async () => {
-            const saleId = document.getElementById('status-sale-id').value;
-            const newStatus = document.getElementById('new-sale-status').value;
+        window.handleStatusChange = async (selectElement, saleId) => {
+            const newStatus = selectElement.value;
             await updateSaleStatus(saleId, newStatus);
-            closeStatusModal();
         };
 
         window.changeView = (viewId) => {
@@ -411,25 +385,6 @@
             document.getElementById('today-sold-total').textContent = `$${todaySoldTotal.toFixed(2)}`;
             document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
         };
-
-        const getStatusBadge = (status) => {
-            const s = status || 'Pagado'; 
-            let colorClass = 'bg-gray-600';
-            let colorText = 'text-white';
-
-            switch (s) {
-                case 'Pagado':
-                    colorClass = 'bg-green-700';
-                    break;
-                case 'Pendiente':
-                    colorClass = 'bg-yellow-700';
-                    break;
-                case 'Devuelto':
-                    colorClass = 'bg-red-700';
-                    break;
-            }
-            return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${colorClass} ${colorText}">${s}</span>`;
-        };
         
         const renderInventoryList = () => {
             const list = document.getElementById('inventory-list');
@@ -471,7 +426,7 @@
             tbody.innerHTML = '';
             salesHistory.forEach(sale => {
                 const date = new Date(sale.timestamp).toLocaleDateString();
-                const statusBadge = getStatusBadge(sale.status);
+                const currentStatus = sale.status || 'Pagado';
                 const row = tbody.insertRow();
                 row.className = 'hover:bg-gray-600 transition-colors';
                 
@@ -480,9 +435,14 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${sale.recipient}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold">$${parseFloat(sale.price).toFixed(2)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <select onchange="handleStatusChange(this, '${sale.id}')" class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2">
+                            <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                            <option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                            <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                        </select>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onclick="openStatusModal('${sale.id}', '${sale.status || 'Pagado'}')" class="text-amber-500 hover:text-amber-400 mr-3">Estado</button>
                         <button onclick="deleteSale('${sale.id}', '${sale.product_name}')" class="text-red-500 hover:text-red-400">Eliminar</button>
                     </td>
                 `;
