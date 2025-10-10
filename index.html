@@ -90,7 +90,7 @@
 
             <section id="view-inventory" class="view-content">
                 <div class="p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
-                    <h2 class="text-2xl font-bold text-amber-400 mb-6">Stock Actual</h2>
+                    <h2 class="text-2xl font-bold text-amber-400 mb-6">Inventario Actual</h2>
                     
                     <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <p class="text-gray-500 text-center col-span-full">Cargando inventario...</p>
@@ -460,7 +460,7 @@
                         <h3 class="text-xl font-bold text-white text-center truncate w-full px-2">${p.name}</h3>
                         <p class="text-sm text-gray-400 my-2">Precio: <span class="text-green-400 font-bold">$${parseFloat(p.price).toFixed(2)}</span></p>
                         <div class="flex items-center space-x-4 mb-4">
-                            <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : 'text-amber-400'}">Stock: ${p.quantity}</p>
+                            <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : 'text-amber-400'}">Disponibles: ${p.quantity}</p>
                             <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}')" title="Restar Stock" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
                             <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}')" title="Añadir Stock" class="quantity-btn">&#x2b;</button>
                         </div>
@@ -545,7 +545,7 @@
                     const newQty = existing.quantity + form.quantity;
                     response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
                     if (response.error) throw response.error; 
-                    showModal("Stock Actualizado", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
+                    showModal("Cantidad Actualizada", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
                 } else {
                     response = await supabase.from('inventory').insert([{ 
                         user_id: currentUserId, 
@@ -621,7 +621,7 @@
             let productId = null;
             if (product) {
                 if (product.quantity < saleQuantity) {
-                    return showModal("Error de Stock", `Solo hay ${product.quantity} unidades de '${product.name}' en stock. No puedes vender ${saleQuantity}.`, "error");
+                    return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error");
                 }
                 productId = product.id;
             }
@@ -657,7 +657,7 @@
                     } else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
                         stockChange = -saleQuantity;
                         if (product && (product.quantity + stockChange) < 0) {
-                            return showModal("Error de Stock", `No hay suficiente stock para cambiar de Devuelto a ${newStatus}. Stock actual: ${product.quantity}.`, "error");
+                            return showModal("Error de Cantidad", `No hay suficientes disponibles para cambiar de Devuelto a ${newStatus}. Disponibles: ${product.quantity}.`, "error");
                         }
                     }
                     if (stockChange !== 0 && product) {
@@ -668,7 +668,7 @@
                 }
                 const { error: updateError } = await supabase.from('sales').update({ status: newStatus }).eq('id', saleId).eq('user_id', currentUserId);
                 if (updateError) throw updateError;
-                const stockMsg = (stockChange !== 0 && isInventorySale) ? `(Stock ${stockChange > 0 ? 'restaurado' : 'reducido'}).` : '';
+                const stockMsg = (stockChange !== 0 && isInventorySale) ? `(Disponibles ${stockChange > 0 ? 'restaurados' : 'reducidos'})` : '';
                 showModal("Éxito", `Estado de '${sale.product_name}' actualizado a ${newStatus}. ${stockMsg}`, "success");
             } catch (e) {
                 showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error");
@@ -682,14 +682,14 @@
             if (!product) return;
             const newQty = product.quantity + delta;
             if (newQty < 0) {
-                return showModal("Error de Stock", `El stock de '${name}' no puede ser negativo.`, "error");
+                return showModal("Error de Cantidad", `La cantidad de '${name}' no puede ser negativa.`, "error");
             }
             try {
                 const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
                 // Mensaje de éxito eliminado según solicitud
             } catch (e) { 
-                showModal("Error de Stock", e.message, "error"); 
+                showModal("Error de Cantidad", e.message, "error"); 
             }
             finally { 
                 await loadInventory(); 
@@ -723,7 +723,7 @@
             confirmButton.onclick = async () => {
                 try {
                     const { error: deleteError } = await supabase.from('sales').delete().eq('id', id).eq('user_id', currentUserId);
-                    if (deleteError) throw deleteError;
+                    if (deleteError) throw error;
                     showModal("Venta Eliminada", "La venta fue eliminada del historial.", "success");
                 } catch(e) { 
                     showModal("Error", e.message, "error"); 
