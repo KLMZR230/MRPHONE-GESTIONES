@@ -182,6 +182,21 @@
                     <input type="text" id="edit-product-name" required class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
                 </div>
                 <div>
+                    <label for="edit-product-category" class="block text-sm font-medium text-gray-300">Categoría</label>
+                    <select id="edit-product-category" required class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                        <option value="Flex Main">Flex Main</option>
+                        <option value="Pantallas">Pantallas</option>
+                        <option value="Jacks De Carga">Jacks De Carga</option>
+                        <option value="Plaquitas de Carga">Plaquitas de Carga</option>
+                        <option value="Protectores Fisicos">Protectores Fisicos</option>
+                        <option value="Vidrio Templado">Vidrio Templado</option>
+                        <option value="Audifonos">Audifonos</option>
+                        <option value="Lentes de Camara">Lentes de Camara</option>
+                        <option value="Cargadores">Cargadores</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div>
                     <label for="edit-product-price" class="block text-sm font-medium text-gray-300">Precio ($)</label>
                     <input type="number" id="edit-product-price" required min="0.01" step="0.01" class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
                 </div>
@@ -200,6 +215,22 @@
                 <div>
                     <label for="product-name" class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
                     <input type="text" id="product-name" required class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                </div>
+                <div>
+                    <label for="product-category" class="block text-sm font-medium text-gray-300">Categoría</label>
+                    <select id="product-category" required class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                        <option value="" disabled selected>Selecciona una categoría</option>
+                        <option value="Flex Main">Flex Main</option>
+                        <option value="Pantallas">Pantallas</option>
+                        <option value="Jacks De Carga">Jacks De Carga</option>
+                        <option value="Plaquitas de Carga">Plaquitas de Carga</option>
+                        <option value="Protectores Fisicos">Protectores Fisicos</option>
+                        <option value="Vidrio Templado">Vidrio Templado</option>
+                        <option value="Audifonos">Audifonos</option>
+                        <option value="Lentes de Camara">Lentes de Camara</option>
+                        <option value="Cargadores">Cargadores</option>
+                        <option value="Otro">Otro</option>
+                    </select>
                 </div>
                 <div>
                     <label for="product-price-initial" class="block text-sm font-medium text-gray-300">Precio Inicial ($)</label>
@@ -279,6 +310,7 @@
             document.getElementById('edit-product-id').value = product.id;
             document.getElementById('edit-product-name').value = product.name;
             document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
+            document.getElementById('edit-product-category').value = product.category || 'Otro';
             document.getElementById('edit-modal-container').classList.remove('hidden');
         };
         window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
@@ -403,6 +435,7 @@
                 item.innerHTML = `
                     <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" class="w-32 h-32 object-cover rounded-lg mb-3 border-2 border-amber-500/50 flex-shrink-0">
                     <h3 class="text-xl font-bold text-white text-center truncate w-full px-2">${p.name}</h3>
+                    ${p.category ? `<p class="text-xs text-amber-400/80 mb-2 bg-gray-800 px-2 py-0.5 rounded-full">${p.category}</p>` : ''}
                     <p class="text-sm text-gray-400 mb-4">Precio: <span class="text-green-400 font-bold">$${parseFloat(p.price).toFixed(2)}</span></p>
                     <div class="flex items-center space-x-4 mb-4">
                         <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : 'text-amber-400'}">Stock: ${p.quantity}</p>
@@ -468,11 +501,14 @@
             event.preventDefault();
             const form = {
                 name: document.getElementById('product-name').value.trim(),
+                category: document.getElementById('product-category').value,
                 quantity: parseInt(document.getElementById('product-quantity').value, 10),
                 price: parseFloat(document.getElementById('product-price-initial').value),
                 file: document.getElementById('product-image-file').files[0]
             };
-            if (!form.name || form.quantity <= 0 || form.price <= 0) return showModal("Error", "Nombre, cantidad y precio son obligatorios.", "error");
+            if (!form.name || !form.category || form.quantity <= 0 || form.price <= 0) {
+                return showModal("Error", "Nombre, categoría, cantidad y precio son obligatorios.", "error");
+            }
             
             try {
                 const imageData = form.file ? await fileToBase64(form.file, 512000) : null;
@@ -484,7 +520,14 @@
                     if (response.error) throw response.error; 
                     showModal("Stock Actualizado", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
                 } else {
-                    response = await supabase.from('inventory').insert([{ user_id: currentUserId, name: form.name, quantity: form.quantity, price: form.price, image_url: imageData }]);
+                    response = await supabase.from('inventory').insert([{ 
+                        user_id: currentUserId, 
+                        name: form.name, 
+                        category: form.category,
+                        quantity: form.quantity, 
+                        price: form.price, 
+                        image_url: imageData 
+                    }]);
                     if (response.error) throw response.error;
                     showModal("Producto Agregado", `El producto '${form.name}' fue añadido con éxito.`, "success");
                 }
@@ -500,11 +543,19 @@
             event.preventDefault();
             const id = document.getElementById('edit-product-id').value;
             const newName = document.getElementById('edit-product-name').value.trim();
+            const newCategory = document.getElementById('edit-product-category').value;
             const newPrice = parseFloat(document.getElementById('edit-product-price').value);
-            if (!id || !newName || newPrice <= 0) return showModal("Error", "Nombre y precio válidos son requeridos.", "error");
+
+            if (!id || !newName || !newCategory || newPrice <= 0) {
+                return showModal("Error", "Nombre, categoría y precio válidos son requeridos.", "error");
+            }
 
             try {
-                const { error } = await supabase.from('inventory').update({ name: newName, price: newPrice }).eq('id', id).eq('user_id', currentUserId);
+                const { error } = await supabase.from('inventory').update({ 
+                    name: newName, 
+                    category: newCategory,
+                    price: newPrice 
+                }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error; 
                 closeEditModal();
                 showModal("Éxito", "Producto actualizado correctamente.", "success");
