@@ -252,6 +252,11 @@
         </div>
     </div>
 
+    <div id="image-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 hidden" onclick="closeImageModal()">
+        <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white text-4xl font-bold hover:text-gray-300 transition-colors">&times;</button>
+        <img id="image-modal-content" src="" alt="Producto Ampliado" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
     <script type="module">
         // --- CONFIGURACIÓN DE SUPABASE ---
         // CLAVES PROPORCIONADAS POR EL USUARIO
@@ -283,7 +288,6 @@
             modal.button.className = 'w-full py-2 rounded-lg font-semibold transition-colors';
             modal.content.className = 'bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-all border-l-4';
 
-            // Reset state for default info modals
             modal.cancelButton.classList.add('hidden');
             modal.button.onclick = closeModal;
 
@@ -301,8 +305,19 @@
         };
         window.closeModal = () => {
             document.getElementById('modal-container').classList.add('hidden');
-            document.getElementById('modal-cancel-button').classList.add('hidden'); // Ensure cancel is hidden on close
+            document.getElementById('modal-cancel-button').classList.add('hidden');
         }
+
+        window.openImageModal = (imageUrl) => {
+            if (!imageUrl) return;
+            document.getElementById('image-modal-content').src = imageUrl;
+            document.getElementById('image-modal-container').classList.remove('hidden');
+        };
+
+        window.closeImageModal = () => {
+            document.getElementById('image-modal-container').classList.add('hidden');
+            document.getElementById('image-modal-content').src = '';
+        };
 
         window.openEditModal = (id) => {
             const product = inventory.find(p => p.id === id);
@@ -317,7 +332,7 @@
         window.openAddProductModal = () => document.getElementById('add-product-modal-container').classList.remove('hidden');
         window.closeAddProductModal = () => {
             document.getElementById('add-product-modal-container').classList.add('hidden');
-            document.getElementById('add-product-form').reset(); // Reset form on close
+            document.getElementById('add-product-form').reset();
         }
 
         window.handleStatusChange = async (selectElement, saleId) => {
@@ -456,7 +471,9 @@
                     item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
                     
                     item.innerHTML = `
-                        <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" class="w-32 h-32 object-cover rounded-lg mb-3 border-2 border-amber-500/50 flex-shrink-0">
+                        <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" 
+                             class="w-32 h-32 object-cover rounded-lg mb-3 border-2 border-amber-500/50 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                             onclick="openImageModal('${p.image_url || placeholder}')">
                         <h3 class="text-xl font-bold text-white text-center truncate w-full px-2">${p.name}</h3>
                         <p class="text-sm text-gray-400 my-2">Precio: <span class="text-green-400 font-bold">$${parseFloat(p.price).toFixed(2)}</span></p>
                         <div class="flex items-center space-x-4 mb-4">
@@ -687,7 +704,6 @@
             try {
                 const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
-                // Mensaje de éxito eliminado según solicitud
             } catch (e) { 
                 showModal("Error de Cantidad", e.message, "error"); 
             }
