@@ -161,7 +161,10 @@
         <div id="modal-content" class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-all border-l-4 border-amber-500">
             <h3 id="modal-title" class="text-xl font-bold mb-3 text-amber-400"></h3>
             <p id="modal-body" class="text-gray-300 mb-4"></p>
-            <button onclick="closeModal()" class="w-full py-2 rounded-lg text-gray-900 font-semibold transition-colors bg-amber-500 hover:bg-amber-400" id="modal-button"></button>
+            <div class="flex flex-col space-y-2 pt-4">
+                <button id="modal-button" class="w-full py-2 rounded-lg font-semibold transition-colors"></button>
+                <button id="modal-cancel-button" onclick="closeModal()" class="w-full py-2 rounded-lg font-semibold border border-gray-500 text-gray-300 hover:bg-gray-700 transition-colors hidden">Cancelar</button>
+            </div>
         </div>
     </div>
 
@@ -235,6 +238,7 @@
                 title: document.getElementById('modal-title'),
                 body: document.getElementById('modal-body'),
                 button: document.getElementById('modal-button'),
+                cancelButton: document.getElementById('modal-cancel-button'),
                 content: document.getElementById('modal-content'),
                 container: document.getElementById('modal-container')
             };
@@ -243,6 +247,10 @@
             modal.container.classList.remove('hidden');
             modal.button.className = 'w-full py-2 rounded-lg font-semibold transition-colors';
             modal.content.className = 'bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-all border-l-4';
+
+            // Reset state for default info modals
+            modal.cancelButton.classList.add('hidden');
+            modal.button.onclick = closeModal;
 
             if (type === 'error') {
                 modal.title.className = 'text-xl font-bold mb-3 text-red-400';
@@ -258,8 +266,7 @@
         };
         window.closeModal = () => {
             document.getElementById('modal-container').classList.add('hidden');
-            document.getElementById('modal-button').textContent = 'Cerrar';
-            document.getElementById('modal-button').onclick = closeModal;
+            document.getElementById('modal-cancel-button').classList.add('hidden'); // Ensure cancel is hidden on close
         }
 
         window.openEditModal = (id) => {
@@ -291,7 +298,6 @@
 
         const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
             if (!file) return resolve(null);
-            // Límite de 2MB
             if (file.size > maxSize) return reject(`Archivo demasiado grande. Límite: ${(maxSize / 1048576).toFixed(0)} MB.`); 
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -304,12 +310,9 @@
         const initializeApp = () => {
             try {
                 supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-                
-                // Forzamos el uso del ID de tienda pública para sincronización universal
                 currentUserId = PUBLIC_STORE_ID; 
-                localStorage.setItem('mrphone_user_id', currentUserId); // Guardamos la ID para futuras cargas
-
-                startPolling(true); // Iniciar la carga de datos
+                localStorage.setItem('mrphone_user_id', currentUserId);
+                startPolling(true);
             } catch (error) {
                 document.getElementById('error-message').textContent = `Error de Conexión: ${error.message}`;
                 document.getElementById('error-message').classList.remove('hidden');
@@ -320,7 +323,6 @@
         const startPolling = (initialLoad = false) => {
             clearInterval(pollingIntervalId);
             loadAllData(initialLoad);
-            // Sincronización continua cada 5 segundos
             pollingIntervalId = setInterval(() => loadAllData(false), 5000); 
         };
 
@@ -332,7 +334,6 @@
                 renderSalesSummary();
             } catch (e) { 
                 console.error("Error cargando datos:", e);
-                // Si la migración falló por alguna razón, este mensaje ayuda a diagnosticar
                 document.getElementById('error-message').textContent = `Error al cargar datos. Mensaje: ${e.message}`;
                 document.getElementById('error-message').classList.remove('hidden'); 
             }
@@ -356,7 +357,6 @@
         };
         const loadSettings = async () => {
             const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', currentUserId).single();
-            // PGRST116 = No Rows, lo cual es normal si no ha cargado logo
             if (error && error.code !== 'PGRST116') { console.error("Error cargando settings:", error); } 
             if (data?.store_logo_url) renderStoreLogo(data.store_logo_url);
         };
@@ -371,12 +371,10 @@
         
         const renderSalesSummary = () => {
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
-            
             const todaySales = salesHistory.filter(sale => {
                 const saleDate = new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
                 return saleDate === today;
             });
-
             const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
             const todayPaidTotal = todaySales
                 .filter(sale => (sale.status || 'Pagado') === 'Pagado')
@@ -397,22 +395,16 @@
                 const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
                 const placeholder = `https://placehold.co/150x150/d97706/1f2937?text=${initials}&font=inter`;
                 const item = document.createElement('div');
-                
                 item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
-                
                 item.innerHTML = `
-                    <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" 
-                         class="w-32 h-32 object-cover rounded-lg mb-3 border-2 border-amber-500/50 flex-shrink-0">
-                    
+                    <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" class="w-32 h-32 object-cover rounded-lg mb-3 border-2 border-amber-500/50 flex-shrink-0">
                     <h3 class="text-xl font-bold text-white text-center truncate w-full px-2">${p.name}</h3>
                     <p class="text-sm text-gray-400 mb-4">Precio: <span class="text-green-400 font-bold">$${parseFloat(p.price).toFixed(2)}</span></p>
-
                     <div class="flex items-center space-x-4 mb-4">
                         <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : 'text-amber-400'}">Stock: ${p.quantity}</p>
                         <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}')" title="Restar Stock" class="quantity-btn ${p.quantity<=0 ? 'opacity-50' : ''}" ${p.quantity<=0 ? 'disabled' : ''}>&minus;</button>
                         <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}')" title="Añadir Stock" class="quantity-btn">&#x2b;</button>
                     </div>
-
                     <div class="flex space-x-4 w-full justify-center text-sm">
                         <button onclick="openEditModal('${p.id}')" class="text-amber-500 hover:text-amber-300 font-medium p-1">Editar</button>
                         <button onclick="deleteProduct('${p.id}', '${p.name}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
@@ -429,7 +421,6 @@
                 const currentStatus = sale.status || 'Pagado';
                 const row = tbody.insertRow();
                 row.className = 'hover:bg-gray-600 transition-colors';
-                
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${sale.product_name} (x${sale.quantity || 1})</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${sale.recipient}</td>
@@ -466,36 +457,23 @@
             try {
                 const imageData = form.file ? await fileToBase64(form.file, 512000) : null;
                 const existing = inventory.find(p => p.name.toLowerCase() === form.name.toLowerCase());
-
                 let response; 
-
                 if (existing) {
                     const newQty = existing.quantity + form.quantity;
                     response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
                     if (response.error) throw response.error; 
                     showModal("Stock Actualizado", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
                 } else {
-                    response = await supabase.from('inventory').insert([{ 
-                        user_id: currentUserId, 
-                        name: form.name, 
-                        quantity: form.quantity, 
-                        price: form.price, 
-                        image_url: imageData
-                    }]);
+                    response = await supabase.from('inventory').insert([{ user_id: currentUserId, name: form.name, quantity: form.quantity, price: form.price, image_url: imageData }]);
                     if (response.error) throw response.error;
                     showModal("Producto Agregado", `El producto '${form.name}' fue añadido con éxito.`, "success");
                 }
-                
                 closeAddProductModal();
                 document.getElementById('add-product-form').reset();
-
             } catch (e) { 
                 const errorBody = e.message || "Error desconocido.";
                 showModal("Error al Guardar Producto", `No se pudo completar la operación. Mensaje: ${errorBody}`, "error"); 
-            }
-            finally { 
-                await loadInventory(); 
-            }
+            } finally { await loadInventory(); }
         }
 
         async function handleEditProduct(event) {
@@ -517,10 +495,8 @@
         async function handleLogoFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             try {
-                const logoBase64 = await fileToBase64(file, 2097152); // Límite de 2MB
-                // Usamos upsert para crear o actualizar la fila de settings con nuestro ID compartido
+                const logoBase64 = await fileToBase64(file, 2097152);
                 const { error } = await supabase.from('settings').upsert({ user_id: currentUserId, store_logo_url: logoBase64 }, { onConflict: 'user_id' });
                 if (error) throw error;
                 renderStoreLogo(logoBase64);
@@ -540,90 +516,59 @@
             if (!productName || !recipient || !price || price <= 0 || saleQuantity <= 0) {
                 return showModal("Datos Incompletos", "Todos los campos son obligatorios.", "error");
             }
-            
             const product = inventory.find(p => p.name.toLowerCase() === productName.toLowerCase());
-
             let productId = null;
-            
             if (product) {
                 if (product.quantity < saleQuantity) {
                     return showModal("Error de Stock", `Solo hay ${product.quantity} unidades de '${product.name}' en stock. No puedes vender ${saleQuantity}.`, "error");
                 }
                 productId = product.id;
             }
-
             try {
-                // 1. Registrar la venta
-                const { error: saleError } = await supabase.from('sales').insert([{ 
-                    user_id: currentUserId, 
-                    product_name: productName, 
-                    product_id: productId, 
-                    recipient, 
-                    price, 
-                    status: status, 
-                    quantity: saleQuantity, 
-                    timestamp: new Date() 
-                }]);
+                const { error: saleError } = await supabase.from('sales').insert([{ user_id: currentUserId, product_name: productName, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
                 if (saleError) throw saleError;
-                
-                // 2. Descontar el stock (solo si el producto fue encontrado)
                 if (productId) {
                     const { error: stockError } = await supabase.from('inventory').update({ quantity: product.quantity - saleQuantity }).eq('id', productId).eq('user_id', currentUserId);
                     if (stockError) throw stockError;
                 }
-                
                 showModal("Venta Exitosa", `Venta de '${productName}' x${saleQuantity} registrada.`, "success");
                 document.getElementById('record-sale-form').reset();
             } catch (e) { 
                 showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error"); 
-            }
-            finally { 
-                await loadAllData(false); 
-            }
+            } finally { await loadAllData(false); }
         }
 
         async function updateSaleStatus(saleId, newStatus) {
             const sale = salesHistory.find(s => s.id === saleId);
             if (!sale) return showModal("Error", "Venta no encontrada.", "error");
-
             const oldStatus = sale.status || 'Pagado';
             const isInventorySale = sale.product_id;
-
             if (oldStatus === newStatus) return; 
 
             try {
                 let stockChange = 0;
                 const saleQuantity = sale.quantity || 1; 
                 let product = null;
-
                 if (isInventorySale) {
                     product = inventory.find(p => p.id === sale.product_id);
-                    if (!product) { console.warn("Producto no encontrado en inventario local."); }
-
                     if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') {
                         stockChange = saleQuantity; 
-                    } 
-                    else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
+                    } else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
                         stockChange = -saleQuantity;
-                        
                         if (product && (product.quantity + stockChange) < 0) {
                             return showModal("Error de Stock", `No hay suficiente stock para cambiar de Devuelto a ${newStatus}. Stock actual: ${product.quantity}.`, "error");
                         }
                     }
-
                     if (stockChange !== 0 && product) {
                         const newQty = product.quantity + stockChange;
                         const { error: stockError } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', product.id).eq('user_id', currentUserId);
                         if (stockError) throw stockError;
                     }
                 }
-
                 const { error: updateError } = await supabase.from('sales').update({ status: newStatus }).eq('id', saleId).eq('user_id', currentUserId);
                 if (updateError) throw updateError;
-                
                 const stockMsg = (stockChange !== 0 && isInventorySale) ? `(Stock ${stockChange > 0 ? 'restaurado' : 'reducido'}).` : '';
                 showModal("Éxito", `Estado de '${sale.product_name}' actualizado a ${newStatus}. ${stockMsg}`, "success");
-
             } catch (e) {
                 showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error");
             } finally {
@@ -643,9 +588,7 @@
             try {
                 const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
-                
-                showModal("Stock Actualizado", `El stock de '${name}' ha sido modificado en ${delta}. Nuevo stock: ${newQty}`, "success");
-
+                // Mensaje de éxito eliminado según solicitud
             } catch (e) { 
                 showModal("Error de Stock", e.message, "error"); 
             }
@@ -654,32 +597,42 @@
             }
         };
 
-        window.deleteProduct = async (id, name) => {
-            try {
-                const { error } = await supabase.from('inventory').delete().eq('id', id).eq('user_id', currentUserId);
-                if (error) throw error;
-            } catch(e) { 
-                showModal("Error", `No se pudo eliminar el producto. ${e.message}`, "error"); 
-            }
-            finally {
-                await loadInventory();
-            }
+        window.deleteProduct = (id, name) => {
+            showModal("Confirmar Eliminación", `¿Estás seguro de que quieres eliminar '${name}'? Esta acción no se puede deshacer.`, "error");
+            const confirmButton = document.getElementById('modal-button');
+            const cancelButton = document.getElementById('modal-cancel-button');
+            confirmButton.textContent = 'Sí, Eliminar';
+            confirmButton.onclick = async () => {
+                try {
+                    const { error } = await supabase.from('inventory').delete().eq('id', id).eq('user_id', currentUserId);
+                    if (error) throw error;
+                    showModal("Eliminado", `'${name}' fue eliminado con éxito.`, "success");
+                } catch(e) { 
+                    showModal("Error", `No se pudo eliminar el producto. ${e.message}`, "error"); 
+                } finally {
+                    await loadInventory();
+                }
+            };
+            cancelButton.classList.remove('hidden');
         };
 
         window.deleteSale = (id, name) => {
-            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar completamente la venta de '${name}' del historial? **Esta acción NO modifica el stock.**`, "error");
-            document.getElementById('modal-button').textContent = 'Confirmar Eliminación';
-            document.getElementById('modal-button').onclick = async () => {
+            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar la venta de '${name}' del historial? Esta acción es permanente.`, "error");
+            const confirmButton = document.getElementById('modal-button');
+            const cancelButton = document.getElementById('modal-cancel-button');
+            confirmButton.textContent = 'Confirmar Eliminación';
+            confirmButton.onclick = async () => {
                 try {
                     const { error: deleteError } = await supabase.from('sales').delete().eq('id', id).eq('user_id', currentUserId);
                     if (deleteError) throw deleteError;
-                    showModal("Venta Eliminada", "La venta fue eliminada permanentemente del historial.", "success");
-                } catch(e) { showModal("Error", e.message, "error"); }
-                finally {
+                    showModal("Venta Eliminada", "La venta fue eliminada del historial.", "success");
+                } catch(e) { 
+                    showModal("Error", e.message, "error"); 
+                } finally {
                     await loadAllData(false);
-                    closeModal(); 
                 }
             };
+            cancelButton.classList.remove('hidden');
         };
 
         // --- INICIALIZACIÓN ---
