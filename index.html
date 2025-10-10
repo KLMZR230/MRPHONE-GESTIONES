@@ -29,6 +29,10 @@
         #store-logo-img {
             cursor: pointer;
         }
+        /* Estilo para las opciones del menú desplegable de estado */
+        select.status-select option {
+            background-color: #1f2937;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -421,16 +425,32 @@
                 const currentStatus = sale.status || 'Pagado';
                 const row = tbody.insertRow();
                 row.className = 'hover:bg-gray-600 transition-colors';
+
+                let statusColorClass = '';
+                switch (currentStatus) {
+                    case 'Pagado':
+                        statusColorClass = 'bg-green-900/50 border-green-700 text-green-300';
+                        break;
+                    case 'Pendiente':
+                        statusColorClass = 'bg-yellow-900/50 border-yellow-700 text-yellow-300';
+                        break;
+                    case 'Devuelto':
+                        statusColorClass = 'bg-red-900/50 border-red-700 text-red-300';
+                        break;
+                    default:
+                        statusColorClass = 'bg-gray-800 border-gray-600 text-white';
+                }
+
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${sale.product_name} (x${sale.quantity || 1})</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${sale.recipient}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold">$${parseFloat(sale.price).toFixed(2)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <select onchange="handleStatusChange(this, '${sale.id}')" class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2">
+                        <select onchange="handleStatusChange(this, '${sale.id}')" class="status-select text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2 font-semibold transition-colors ${statusColorClass}">
                             <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option>
                             <option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                            <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto</option>
+                            <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto / Cancelado</option>
                         </select>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -579,12 +599,10 @@
         window.updateInventoryQuantity = async (id, delta, name) => {
             const product = inventory.find(p => p.id === id);
             if (!product) return;
-
             const newQty = product.quantity + delta;
             if (newQty < 0) {
                 return showModal("Error de Stock", `El stock de '${name}' no puede ser negativo.`, "error");
             }
-            
             try {
                 const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
