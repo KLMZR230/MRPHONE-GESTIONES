@@ -259,7 +259,6 @@
 
     <script type="module">
         // --- CONFIGURACIÓN DE SUPABASE ---
-        // CLAVES PROPORCIONADAS POR EL USUARIO
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
@@ -268,7 +267,6 @@
             salesHistory = [], 
             pollingIntervalId = null;
 
-        // ID COMPARTIDO: Todos los dispositivos usan este ID para leer/escribir.
         const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
         let currentUserId = null; 
 
@@ -383,6 +381,7 @@
         async function loadAllData(showSpinner = false) {
             if (!supabase || !currentUserId) return;
             if (showSpinner) document.getElementById('loading-spinner').classList.remove('hidden');
+            
             try {
                 await Promise.all([loadInventory(), loadSalesHistory(), loadSettings()]); 
                 renderSalesSummary();
@@ -392,9 +391,9 @@
                 document.getElementById('error-message').classList.remove('hidden'); 
             }
             finally {
-                if (showSpinner) document.getElementById('loading-spinner').classList.add('hidden');
-                if (!document.querySelector('.view-content:not(.hidden)')) {
-                    changeView('inventory');
+                if (showSpinner) {
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                    changeView('inventory'); // Always show inventory after initial load.
                 }
             }
         }
@@ -441,11 +440,12 @@
         };
         
         const renderInventoryList = () => {
-            const list = document.getElementById('inventory-list');
-            list.innerHTML = '';
+            const listContainer = document.getElementById('inventory-list');
+            listContainer.innerHTML = '';
+            listContainer.className = 'space-y-8';
 
             if (inventory.length === 0) {
-                list.innerHTML = '<p class="text-gray-400 text-center col-span-full">No hay productos en el inventario.</p>';
+                listContainer.innerHTML = '<p class="text-gray-400 text-center col-span-full">No hay productos en el inventario.</p>';
                 return;
             }
 
@@ -462,11 +462,11 @@
 
             sortedCategories.forEach(category => {
                 const header = document.createElement('h2');
-                header.className = 'text-xl font-semibold text-amber-300 pt-6 pb-2 mb-4 col-span-full border-b-2 border-amber-800/50';
+                header.className = 'text-xl font-semibold text-amber-300 pt-6 pb-2 border-b-2 border-amber-800/50';
                 header.textContent = category;
                 
                 const categoryGrid = document.createElement('div');
-                categoryGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 col-span-full';
+                categoryGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
 
                 groupedInventory[category].forEach(p => {
                     const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
@@ -482,8 +482,8 @@
                         <p class="text-sm text-gray-400 my-2">Precio: <span class="text-green-400 font-bold">$${parseFloat(p.price).toFixed(2)}</span></p>
                         <div class="flex items-center space-x-4 mb-4">
                             <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : 'text-amber-400'}">Disponibles: ${p.quantity}</p>
-                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}')" title="Restar Stock" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
-                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}')" title="Añadir Stock" class="quantity-btn">&#x2b;</button>
+                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
+                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
                         </div>
                         <div class="flex space-x-4 w-full justify-center text-sm">
                             <button onclick="openEditModal('${p.id}')" class="text-amber-500 hover:text-amber-300 font-medium p-1">Editar</button>
@@ -492,8 +492,8 @@
                     categoryGrid.appendChild(item);
                 });
                 
-                list.appendChild(header);
-                list.appendChild(categoryGrid);
+                listContainer.appendChild(header);
+                listContainer.appendChild(categoryGrid);
             });
         };
 
