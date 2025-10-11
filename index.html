@@ -28,20 +28,6 @@
         }
         #store-logo-img {
             cursor: pointer;
-            /* Cambios para que el logo se vea completo */
-            object-fit: contain; /* Asegura que la imagen se escala para encajar sin recortar */
-            border-radius: 0; /* Elimina el borde redondeado si el logo es rectangular */
-            border: none; /* Elimina el borde si no lo deseas para un logo rectangular */
-        }
-        #store-logo-container {
-            /* Ajuste del tamaño del contenedor para el logo */
-            width: 150px; /* Aumenta el ancho */
-            height: 75px; /* Aumenta la altura para logos más horizontales */
-            display: flex; /* Asegura que la imagen se centre */
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            flex-shrink: 0; /* Evita que el contenedor se encoja */
         }
         select.status-select option {
             background-color: #1f2937;
@@ -56,7 +42,7 @@
         <header class="mb-6 md:mb-10 luxury-card p-4 rounded-xl shadow-2xl shadow-yellow-900/20">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                 <div class="flex items-center mb-4 sm:mb-0">
-                    <div id="store-logo-container" title="Haz clic para cambiar el logo" >
+                    <div id="store-logo-container" title="Haz clic para cambiar el logo" class="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center mr-4">
                         <img id="store-logo-img" src="https://placehold.co/96x96/d97706/1f2937?text=MR" alt="Store Logo"
                              class="w-full h-full object-cover rounded-full border-2 border-amber-500 transition-transform hover:scale-110">
                     </div>
@@ -102,7 +88,7 @@
                     <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
                         <h2 class="text-2xl font-bold text-amber-400 mb-4 md:mb-0">Inventario Actual</h2>
                         <div class="relative w-full md:w-72">
-                            <input type="text" id="search-inventory" onkeyup="filterInventory()" placeholder="Buscar producto..."
+                            <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
                                    class="w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 pl-10 border">
                             <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -401,6 +387,10 @@
             pollingIntervalId = setInterval(() => loadAllData(false), 5000); 
         };
 
+        const stopPolling = () => {
+            clearInterval(pollingIntervalId);
+        };
+
         async function loadAllData(showSpinner = false) {
             const loadingSpinner = document.getElementById('loading-spinner');
             if (showSpinner) loadingSpinner.classList.remove('hidden');
@@ -415,7 +405,7 @@
             }
             finally {
                 loadingSpinner.classList.add('hidden');
-                if (!document.querySelector('.view-content:not(.hidden)')) {
+                if (showSpinner) {
                     changeView('inventory');
                 }
             }
@@ -424,7 +414,11 @@
             const { data, error } = await supabase.from('inventory').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
             if (error) throw error;
             inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
-            renderInventoryList();
+            
+            const searchTerm = document.getElementById('search-inventory').value;
+            if (!searchTerm) {
+                renderInventoryList();
+            }
         };
         
         const loadSalesHistory = async () => {
@@ -442,7 +436,7 @@
         // --- RENDERIZACIÓN ---
         const renderStoreLogo = (url) => {
             const logoImg = document.getElementById('store-logo-img');
-            const placeholder = "https://placehold.co/150x75/d97706/1f2937?text=MRPHONE"; // Ajustado para logo rectangular
+            const placeholder = "https://placehold.co/150x75/d97706/1f2937?text=MRPHONE";
             logoImg.src = url || placeholder;
             logoImg.onerror = () => { logoImg.src = placeholder; };
         };
@@ -463,8 +457,13 @@
         };
 
         window.filterInventory = () => {
-            const searchTerm = document.getElementById('search-inventory').value.toLowerCase();
-            renderInventoryList(searchTerm);
+            const searchTerm = document.getElementById('search-inventory').value;
+            if (searchTerm.trim() !== '') {
+                stopPolling();
+            } else {
+                startPolling(false);
+            }
+            renderInventoryList(searchTerm.toLowerCase());
         }
         
         const renderInventoryList = (searchTerm = '') => {
@@ -650,7 +649,7 @@
             const file = event.target.files[0];
             if (!file) return;
             try {
-                const logoBase64 = await fileToBase64(file, 2097152); // Max 2MB para el logo
+                const logoBase64 = await fileToBase64(file, 2097152);
                 const { error } = await supabase.from('settings').upsert({ user_id: currentUserId, store_logo_url: logoBase64 }, { onConflict: 'user_id' });
                 if (error) throw error;
                 renderStoreLogo(logoBase64);
