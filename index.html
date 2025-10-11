@@ -28,20 +28,18 @@
         }
         #store-logo-img {
             cursor: pointer;
-            /* Cambios para que el logo se vea completo */
-            object-fit: contain; /* Asegura que la imagen se escala para encajar sin recortar */
-            border-radius: 0; /* Elimina el borde redondeado si el logo es rectangular, según tu imagen */
-            border: none; /* Elimina el borde si no lo deseas para un logo rectangular */
+            object-fit: contain; 
+            border-radius: 0; 
+            border: none; 
         }
         #store-logo-container {
-            /* Ajuste del tamaño del contenedor para el logo */
-            width: 150px; /* Aumenta el ancho */
-            height: 75px; /* Aumenta la altura para logos más horizontales */
-            display: flex; /* Asegura que la imagen se centre */
+            width: 150px; 
+            height: 75px; 
+            display: flex; 
             align-items: center;
             justify-content: center;
             margin-right: 1rem;
-            flex-shrink: 0; /* Evita que el contenedor se encoja */
+            flex-shrink: 0; 
         }
         select.status-select option {
             background-color: #1f2937;
@@ -58,7 +56,7 @@
                 <div class="flex items-center mb-4 sm:mb-0">
                     <div id="store-logo-container" title="Haz clic para cambiar el logo" >
                         <img id="store-logo-img" src="https://placehold.co/96x96/d97706/1f2937?text=MR" alt="Store Logo"
-                             class="w-full h-full object-cover rounded-full border-2 border-amber-500 transition-transform hover:scale-110">
+                             class="w-full h-full object-cover transition-transform hover:scale-110">
                     </div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-amber-500">
                         MRPHONE PRODUCTOS Y VENTAS
@@ -430,9 +428,9 @@
             inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
             
             const searchTerm = document.getElementById('search-inventory').value;
-            if (!searchTerm) { // Solo renderiza si no hay búsqueda activa
+            if (!searchTerm) {
                 renderInventoryList();
-            } else { // Si hay búsqueda activa, renderiza filtrado.
+            } else {
                 renderInventoryList(searchTerm.toLowerCase());
             }
         };
@@ -487,7 +485,12 @@
             listContainer.innerHTML = '';
             listContainer.className = 'space-y-8';
 
-            const filteredInventory = inventory.filter(p => p.name.toLowerCase().includes(searchTerm));
+            const searchWords = searchTerm.toLowerCase().split(' ').filter(word => word.length > 0);
+
+            const filteredInventory = searchTerm.trim() === '' ? inventory : inventory.filter(p => {
+                const searchableText = `${p.name.toLowerCase()} ${p.category ? p.category.toLowerCase() : ''}`;
+                return searchWords.every(word => searchableText.includes(word));
+            });
 
             if (filteredInventory.length === 0) {
                 listContainer.innerHTML = `<p class="text-gray-400 text-center col-span-full">No se encontraron productos ${searchTerm ? `que coincidan con "${searchTerm}"` : ''}.</p>`;
