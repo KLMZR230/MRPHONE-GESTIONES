@@ -28,17 +28,15 @@
         }
         #store-logo-img {
             cursor: pointer;
-            object-fit: contain; 
-            border-radius: 0; 
-            border: none; 
+            object-fit: contain; /* Asegura que la imagen se escala para encajar sin recortar */
         }
         #store-logo-container {
-            width: 150px; 
-            height: 75px; 
+            width: 240px; /* Ancho aumentado para un look más panorámico */
+            height: 80px;  /* Altura ajustada */
             display: flex; 
             align-items: center;
             justify-content: center;
-            margin-right: 1rem;
+            margin-right: 1.5rem;
             flex-shrink: 0; 
         }
         select.status-select option {
@@ -54,9 +52,9 @@
         <header class="mb-6 md:mb-10 luxury-card p-4 rounded-xl shadow-2xl shadow-yellow-900/20">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                 <div class="flex items-center mb-4 sm:mb-0">
-                    <div id="store-logo-container" title="Haz clic para cambiar el logo" >
-                        <img id="store-logo-img" src="https://placehold.co/96x96/d97706/1f2937?text=MR" alt="Store Logo"
-                             class="w-full h-full object-cover transition-transform hover:scale-110">
+                    <div id="store-logo-container" title="Haz clic para cambiar el logo">
+                        <img id="store-logo-img" src="https://placehold.co/240x80/d97706/1f2937?text=MRPHONE" alt="Store Logo"
+                             class="w-full h-full transition-transform hover:scale-105">
                     </div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-amber-500">
                         MRPHONE PRODUCTOS Y VENTAS
@@ -462,7 +460,7 @@
         // --- RENDERIZACIÓN ---
         const renderStoreLogo = (url) => {
             const logoImg = document.getElementById('store-logo-img');
-            const placeholder = "https://placehold.co/150x75/d97706/1f2937?text=MRPHONE";
+            const placeholder = "https://placehold.co/240x80/d97706/1f2937?text=MRPHONE";
             logoImg.src = url || placeholder;
             logoImg.onerror = () => { logoImg.src = placeholder; };
         };
