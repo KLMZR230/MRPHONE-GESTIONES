@@ -82,7 +82,7 @@
         </header>
 
         <main>
-            <div id="loading-spinner" class="text-center p-8 hidden">
+            <div id="loading-spinner" class="text-center p-8">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-amber-500 mx-auto"></div>
                 <p class="mt-4 text-amber-500">Conectando a Supabase y sincronizando datos...</p>
             </div>
@@ -92,7 +92,7 @@
                 <div class="p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
                     <h2 class="text-2xl font-bold text-amber-400 mb-6">Inventario Actual</h2>
                     
-                    <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div id="inventory-list" class="space-y-8">
                         <p class="text-gray-500 text-center col-span-full">Cargando inventario...</p>
                     </div>
                 </div>
@@ -261,7 +261,7 @@
         // --- CONFIGURACIÓN DE SUPABASE ---
         // CLAVES PROPORCIONADAS POR EL USUARIO
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ8MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
         let supabase = null, 
             inventory = [], 
@@ -464,7 +464,9 @@
                 const header = document.createElement('h2');
                 header.className = 'text-xl font-semibold text-amber-300 pt-6 pb-2 mb-4 col-span-full border-b-2 border-amber-800/50';
                 header.textContent = category;
-                list.appendChild(header);
+                
+                const categoryGrid = document.createElement('div');
+                categoryGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 col-span-full';
 
                 groupedInventory[category].forEach(p => {
                     const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
@@ -487,8 +489,11 @@
                             <button onclick="openEditModal('${p.id}')" class="text-amber-500 hover:text-amber-300 font-medium p-1">Editar</button>
                             <button onclick="deleteProduct('${p.id}', '${p.name}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
                         </div>`;
-                    list.appendChild(item);
+                    categoryGrid.appendChild(item);
                 });
+                
+                list.appendChild(header);
+                list.appendChild(categoryGrid);
             });
         };
 
