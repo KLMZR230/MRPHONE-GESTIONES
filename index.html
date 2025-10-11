@@ -118,9 +118,18 @@
                     <h2 class="text-2xl font-bold text-amber-400 mb-6">Registrar Venta</h2>
                     <form id="record-sale-form" class="space-y-4">
                         <div>
-                            <label for="sale-product-name" class="block text-sm font-medium text-gray-300">Nombre del Producto</label>
-                            <input type="text" id="sale-product-name" required placeholder="Ej: iPhone 15 Pro Max o Reparación de Pantalla"
+                            <label for="sale-category" class="block text-sm font-medium text-gray-300">Categoría</label>
+                            <select id="sale-category" required 
                                 class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border">
+                                <option value="" disabled selected>Primero selecciona una categoría</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="sale-product-id" class="block text-sm font-medium text-gray-300">Producto</label>
+                            <select id="sale-product-id" required disabled
+                                class="mt-1 block w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
+                                <option value="" disabled selected>Selecciona un producto</option>
+                            </select>
                         </div>
                         <div>
                             <label for="sale-quantity" class="block text-sm font-medium text-gray-300">Cantidad Vendida</label>
@@ -367,6 +376,9 @@
             });
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
             document.getElementById(`nav-${viewId}`).classList.add('text-amber-500', 'border-amber-500');
+            if (viewId === 'sales') {
+                populateSaleCategoryDropdown();
+            }
         };
 
         const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
@@ -588,6 +600,51 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">No hay ventas registradas.</td></tr>';
             }
         };
+
+        const populateSaleCategoryDropdown = () => {
+            const categorySelect = document.getElementById('sale-category');
+            const productSelect = document.getElementById('sale-product-id');
+            
+            productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
+            productSelect.disabled = true;
+
+            const categories = [...new Set(inventory.map(p => p.category || 'Sin Categoría'))].sort();
+
+            categorySelect.innerHTML = '<option value="" disabled selected>Primero selecciona una categoría</option>';
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        };
+
+        const populateSaleProductDropdown = (category) => {
+            const productSelect = document.getElementById('sale-product-id');
+            const priceInput = document.getElementById('sale-price');
+            productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
+            priceInput.value = '0.00';
+
+            if (!category) {
+                productSelect.disabled = true;
+                return;
+            }
+
+            const productsInCategory = inventory.filter(p => (p.category || 'Sin Categoría') === category);
+
+            if (productsInCategory.length > 0) {
+                productsInCategory.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = `${product.name} (${product.quantity} disponibles)`;
+                    productSelect.appendChild(option);
+                });
+                productSelect.disabled = false;
+            } else {
+                productSelect.disabled = true;
+            }
+        };
         
         // --- MANEJADORES DE ACCIONES ---
         async function handleAddProduct(event) {
@@ -679,22 +736,26 @@
 
         async function handleRecordSale(event) {
             event.preventDefault();
-            const productName = document.getElementById('sale-product-name').value.trim();
+            const productId = document.getElementById('sale-product-id').value;
             const saleQuantity = parseInt(document.getElementById('sale-quantity').value, 10);
             const recipient = document.getElementById('sale-recipient').value.trim();
             const price = parseFloat(document.getElementById('sale-price').value);
             const status = document.getElementById('sale-status').value;
 
-            if (!productName || !recipient || !price || price <= 0 || saleQuantity <= 0) {
-                return showModal("Datos Incompletos", "Todos los campos son obligatorios.", "error");
+            if (!productId || !recipient || !price || price <= 0 || saleQuantity <= 0) {
+                return showModal("Datos Incompletos", "Categoría, producto, destinatario y precio son obligatorios.", "error");
             }
-            const product = inventory.find(p => p.name.toLowerCase() === productName.toLowerCase());
-            let productId = null;
-            if (product) {
-                if (product.quantity < saleQuantity) {
-                    return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error");
-                }
-                productId = product.id;
+            
+            const product = inventory.find(p => p.id === productId);
+
+            if (!product) {
+                return showModal("Error de Producto", "El producto seleccionado no es válido.", "error");
+            }
+
+            const productName = product.name;
+            
+            if (product.quantity < saleQuantity) {
+                return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error");
             }
             try {
                 const { error: saleError } = await supabase.from('sales').insert([{ user_id: currentUserId, product_name: productName, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
@@ -705,6 +766,7 @@
                 }
                 showModal("Venta Exitosa", `Venta de '${productName}' x${saleQuantity} registrada.`, "success");
                 document.getElementById('record-sale-form').reset();
+                populateSaleCategoryDropdown();
             } catch (e) { 
                 showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error"); 
             } finally { await loadAllData(false); }
@@ -812,6 +874,19 @@
             document.getElementById('record-sale-form').addEventListener('submit', handleRecordSale);
             document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click());
             document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect);
+            
+            document.getElementById('sale-category').addEventListener('change', (event) => {
+                populateSaleProductDropdown(event.target.value);
+            });
+
+            document.getElementById('sale-product-id').addEventListener('change', (event) => {
+                const productId = event.target.value;
+                const selectedProduct = inventory.find(p => p.id === productId);
+                const priceInput = document.getElementById('sale-price');
+                if (selectedProduct) {
+                    priceInput.value = parseFloat(selectedProduct.price).toFixed(2);
+                }
+            });
         };
     </script>
 </body>
