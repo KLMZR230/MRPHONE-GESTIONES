@@ -70,8 +70,7 @@
              box-shadow: 0 10px 15px -3px var(--header-shadow), 0 4px 6px -2px var(--header-shadow);
         }
         .quantity-btn {
-            @apply bg-amber-700 text-white hover:bg-amber-600 transition-colors shadow-lg shadow-amber-900/50
-                   rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold p-0.5;
+            @apply rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold p-0.5 transition-colors;
             background-color: var(--button-primary-bg);
             color: var(--button-primary-text);
         }
@@ -407,7 +406,7 @@
         };
 
         window.applyTheme = (theme) => {
-            document.body.classList.remove(...Object.values(themes));
+            document.body.className = 'min-h-screen flex flex-col'; // Reset classes
             if (themes[theme] && theme !== 'luxury-gold') {
                 document.body.classList.add(themes[theme]);
             }
@@ -435,7 +434,7 @@
             const modalButton = document.getElementById('modal-button');
             modalButton.className = 'w-full py-2 rounded-lg font-semibold transition-colors';
             if (type === 'error') {
-                modal.title.style.color = '#f87171'; // Un rojo más visible en temas oscuros
+                modal.title.style.color = '#f87171';
                 modalButton.style.backgroundColor = '#b91c1c';
                 modalButton.style.color = 'white';
                 modalButton.textContent = 'Entendido';
