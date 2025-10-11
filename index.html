@@ -28,6 +28,20 @@
         }
         #store-logo-img {
             cursor: pointer;
+            /* Cambios para que el logo se vea completo */
+            object-fit: contain; /* Asegura que la imagen se escala para encajar sin recortar */
+            border-radius: 0; /* Elimina el borde redondeado si el logo es rectangular, según tu imagen */
+            border: none; /* Elimina el borde si no lo deseas para un logo rectangular */
+        }
+        #store-logo-container {
+            /* Ajuste del tamaño del contenedor para el logo */
+            width: 150px; /* Aumenta el ancho */
+            height: 75px; /* Aumenta la altura para logos más horizontales */
+            display: flex; /* Asegura que la imagen se centre */
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0; /* Evita que el contenedor se encoja */
         }
         select.status-select option {
             background-color: #1f2937;
@@ -42,7 +56,7 @@
         <header class="mb-6 md:mb-10 luxury-card p-4 rounded-xl shadow-2xl shadow-yellow-900/20">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                 <div class="flex items-center mb-4 sm:mb-0">
-                    <div id="store-logo-container" title="Haz clic para cambiar el logo" class="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center mr-4">
+                    <div id="store-logo-container" title="Haz clic para cambiar el logo" >
                         <img id="store-logo-img" src="https://placehold.co/96x96/d97706/1f2937?text=MR" alt="Store Logo"
                              class="w-full h-full object-cover rounded-full border-2 border-amber-500 transition-transform hover:scale-110">
                     </div>
@@ -416,8 +430,10 @@
             inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
             
             const searchTerm = document.getElementById('search-inventory').value;
-            if (!searchTerm) {
+            if (!searchTerm) { // Solo renderiza si no hay búsqueda activa
                 renderInventoryList();
+            } else { // Si hay búsqueda activa, renderiza filtrado.
+                renderInventoryList(searchTerm.toLowerCase());
             }
         };
         
