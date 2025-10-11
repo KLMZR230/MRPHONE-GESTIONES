@@ -569,8 +569,9 @@
 
             try {
                 const imageData = form.file ? await fileToBase64(form.file, 512000) : null;
-                const existing = inventory.find(p => p.name.toLowerCase() === form.name.toLowerCase());
+                const existing = inventory.find(p => p.name.toLowerCase() === form.name.toLowerCase() && p.category === form.category);
                 let response; 
+                
                 if (existing) {
                     const newQty = existing.quantity + form.quantity;
                     response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
