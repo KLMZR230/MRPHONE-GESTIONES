@@ -88,7 +88,7 @@
             </div>
             <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden"></div>
 
-            <section id="view-inventory" class="view-content">
+            <section id="view-inventory" class="view-content hidden">
                 <div class="p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
                     <h2 class="text-2xl font-bold text-amber-400 mb-6">Inventario Actual</h2>
                     
@@ -261,7 +261,7 @@
         // --- CONFIGURACIÓN DE SUPABASE ---
         // CLAVES PROPORCIONADAS POR EL USUARIO
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ8MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
         let supabase = null, 
             inventory = [], 
@@ -393,7 +393,9 @@
             }
             finally {
                 if (showSpinner) document.getElementById('loading-spinner').classList.add('hidden');
-                if (!document.querySelector('.view-content:not(.hidden)')) changeView('inventory');
+                if (!document.querySelector('.view-content:not(.hidden)')) {
+                    changeView('inventory');
+                }
             }
         }
         const loadInventory = async () => {
