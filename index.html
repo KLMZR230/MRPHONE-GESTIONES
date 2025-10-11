@@ -29,7 +29,6 @@
         #store-logo-img {
             cursor: pointer;
         }
-        /* Estilo para las opciones del menú desplegable de estado */
         select.status-select option {
             background-color: #1f2937;
         }
@@ -41,7 +40,6 @@
 
     <div id="app" class="flex-grow p-4 md:p-8">
         <header class="mb-6 md:mb-10 luxury-card p-4 rounded-xl shadow-2xl shadow-yellow-900/20">
-            
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                 <div class="flex items-center mb-4 sm:mb-0">
                     <div id="store-logo-container" title="Haz clic para cambiar el logo" class="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center mr-4">
@@ -52,19 +50,16 @@
                         MRPHONE PRODUCTOS Y VENTAS
                     </h1>
                 </div>
-
                 <div class="flex flex-col items-start sm:items-end space-y-2">
                     <div id="daily-sales-summary" class="flex flex-col space-y-1 text-sm md:text-base font-semibold luxury-card p-2 rounded-lg border-amber-800/50">
                         <p>Vendido HOY: <span id="today-sold-total" class="text-amber-400">$0.00</span></p>
                         <p>Pagado HOY: <span id="today-paid-total" class="text-green-400">$0.00</span></p>
                     </div>
-                    
                     <button onclick="openAddProductModal()" class="w-full sm:w-auto bg-amber-600 text-gray-900 px-4 py-2 rounded-lg font-bold hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/50 whitespace-nowrap">
                         Añadir Producto
                     </button>
                 </div>
-                </div>
-
+            </div>
             <nav class="flex justify-around space-x-2 border-b border-gray-700">
                 <button onclick="changeView('inventory')" id="nav-inventory"
                     class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent hover:border-amber-500 text-gray-400 hover:text-amber-400 focus:outline-none">
@@ -90,8 +85,16 @@
 
             <section id="view-inventory" class="view-content hidden">
                 <div class="p-6 luxury-card rounded-xl shadow-xl shadow-gray-900">
-                    <h2 class="text-2xl font-bold text-amber-400 mb-6">Inventario Actual</h2>
-                    
+                    <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
+                        <h2 class="text-2xl font-bold text-amber-400 mb-4 md:mb-0">Inventario Actual</h2>
+                        <div class="relative w-full md:w-72">
+                            <input type="text" id="search-inventory" onkeyup="filterInventory()" placeholder="Buscar producto..."
+                                   class="w-full rounded-lg border-gray-600 bg-gray-900 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 p-3 pl-10 border">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
                     <div id="inventory-list" class="space-y-8">
                         <p class="text-gray-500 text-center col-span-full">Cargando inventario...</p>
                     </div>
@@ -385,8 +388,8 @@
         };
 
         async function loadAllData(showSpinner = false) {
-            if (!supabase || !currentUserId) return;
-            if (showSpinner) document.getElementById('loading-spinner').classList.remove('hidden');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (showSpinner) loadingSpinner.classList.remove('hidden');
             
             try {
                 await Promise.all([loadInventory(), loadSalesHistory(), loadSettings()]); 
@@ -397,9 +400,9 @@
                 document.getElementById('error-message').classList.remove('hidden'); 
             }
             finally {
-                if (showSpinner) {
-                    document.getElementById('loading-spinner').classList.add('hidden');
-                    changeView('inventory'); // Always show inventory after initial load.
+                loadingSpinner.classList.add('hidden');
+                if (!document.querySelector('.view-content:not(.hidden)')) {
+                    changeView('inventory');
                 }
             }
         }
@@ -444,22 +447,27 @@
             document.getElementById('today-sold-total').textContent = `$${todaySoldTotal.toFixed(2)}`;
             document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
         };
+
+        window.filterInventory = () => {
+            const searchTerm = document.getElementById('search-inventory').value.toLowerCase();
+            renderInventoryList(searchTerm);
+        }
         
-        const renderInventoryList = () => {
+        const renderInventoryList = (searchTerm = '') => {
             const listContainer = document.getElementById('inventory-list');
             listContainer.innerHTML = '';
             listContainer.className = 'space-y-8';
 
-            if (inventory.length === 0) {
-                listContainer.innerHTML = '<p class="text-gray-400 text-center col-span-full">No hay productos en el inventario.</p>';
+            const filteredInventory = inventory.filter(p => p.name.toLowerCase().includes(searchTerm));
+
+            if (filteredInventory.length === 0) {
+                listContainer.innerHTML = `<p class="text-gray-400 text-center col-span-full">No se encontraron productos ${searchTerm ? `que coincidan con "${searchTerm}"` : ''}.</p>`;
                 return;
             }
 
-            const groupedInventory = inventory.reduce((acc, product) => {
+            const groupedInventory = filteredInventory.reduce((acc, product) => {
                 const category = product.category || 'Sin Categoría';
-                if (!acc[category]) {
-                    acc[category] = [];
-                }
+                if (!acc[category]) acc[category] = [];
                 acc[category].push(product);
                 return acc;
             }, {});
