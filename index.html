@@ -123,9 +123,6 @@
                             <option value="fuego-infernal">Fuego Infernal</option>
                             <option value="hacker-matrix">Hacker Matrix</option>
                         </select>
-                        <button onclick="openAddProductModal()" class="w-full sm:w-auto px-4 py-2 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);">
-                            Añadir Producto
-                        </button>
                     </div>
                 </div>
             </div>
@@ -163,13 +160,18 @@
             <section id="view-inventory" class="view-content hidden">
                 <div class="p-6 luxury-card rounded-xl shadow-xl">
                     <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
-                        <h2 class="text-2xl font-bold mb-4 md:mb-0" style="color: var(--text-accent);">Inventario Actual</h2>
-                        <div class="relative w-full md:w-72">
-                            <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
-                                   class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
-                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                        <h2 class="text-2xl font-bold mb-4 md:mb-0" style="color: var(--text-accent);">Inventario Principal</h2>
+                        <div class="flex items-center space-x-2">
+                             <div class="relative w-full md:w-72">
+                                <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
+                                       class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                             <button onclick="openAddProductModal('local1')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);">
+                                Añadir
+                            </button>
                         </div>
                     </div>
                     <div id="inventory-list" class="space-y-8">
@@ -286,17 +288,22 @@
 
             <section id="view-local2" class="view-content hidden">
                 <nav class="flex justify-center space-x-4 border-b mb-6" style="border-color: var(--border-color);">
-                    <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="py-2 px-4 text-sm font-medium text-center border-b-2" style="color: var(--text-accent); border-color: var(--text-accent);">
-                        Inventario Local 2
+                    <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="py-2 px-4 text-sm font-medium text-center border-b-2">
+                        Inventario
                     </button>
-                    <button onclick="changeSubView('local2-sales')" id="nav-local2-sales" class="py-2 px-4 text-sm font-medium text-center text-gray-400 border-b-2 border-transparent">
-                        Ventas Local 2
+                    <button onclick="changeSubView('local2-sales')" id="nav-local2-sales" class="py-2 px-4 text-sm font-medium text-center border-b-2 border-transparent">
+                        Registrar Venta
                     </button>
                 </nav>
 
                 <div id="subview-local2-inventory" class="subview-content">
                      <div class="p-6 luxury-card rounded-xl shadow-xl">
-                        <h2 class="text-2xl font-bold mb-6" style="color: var(--text-accent);">Inventario Local 2</h2>
+                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
+                            <h2 class="text-2xl font-bold mb-4 md:mb-0" style="color: var(--text-accent);">Inventario Local 2</h2>
+                            <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);">
+                                Añadir Producto (Local 2)
+                            </button>
+                        </div>
                         <div id="inventory-list-2" class="space-y-8"></div>
                      </div>
                 </div>
@@ -304,7 +311,42 @@
                      <div class="max-w-xl mx-auto p-6 luxury-card rounded-xl shadow-xl">
                         <h2 class="text-2xl font-bold mb-6" style="color: var(--text-accent);">Registrar Venta (Local 2)</h2>
                         <form id="record-sale-form-2" class="space-y-4">
-                            </form>
+                            <div>
+                                <label for="sale-category-2" class="block text-sm font-medium">Categoría</label>
+                                <select id="sale-category-2" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                    <option value="" disabled selected>Primero selecciona una categoría</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="sale-product-id-2" class="block text-sm font-medium">Producto</label>
+                                <select id="sale-product-id-2" required disabled class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <option value="" disabled selected>Selecciona un producto</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="sale-quantity-2" class="block text-sm font-medium">Cantidad Vendida</label>
+                                <input type="number" id="sale-quantity-2" required min="1" step="1" value="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                            </div>
+                            <div>
+                                <label for="sale-recipient-2" class="block text-sm font-medium">Destinatario / Cliente</label>
+                                <input type="text" id="sale-recipient-2" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                            </div>
+                            <div>
+                                <label for="sale-price-2" class="block text-sm font-medium">Precio de Venta ($)</label>
+                                <input type="number" id="sale-price-2" required min="0.01" step="0.01" value="0.00" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                            </div>
+                             <div>
+                                <label for="sale-status-2" class="block text-sm font-medium">Estado de Pago</label>
+                                <select id="sale-status-2" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                    <option value="Pagado">Pagado</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                </select>
+                            </div>
+                            <button type="submit"
+                                class="w-full bg-red-700 text-white p-3 rounded-lg font-bold hover:bg-red-800 transition-colors shadow-lg shadow-red-900/50">
+                                Confirmar Venta
+                            </button>
+                        </form>
                     </div>
                 </div>
             </section>
@@ -366,6 +408,7 @@
         <div class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all border-l-4" style="border-color: var(--text-accent);">
             <h3 class="text-2xl font-bold mb-4" style="color: var(--text-accent);">Añadir Nuevo Producto</h3>
             <form id="add-product-form" class="space-y-4">
+                <input type="hidden" id="add-product-location">
                 <div>
                     <label for="product-name" class="block text-sm font-medium">Nombre del Producto</label>
                     <input type="text" id="product-name" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
@@ -421,7 +464,7 @@
         
         let supabase = null; 
         let inventory = [], salesHistory = [], expensesHistory = [];
-        let inventory2 = [], salesHistory2 = [];
+        let inventory2 = [];
         let pollingIntervalId = null;
 
         const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
@@ -505,7 +548,11 @@
             document.getElementById('edit-modal-container').classList.remove('hidden');
         };
         window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
-        window.openAddProductModal = () => document.getElementById('add-product-modal-container').classList.remove('hidden');
+        
+        window.openAddProductModal = (location = 'local1') => {
+            document.getElementById('add-product-location').value = location;
+            document.getElementById('add-product-modal-container').classList.remove('hidden');
+        };
         window.closeAddProductModal = () => {
             document.getElementById('add-product-modal-container').classList.add('hidden');
             document.getElementById('add-product-form').reset();
@@ -872,6 +919,11 @@
         async function handleAddProduct(event) {
             event.preventDefault();
             const submitButton = document.getElementById('add-product-submit-button');
+            const location = document.getElementById('add-product-location').value || 'local1';
+            const table = location === 'local2' ? 'inventory2' : 'inventory';
+            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+            const inventorySource = location === 'local2' ? inventory2 : inventory;
+
             const form = {
                 name: document.getElementById('product-name').value.trim(),
                 category: document.getElementById('product-category').value,
@@ -888,16 +940,16 @@
 
             try {
                 const imageData = form.file ? await fileToBase64(form.file, 512000) : null;
-                const existing = inventory.find(p => p.name.toLowerCase() === form.name.toLowerCase() && p.category === form.category);
+                const existing = inventorySource.find(p => p.name.toLowerCase() === form.name.toLowerCase() && p.category === form.category);
                 let response; 
                 
                 if (existing) {
                     const newQty = existing.quantity + form.quantity;
-                    response = await supabase.from('inventory').update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
+                    response = await supabase.from(table).update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
                     if (response.error) throw response.error; 
                     showModal("Cantidad Actualizada", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
                 } else {
-                    response = await supabase.from('inventory').insert([{ 
+                    response = await supabase.from(table).insert([{ 
                         user_id: currentUserId, 
                         name: form.name, 
                         category: form.category,
@@ -915,7 +967,7 @@
             } finally {
                 submitButton.disabled = false;
                 submitButton.innerHTML = 'Guardar Producto';
-                await loadInventory(); 
+                await loadFunction(); 
             }
         }
 
@@ -962,17 +1014,18 @@
 
         async function handleRecordSale(event, location = 'local1') {
             event.preventDefault();
-            const formPrefix = location === 'local2' ? 'sale-2-' : 'sale-';
-            const productId = document.getElementById(`${formPrefix}product-id`).value;
-            const saleQuantity = parseInt(document.getElementById(`${formPrefix}quantity`).value, 10);
-            const recipient = document.getElementById(`${formPrefix}recipient`).value.trim();
-            const price = parseFloat(document.getElementById(`${formPrefix}price`).value);
-            const status = document.getElementById(`${formPrefix}status`).value;
+            const formPrefix = location === 'local2' ? 'sale-' : 'sale-';
+            const formSuffix = location === 'local2' ? '-2' : '';
+            
+            const productId = document.getElementById(`sale-product-id${formSuffix}`).value;
+            const saleQuantity = parseInt(document.getElementById(`sale-quantity${formSuffix}`).value, 10);
+            const recipient = document.getElementById(`sale-recipient${formSuffix}`).value.trim();
+            const price = parseFloat(document.getElementById(`sale-price${formSuffix}`).value);
+            const status = document.getElementById(`sale-status${formSuffix}`).value;
             
             const inventorySource = location === 'local2' ? inventory2 : inventory;
             const salesTable = location === 'local2' ? 'sales2' : 'sales';
             const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory';
-            const loadInvFunction = location === 'local2' ? loadInventory2 : loadInventory;
             const formId = location === 'local2' ? 'record-sale-form-2' : 'record-sale-form';
 
             if (!productId || !recipient || !price || price <= 0 || saleQuantity <= 0) {
@@ -1158,20 +1211,26 @@
             document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct);
             document.getElementById('record-sale-form').addEventListener('submit', (e) => handleRecordSale(e, 'local1'));
             document.getElementById('record-expense-form').addEventListener('submit', handleRecordExpense);
+            document.getElementById('record-sale-form-2').addEventListener('submit', (e) => handleRecordSale(e, 'local2'));
             document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click());
             document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect);
             
             document.getElementById('sale-category').addEventListener('change', (event) => {
                 populateSaleProductDropdown(event.target.value, 'local1');
             });
-
             document.getElementById('sale-product-id').addEventListener('change', (event) => {
                 const productId = event.target.value;
                 const selectedProduct = inventory.find(p => p.id === productId);
-                const priceInput = document.getElementById('sale-price');
-                if (selectedProduct) {
-                    priceInput.value = parseFloat(selectedProduct.price).toFixed(2);
-                }
+                if (selectedProduct) document.getElementById('sale-price').value = parseFloat(selectedProduct.price).toFixed(2);
+            });
+
+            document.getElementById('sale-category-2').addEventListener('change', (event) => {
+                populateSaleProductDropdown(event.target.value, 'local2');
+            });
+            document.getElementById('sale-product-id-2').addEventListener('change', (event) => {
+                const productId = event.target.value;
+                const selectedProduct = inventory2.find(p => p.id === productId);
+                if (selectedProduct) document.getElementById('sale-price-2').value = parseFloat(selectedProduct.price).toFixed(2);
             });
         };
     </script>
