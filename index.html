@@ -146,6 +146,10 @@
                     class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent hover:border-amber-500 text-gray-400 hover:text-amber-400 focus:outline-none" style="--tw-hover-border-color: var(--text-accent-hover); --tw-hover-text-color: var(--text-accent-hover);">
                     Historial de Ventas
                 </button>
+                <button onclick="changeView('local2')" id="nav-local2"
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent hover:border-amber-500 text-gray-400 hover:text-amber-400 focus:outline-none" style="--tw-hover-border-color: var(--text-accent-hover); --tw-hover-text-color: var(--text-accent-hover);">
+                    LOCAL 2
+                </button>
             </nav>
         </header>
 
@@ -279,6 +283,31 @@
                     </div>
                 </div>
             </section>
+
+            <section id="view-local2" class="view-content hidden">
+                <nav class="flex justify-center space-x-4 border-b mb-6" style="border-color: var(--border-color);">
+                    <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="py-2 px-4 text-sm font-medium text-center border-b-2" style="color: var(--text-accent); border-color: var(--text-accent);">
+                        Inventario Local 2
+                    </button>
+                    <button onclick="changeSubView('local2-sales')" id="nav-local2-sales" class="py-2 px-4 text-sm font-medium text-center text-gray-400 border-b-2 border-transparent">
+                        Ventas Local 2
+                    </button>
+                </nav>
+
+                <div id="subview-local2-inventory" class="subview-content">
+                     <div class="p-6 luxury-card rounded-xl shadow-xl">
+                        <h2 class="text-2xl font-bold mb-6" style="color: var(--text-accent);">Inventario Local 2</h2>
+                        <div id="inventory-list-2" class="space-y-8"></div>
+                     </div>
+                </div>
+                <div id="subview-local2-sales" class="subview-content hidden">
+                     <div class="max-w-xl mx-auto p-6 luxury-card rounded-xl shadow-xl">
+                        <h2 class="text-2xl font-bold mb-6" style="color: var(--text-accent);">Registrar Venta (Local 2)</h2>
+                        <form id="record-sale-form-2" class="space-y-4">
+                            </form>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -298,6 +327,7 @@
             <h3 class="text-2xl font-bold mb-4" style="color: var(--text-accent);">Editar Producto</h3>
             <form id="edit-product-form" class="space-y-4">
                 <input type="hidden" id="edit-product-id">
+                <input type="hidden" id="edit-product-location">
                 <div>
                     <label for="edit-product-name" class="block text-sm font-medium">Nombre</label>
                     <input type="text" id="edit-product-name" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
@@ -389,11 +419,10 @@
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
-        let supabase = null, 
-            inventory = [], 
-            salesHistory = [], 
-            expensesHistory = [],
-            pollingIntervalId = null;
+        let supabase = null; 
+        let inventory = [], salesHistory = [], expensesHistory = [];
+        let inventory2 = [], salesHistory2 = [];
+        let pollingIntervalId = null;
 
         const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
         let currentUserId = null; 
@@ -464,13 +493,15 @@
             document.getElementById('image-modal-content').src = '';
         };
 
-        window.openEditModal = (id) => {
-            const product = inventory.find(p => p.id === id);
+        window.openEditModal = (id, location = 'local1') => {
+            const productSource = location === 'local2' ? inventory2 : inventory;
+            const product = productSource.find(p => p.id === id);
             if (!product) return;
             document.getElementById('edit-product-id').value = product.id;
             document.getElementById('edit-product-name').value = product.name;
             document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
             document.getElementById('edit-product-category').value = product.category || 'Otro';
+            document.getElementById('edit-product-location').value = location;
             document.getElementById('edit-modal-container').classList.remove('hidden');
         };
         window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
@@ -497,9 +528,29 @@
             activeNavButton.style.borderColor = 'var(--text-accent)';
 
             if (viewId === 'sales') {
-                populateSaleCategoryDropdown();
+                populateSaleCategoryDropdown('local1');
+            }
+             if (viewId === 'local2') {
+                changeSubView('local2-inventory');
             }
         };
+
+        window.changeSubView = (subViewId) => {
+            document.querySelectorAll('#view-local2 .subview-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('#view-local2 nav button').forEach(b => {
+                b.style.color = '#9ca3af';
+                b.style.borderColor = 'transparent';
+            });
+            document.getElementById(`subview-${subViewId}`).classList.remove('hidden');
+            const activeNavButton = document.getElementById(`nav-${subViewId}`);
+            activeNavButton.style.color = 'var(--text-accent)';
+            activeNavButton.style.borderColor = 'var(--text-accent)';
+
+             if (subViewId === 'local2-sales') {
+                populateSaleCategoryDropdown('local2');
+            }
+        };
+
 
         const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
             if (!file) return resolve(null);
@@ -544,7 +595,7 @@
             if (showSpinner) loadingSpinner.classList.remove('hidden');
             
             try {
-                await Promise.all([loadInventory(), loadSalesHistory(), loadExpenses(), loadSettings()]); 
+                await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadExpenses(), loadSettings()]); 
                 renderHeaderSummary();
             } catch (e) { 
                 console.error("Error cargando datos:", e);
@@ -565,10 +616,16 @@
             
             const searchTerm = document.getElementById('search-inventory').value;
             if (!searchTerm) {
-                renderInventoryList();
+                renderInventoryList(inventory, 'inventory-list', 'local1');
             } else {
-                renderInventoryList(searchTerm.toLowerCase());
+                renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm.toLowerCase());
             }
+        };
+        const loadInventory2 = async () => {
+            const { data, error } = await supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
+            if (error) throw error;
+            inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
+            renderInventoryList(inventory2, 'inventory-list-2', 'local2');
         };
         
         const loadSalesHistory = async () => {
@@ -621,17 +678,17 @@
             } else {
                 startPolling(false);
             }
-            renderInventoryList(searchTerm.toLowerCase());
+            renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm.toLowerCase());
         }
         
-        const renderInventoryList = (searchTerm = '') => {
-            const listContainer = document.getElementById('inventory-list');
+        const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
+            const listContainer = document.getElementById(containerId);
             listContainer.innerHTML = '';
             listContainer.className = 'space-y-8';
 
             const searchWords = searchTerm.toLowerCase().split(' ').filter(word => word.length > 0);
 
-            const filteredInventory = searchTerm.trim() === '' ? inventory : inventory.filter(p => {
+            const filteredInventory = searchTerm.trim() === '' ? inventorySource : inventorySource.filter(p => {
                 const searchableText = `${p.name.toLowerCase()} ${p.category ? p.category.toLowerCase() : ''}`;
                 return searchWords.every(word => searchableText.includes(word));
             });
@@ -675,12 +732,12 @@
                         <p class="text-sm my-2">Precio: <span class="font-bold text-green-400">$${parseFloat(p.price).toFixed(2)}</span></p>
                         <div class="flex items-center space-x-4 mb-4">
                             <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : ''}" style="color: ${p.quantity >= 5 ? 'var(--text-accent)' : ''};">Disponibles: ${p.quantity}</p>
-                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
-                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
+                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}', '${location}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
+                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}', '${location}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
                         </div>
                         <div class="flex space-x-4 w-full justify-center text-sm">
-                            <button onclick="openEditModal('${p.id}')" class="font-medium p-1" style="color: var(--text-accent-hover);">Editar</button>
-                            <button onclick="deleteProduct('${p.id}', '${p.name}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
+                            <button onclick="openEditModal('${p.id}', '${location}')" class="font-medium p-1" style="color: var(--text-accent-hover);">Editar</button>
+                            <button onclick="deleteProduct('${p.id}', '${p.name}', '${location}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
                         </div>`;
                     categoryGrid.appendChild(item);
                 });
@@ -758,14 +815,18 @@
             }
         };
 
-        const populateSaleCategoryDropdown = () => {
-            const categorySelect = document.getElementById('sale-category');
-            const productSelect = document.getElementById('sale-product-id');
+        const populateSaleCategoryDropdown = (location) => {
+            const inventorySource = location === 'local2' ? inventory2 : inventory;
+            const categorySelectId = location === 'local2' ? 'sale-category-2' : 'sale-category';
+            const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
+
+            const categorySelect = document.getElementById(categorySelectId);
+            const productSelect = document.getElementById(productSelectId);
             
             productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
             productSelect.disabled = true;
 
-            const categories = [...new Set(inventory.map(p => p.category || 'Sin Categoría'))].sort();
+            const categories = [...new Set(inventorySource.map(p => p.category || 'Sin Categoría'))].sort();
 
             categorySelect.innerHTML = '<option value="" disabled selected>Primero selecciona una categoría</option>';
 
@@ -777,9 +838,13 @@
             });
         };
 
-        const populateSaleProductDropdown = (category) => {
-            const productSelect = document.getElementById('sale-product-id');
-            const priceInput = document.getElementById('sale-price');
+        const populateSaleProductDropdown = (category, location) => {
+            const inventorySource = location === 'local2' ? inventory2 : inventory;
+            const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
+            const priceInputId = location === 'local2' ? 'sale-price-2' : 'sale-price';
+
+            const productSelect = document.getElementById(productSelectId);
+            const priceInput = document.getElementById(priceInputId);
             productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
             priceInput.value = '0.00';
 
@@ -788,7 +853,7 @@
                 return;
             }
 
-            const productsInCategory = inventory.filter(p => (p.category || 'Sin Categoría') === category);
+            const productsInCategory = inventorySource.filter(p => (p.category || 'Sin Categoría') === category);
 
             if (productsInCategory.length > 0) {
                 productsInCategory.forEach(product => {
@@ -857,6 +922,10 @@
         async function handleEditProduct(event) {
             event.preventDefault();
             const id = document.getElementById('edit-product-id').value;
+            const location = document.getElementById('edit-product-location').value;
+            const table = location === 'local2' ? 'inventory2' : 'inventory';
+            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+
             const newName = document.getElementById('edit-product-name').value.trim();
             const newCategory = document.getElementById('edit-product-category').value;
             const newPrice = parseFloat(document.getElementById('edit-product-price').value);
@@ -866,7 +935,7 @@
             }
 
             try {
-                const { error } = await supabase.from('inventory').update({ 
+                const { error } = await supabase.from(table).update({ 
                     name: newName, 
                     category: newCategory,
                     price: newPrice 
@@ -875,7 +944,7 @@
                 closeEditModal();
                 showModal("Éxito", "Producto actualizado correctamente.", "success");
             } catch (e) { showModal("Error", e.message, "error"); }
-            finally { await loadInventory(); }
+            finally { await loadFunction(); }
         }
 
         async function handleLogoFileSelect(event) {
@@ -891,19 +960,26 @@
             finally { event.target.value = ''; }
         }
 
-        async function handleRecordSale(event) {
+        async function handleRecordSale(event, location = 'local1') {
             event.preventDefault();
-            const productId = document.getElementById('sale-product-id').value;
-            const saleQuantity = parseInt(document.getElementById('sale-quantity').value, 10);
-            const recipient = document.getElementById('sale-recipient').value.trim();
-            const price = parseFloat(document.getElementById('sale-price').value);
-            const status = document.getElementById('sale-status').value;
+            const formPrefix = location === 'local2' ? 'sale-2-' : 'sale-';
+            const productId = document.getElementById(`${formPrefix}product-id`).value;
+            const saleQuantity = parseInt(document.getElementById(`${formPrefix}quantity`).value, 10);
+            const recipient = document.getElementById(`${formPrefix}recipient`).value.trim();
+            const price = parseFloat(document.getElementById(`${formPrefix}price`).value);
+            const status = document.getElementById(`${formPrefix}status`).value;
+            
+            const inventorySource = location === 'local2' ? inventory2 : inventory;
+            const salesTable = location === 'local2' ? 'sales2' : 'sales';
+            const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory';
+            const loadInvFunction = location === 'local2' ? loadInventory2 : loadInventory;
+            const formId = location === 'local2' ? 'record-sale-form-2' : 'record-sale-form';
 
             if (!productId || !recipient || !price || price <= 0 || saleQuantity <= 0) {
                 return showModal("Datos Incompletos", "Categoría, producto, destinatario y precio son obligatorios.", "error");
             }
             
-            const product = inventory.find(p => p.id === productId);
+            const product = inventorySource.find(p => p.id === productId);
 
             if (!product) {
                 return showModal("Error de Producto", "El producto seleccionado no es válido.", "error");
@@ -915,15 +991,15 @@
                 return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error");
             }
             try {
-                const { error: saleError } = await supabase.from('sales').insert([{ user_id: currentUserId, product_name: productName, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
+                const { error: saleError } = await supabase.from(salesTable).insert([{ user_id: currentUserId, product_name: productName, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
                 if (saleError) throw saleError;
-                if (productId) {
-                    const { error: stockError } = await supabase.from('inventory').update({ quantity: product.quantity - saleQuantity }).eq('id', productId).eq('user_id', currentUserId);
-                    if (stockError) throw stockError;
-                }
+                
+                const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity - saleQuantity }).eq('id', productId).eq('user_id', currentUserId);
+                if (stockError) throw stockError;
+                
                 showModal("Venta Exitosa", `Venta de '${productName}' x${saleQuantity} registrada.`, "success");
-                document.getElementById('record-sale-form').reset();
-                populateSaleCategoryDropdown();
+                document.getElementById(formId).reset();
+                populateSaleCategoryDropdown(location);
             } catch (e) { 
                 showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error"); 
             } finally { await loadAllData(false); }
@@ -993,38 +1069,46 @@
             }
         }
 
-        window.updateInventoryQuantity = async (id, delta, name) => {
-            const product = inventory.find(p => p.id === id);
+        window.updateInventoryQuantity = async (id, delta, name, location = 'local1') => {
+            const inventorySource = location === 'local2' ? inventory2 : inventory;
+            const table = location === 'local2' ? 'inventory2' : 'inventory';
+            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+
+            const product = inventorySource.find(p => p.id === id);
             if (!product) return;
+
             const newQty = product.quantity + delta;
             if (newQty < 0) {
                 return showModal("Error de Cantidad", `La cantidad de '${name}' no puede ser negativa.`, "error");
             }
             try {
-                const { error } = await supabase.from('inventory').update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
+                const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
             } catch (e) { 
                 showModal("Error de Cantidad", e.message, "error"); 
             }
             finally { 
-                await loadInventory(); 
+                await loadFunction(); 
             }
         };
 
-        window.deleteProduct = (id, name) => {
+        window.deleteProduct = (id, name, location = 'local1') => {
+            const table = location === 'local2' ? 'inventory2' : 'inventory';
+            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+
             showModal("Confirmar Eliminación", `¿Estás seguro de que quieres eliminar '${name}'? Esta acción no se puede deshacer.`, "error");
             const confirmButton = document.getElementById('modal-button');
             const cancelButton = document.getElementById('modal-cancel-button');
             confirmButton.textContent = 'Sí, Eliminar';
             confirmButton.onclick = async () => {
                 try {
-                    const { error } = await supabase.from('inventory').delete().eq('id', id).eq('user_id', currentUserId);
+                    const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', currentUserId);
                     if (error) throw error;
                     showModal("Eliminado", `'${name}' fue eliminado con éxito.`, "success");
                 } catch(e) { 
                     showModal("Error", `No se pudo eliminar el producto. ${e.message}`, "error"); 
                 } finally {
-                    await loadInventory();
+                    await loadFunction();
                 }
             };
             cancelButton.classList.remove('hidden');
@@ -1072,13 +1156,13 @@
             initializeApp();
             document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
             document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct);
-            document.getElementById('record-sale-form').addEventListener('submit', handleRecordSale);
+            document.getElementById('record-sale-form').addEventListener('submit', (e) => handleRecordSale(e, 'local1'));
             document.getElementById('record-expense-form').addEventListener('submit', handleRecordExpense);
             document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click());
             document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect);
             
             document.getElementById('sale-category').addEventListener('change', (event) => {
-                populateSaleProductDropdown(event.target.value);
+                populateSaleProductDropdown(event.target.value, 'local1');
             });
 
             document.getElementById('sale-product-id').addEventListener('change', (event) => {
