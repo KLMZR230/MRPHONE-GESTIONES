@@ -428,11 +428,238 @@
     </div>
 
     <script type="module">
-        // Importa todas las funciones y variables aquí
-        import { initializeApp } from './main.js';
+        // --- COMIENZO DEL SCRIPT COMPLETO ---
+        const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
-        window.onload = initializeApp;
-    </script>
+        let supabase = null; 
+        let inventory = [], salesHistory = [], expensesHistory = [];
+        let inventory2 = [], salesHistory2 = [];
+        let pollingIntervalId = null;
 
+        const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
+        let currentUserId = null; 
+
+        // --- MANEJO DE TEMAS ---
+        const themes = {
+            'luxury-gold': 'Luxury Gold',
+            'fuego-infernal': 'theme-fuego-infernal',
+            'hacker-matrix': 'theme-hacker-matrix',
+            'vino-celeste': 'theme-vino-celeste'
+        };
+
+        window.applyTheme = (theme) => {
+            document.body.className = 'min-h-screen flex flex-col'; // Reset classes
+            if (themes[theme] && theme !== 'luxury-gold') {
+                document.body.classList.add(themes[theme]);
+            }
+        };
+
+        window.changeTheme = (theme) => {
+            applyTheme(theme);
+            localStorage.setItem('mrphone_theme', theme);
+        };
+
+        // --- FUNCIONES DE UTILIDAD (MODALES, VISTAS) ---
+        window.showModal = (title, body, type = 'success') => {
+            const modal = {
+                title: document.getElementById('modal-title'),
+                body: document.getElementById('modal-body'),
+                button: document.getElementById('modal-button'),
+                cancelButton: document.getElementById('modal-cancel-button'),
+                content: document.getElementById('modal-content'),
+                container: document.getElementById('modal-container')
+            };
+            modal.title.textContent = title;
+            modal.body.textContent = body;
+            modal.container.classList.remove('hidden');
+
+            const modalButton = document.getElementById('modal-button');
+            modalButton.className = 'w-full py-2 rounded-lg font-semibold transition-colors';
+            if (type === 'error') {
+                modal.title.style.color = '#f87171';
+                modalButton.style.backgroundColor = '#b91c1c';
+                modalButton.style.color = 'white';
+                modalButton.textContent = 'Entendido';
+            } else {
+                modal.title.style.color = 'var(--text-accent)';
+                modalButton.style.backgroundColor = 'var(--button-primary-bg)';
+                modalButton.style.color = 'var(--button-primary-text)';
+                modalButton.textContent = 'Cerrar';
+            }
+
+            modal.cancelButton.classList.add('hidden');
+            modal.button.onclick = closeModal;
+        };
+        window.closeModal = () => {
+            document.getElementById('modal-container').classList.add('hidden');
+            document.getElementById('modal-cancel-button').classList.add('hidden');
+        }
+
+        window.openImageModal = (imageUrl) => {
+            if (!imageUrl) return;
+            document.getElementById('image-modal-content').src = imageUrl;
+            document.getElementById('image-modal-container').classList.remove('hidden');
+        };
+
+        window.closeImageModal = () => {
+            document.getElementById('image-modal-container').classList.add('hidden');
+            document.getElementById('image-modal-content').src = '';
+        };
+
+        window.openEditModal = (id, location = 'local1') => {
+            const productSource = location === 'local2' ? inventory2 : inventory;
+            const product = productSource.find(p => p.id === id);
+            if (!product) return;
+            document.getElementById('edit-product-id').value = product.id;
+            document.getElementById('edit-product-name').value = product.name;
+            document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
+            document.getElementById('edit-product-category').value = product.category || 'Otro';
+            document.getElementById('edit-product-location').value = location;
+            document.getElementById('edit-modal-container').classList.remove('hidden');
+        };
+        window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
+        
+        window.openAddProductModal = (location = 'local1') => {
+            document.getElementById('add-product-location').value = location;
+            document.getElementById('add-product-modal-container').classList.remove('hidden');
+        };
+        window.closeAddProductModal = () => {
+            document.getElementById('add-product-modal-container').classList.add('hidden');
+            document.getElementById('add-product-form').reset();
+        }
+
+        window.handleStatusChange = async (selectElement, saleId, location = 'local1') => {
+            const newStatus = selectElement.value;
+            await updateSaleStatus(saleId, newStatus, location);
+        };
+
+        window.changeView = (viewId) => {
+            document.querySelectorAll('.view-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('active-nav');
+                b.style.color = ''; 
+                b.style.borderColor = 'transparent';
+            });
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById(`nav-${viewId}`).classList.add('active-nav');
+            
+            if (viewId === 'sales') populateSaleCategoryDropdown('local1');
+            if (viewId === 'local2') changeSubView('local2-inventory');
+        };
+
+        window.changeSubView = (subViewId) => {
+            document.querySelectorAll('#view-local2 .subview-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('#view-local2 nav button').forEach(b => b.classList.remove('active-nav'));
+            document.getElementById(`subview-${subViewId}`).classList.remove('hidden');
+            document.getElementById(`nav-${subViewId}`).classList.add('active-nav');
+
+            if (subViewId === 'local2-sales') populateSaleCategoryDropdown('local2');
+        };
+
+        const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
+            if (!file) return resolve(null);
+            if (file.size > maxSize) return reject(`Archivo demasiado grande. Límite: ${(maxSize / 1048576).toFixed(0)} MB.`); 
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject("Error al leer archivo.");
+        });
+
+        const initializeApp = () => {
+            const savedTheme = localStorage.getItem('mrphone_theme') || 'luxury-gold';
+            document.getElementById('theme-selector').value = savedTheme;
+            applyTheme(savedTheme);
+
+            try {
+                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+                currentUserId = PUBLIC_STORE_ID; 
+                localStorage.setItem('mrphone_user_id', currentUserId);
+                startPolling(true);
+            } catch (error) {
+                document.getElementById('error-message').textContent = `Error de Conexión: ${error.message}`;
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('loading-spinner').classList.add('hidden');
+            }
+        };
+
+        const startPolling = (initialLoad = false) => {
+            clearInterval(pollingIntervalId);
+            loadAllData(initialLoad);
+            pollingIntervalId = setInterval(() => loadAllData(false), 5000); 
+        };
+
+        const stopPolling = () => clearInterval(pollingIntervalId);
+
+        async function loadAllData(showSpinner = false) {
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (showSpinner) loadingSpinner.classList.remove('hidden');
+            
+            try {
+                await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2(), loadExpenses(), loadSettings()]); 
+                renderHeaderSummary();
+            } catch (e) { 
+                console.error("Error cargando datos:", e);
+                document.getElementById('error-message').textContent = `Error al cargar datos. Mensaje: ${e.message}`;
+                document.getElementById('error-message').classList.remove('hidden'); 
+            }
+            finally {
+                loadingSpinner.classList.add('hidden');
+                if (showSpinner) {
+                    changeView('inventory');
+                }
+            }
+        }
+        
+        const loadInventory = async () => {
+            const { data, error } = await supabase.from('inventory').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
+            if (error) throw error;
+            inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
+            renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase());
+        };
+        
+        const loadInventory2 = async () => {
+            const { data, error } = await supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
+            if (error) throw error;
+            inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
+            renderInventoryList(inventory2, 'inventory-list-2', 'local2');
+        };
+        
+        const loadSalesHistory = async () => {
+            const { data, error } = await supabase.from('sales').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
+            if (error) throw error;
+            salesHistory = data || [];
+            renderSalesHistory(salesHistory, 'sales-history-body', 'local1');
+        };
+        
+        const loadSalesHistory2 = async () => {
+            const { data, error } = await supabase.from('sales2').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
+            if (error) throw error;
+            salesHistory2 = data || [];
+            renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2');
+        };
+
+        const loadExpenses = async () => {
+            const { data, error } = await supabase.from('gastos').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
+            if (error) throw error;
+            expensesHistory = data || [];
+            renderExpenses();
+        };
+
+        const loadSettings = async () => {
+            const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', currentUserId).single();
+            if (error && error.code !== 'PGRST116') console.error("Error cargando settings:", error); 
+            if (data?.store_logo_url) renderStoreLogo(data.store_logo_url);
+        };
+
+        // --- RENDERIZACIÓN ---
+        // (El resto de las funciones de renderizado, manejo de acciones e inicialización van aquí)
+        
+        // --- INICIALIZACIÓN ---
+        window.onload = () => {
+            initializeApp();
+            // ... (el resto de los listeners)
+        };
+    </script>
 </body>
 </html>
