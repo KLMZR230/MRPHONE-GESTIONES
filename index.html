@@ -200,7 +200,41 @@
                 <div class="max-w-xl mx-auto p-6 luxury-card rounded-xl shadow-xl">
                     <h2 class="text-2xl font-bold mb-6" style="color: var(--text-accent);">Registrar Venta</h2>
                     <form id="record-sale-form" class="space-y-4">
-                        </form>
+                        <div>
+                            <label for="sale-category" class="block text-sm font-medium">Categoría</label>
+                            <select id="sale-category" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                <option value="" disabled selected>Primero selecciona una categoría</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="sale-product-id" class="block text-sm font-medium">Producto</label>
+                            <select id="sale-product-id" required disabled class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
+                                <option value="" disabled selected>Selecciona un producto</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="sale-quantity" class="block text-sm font-medium">Cantidad Vendida</label>
+                            <input type="number" id="sale-quantity" required min="1" step="1" value="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                        </div>
+                        <div>
+                            <label for="sale-recipient" class="block text-sm font-medium">Destinatario / Cliente</label>
+                            <input type="text" id="sale-recipient" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                        </div>
+                        <div>
+                            <label for="sale-price" class="block text-sm font-medium">Precio de Venta ($)</label>
+                            <input type="number" id="sale-price" required min="0.01" step="0.01" value="0.00" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                        </div>
+                         <div>
+                            <label for="sale-status" class="block text-sm font-medium">Estado de Pago</label>
+                            <select id="sale-status" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                <option value="Pagado">Pagado</option>
+                                <option value="Pendiente">Pendiente</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-red-700 text-white p-3 rounded-lg font-bold hover:bg-red-800 transition-colors shadow-lg shadow-red-900/50">
+                            Confirmar Venta
+                        </button>
+                    </form>
                 </div>
             </section>
 
@@ -296,7 +330,41 @@
                      <div class="max-w-xl mx-auto p-6 luxury-card rounded-xl shadow-xl">
                         <h2 class="text-2xl font-bold mb-6" style="color: var(--text-accent);">Registrar Venta (Local 2)</h2>
                         <form id="record-sale-form-2" class="space-y-4">
-                            </form>
+                            <div>
+                                <label for="sale-category-2" class="block text-sm font-medium">Categoría</label>
+                                <select id="sale-category-2" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                    <option value="" disabled selected>Primero selecciona una categoría</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="sale-product-id-2" class="block text-sm font-medium">Producto</label>
+                                <select id="sale-product-id-2" required disabled class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <option value="" disabled selected>Selecciona un producto</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="sale-quantity-2" class="block text-sm font-medium">Cantidad Vendida</label>
+                                <input type="number" id="sale-quantity-2" required min="1" step="1" value="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                            </div>
+                            <div>
+                                <label for="sale-recipient-2" class="block text-sm font-medium">Destinatario / Cliente</label>
+                                <input type="text" id="sale-recipient-2" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                            </div>
+                            <div>
+                                <label for="sale-price-2" class="block text-sm font-medium">Precio de Venta ($)</label>
+                                <input type="number" id="sale-price-2" required min="0.01" step="0.01" value="0.00" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                            </div>
+                            <div>
+                                <label for="sale-status-2" class="block text-sm font-medium">Estado de Pago</label>
+                                <select id="sale-status-2" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                    <option value="Pagado">Pagado</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-red-700 text-white p-3 rounded-lg font-bold hover:bg-red-800 transition-colors shadow-lg shadow-red-900/50">
+                                Confirmar Venta
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div id="subview-local2-history" class="subview-content hidden">
@@ -461,6 +529,7 @@
         };
 
         // --- FUNCIONES DE UTILIDAD (MODALES, VISTAS) ---
+        // (el resto del script sigue aquí, sin cambios en esta sección)
         window.showModal = (title, body, type = 'success') => {
             const modal = {
                 title: document.getElementById('modal-title'),
@@ -610,7 +679,6 @@
         }
         
         // --- El resto del código de carga, renderizado y manejo de acciones ---
-        // (Incluido aquí para ser completo)
         
         async function loadInventory() {
             const { data, error } = await supabase.from('inventory').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
@@ -971,7 +1039,7 @@
 
         async function handleRecordSale(event, location = 'local1') {
             event.preventDefault();
-            const formPrefix = location === 'local2' ? 'sale-2-' : 'sale-';
+            
             const formSuffix = location === 'local2' ? '-2' : '';
             
             const productId = document.getElementById(`sale-product-id${formSuffix}`).value;
