@@ -36,7 +36,7 @@
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
         /********************************/
-        .theme-dark {
+        :root, .theme-dark {
             --bg-primary: #1f2937;
             --bg-secondary: #374151;
             --bg-header: rgba(31, 41, 55, 0.8);
@@ -103,7 +103,7 @@
 
         .bg-gray-800, .bg-gray-900\/50 {
             background-color: var(--bg-header);
-            border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+            border: 1px solid var(--border-color);
             backdrop-filter: blur(10px);
         }
         .text-gray-300 { color: var(--text-secondary); }
@@ -128,65 +128,23 @@
         /********************************/
         /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
         /********************************/
-        .status-paid {
-            background-color: #16a34a !important; /* Verde */
-            color: #ffffff !important;
-            border-color: #15803d !important;
-        }
-        .status-pending {
-            background-color: #f59e0b !important; /* Naranja/Amarillo */
-            color: #1f2937 !important;
-            border-color: #d97706 !important;
-        }
-        .status-returned {
-            background-color: #dc2626 !important; /* Rojo */
-            color: #ffffff !important;
-            border-color: #b91c1c !important;
-        }
+        .status-paid { background-color: #16a34a !important; color: #ffffff !important; border-color: #15803d !important; }
+        .status-pending { background-color: #f59e0b !important; color: #1f2937 !important; border-color: #d97706 !important; }
+        .status-returned { background-color: #dc2626 !important; color: #ffffff !important; border-color: #b91c1c !important; }
         
         /********************************/
-        /* --- NUEVOS ESTILOS: BORDE ENCENDIDO --- */
+        /* --- NUEVO ESTILO: LÍNEA EN EL BORDE --- */
         /********************************/
-        @keyframes rotate-glow {
-            100% {
-                transform: rotate(1turn);
-            }
+        .themed-border {
+            border: 2px solid var(--accent-color);
+            /* Sombra sutil para que la línea resalte un poco */
+            box-shadow: 0 0 8px -2px var(--accent-color);
         }
-        .glow-border {
-            position: relative;
-            z-index: 1;
-            /* Quitamos el borde por defecto para reemplazarlo con el efecto */
-            border: none !important; 
-        }
-        .glow-border::before {
-            content: '';
-            position: absolute;
-            z-index: -2;
-            left: -50%;
-            top: -50%;
-            width: 200%;
-            height: 200%;
-            background-image: conic-gradient(
-                transparent,
-                var(--accent-color),
-                transparent 30%
-            );
-            animation: rotate-glow 4s linear infinite;
-        }
-        .glow-border::after {
-            content: '';
-            position: absolute;
-            z-index: -1;
-            /* El inset crea el grosor del borde (2px en este caso) */
-            inset: 2px;
-            /* Usamos el color de fondo original del elemento */
-            background: var(--bg-header); 
-            border-radius: 0.5rem; /* Asegúrate que coincida con el borde del elemento */
-        }
+
     </style>
 </head>
 <body class="theme-dark"> 
-    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700 glow-border">
+    <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between themed-border">
         <div class="flex items-center space-x-4">
             <img id="store-logo-img" src="https://via.placeholder.com/60/4f46e5/ffffff?text=MP" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105 cursor-pointer" title="Haz clic para cambiar el logo" />
             <h1 class="text-3xl font-extrabold tracking-tight">
@@ -220,7 +178,7 @@
         <p class="text-gray-300 mb-6" id="current-view-title">Vista: Inventario</p>
         
         <div id="inventory-view" class="view-section">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 glow-border">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 themed-border">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">➕ Agregar producto a Inventario Principal</h2>
                 <form id="add-product-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                     <input type="hidden" id="add-product-location" value="local1">
@@ -247,7 +205,7 @@
         </div>
         
         <div id="sales-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 glow-border">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 themed-border">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">✍️ Registrar Nueva Venta</h2>
                 <form id="record-sale-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Categoría</label><select id="sale-category" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white"></select></div>
@@ -271,7 +229,7 @@
         </div>
 
         <div id="expenses-view" class="view-section hidden">
-            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto glow-border">
+            <section class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 max-w-4xl mx-auto themed-border">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-300">💸 Registrar Gasto</h2>
                 <form id="record-expense-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                     <div><label class="block text-sm font-medium text-gray-300">Descripción</label><input id="expense-description" type="text" required class="mt-1 block w-full border rounded-md p-2 bg-gray-600 border-gray-500 text-white" /></div>
@@ -289,8 +247,7 @@
     
     <script type="module">
         const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
-        // CLAVE API CORREGIDA Y RESTAURADA
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ8MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
         
         let supabase = null; 
         let inventory = [], salesHistory = [], expensesHistory = [];
@@ -311,12 +268,12 @@
             } catch (error) { console.error('Error subiendo archivo a R2:', error); throw error; }
         };
 
-        window.applyTheme = (theme) => { document.body.className = theme; }; // Se aplica al body para que las variables CSS funcionen globalmente
-        window.changeTheme = (theme) => { applyTheme(theme); localStorage.setItem('mrphone_theme_v2', theme); };
+        const applyTheme = (theme) => { document.body.className = theme; };
+        const changeTheme = (theme) => { applyTheme(theme); localStorage.setItem('mrphone_theme_v2', theme); };
 
-        window.showModal = (title, body, type = 'success') => { alert(`[${type.toUpperCase()}] ${title}: ${body}`); };
+        const showModal = (title, body, type = 'success') => { alert(`[${type.toUpperCase()}] ${title}: ${body}`); };
 
-        window.toggleView = (viewName) => {
+        const toggleView = (viewName) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.view-btn').forEach(b => {
                 const isCurrent = b.dataset.view === viewName;
@@ -408,10 +365,10 @@
                 grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
                 grouped[category].forEach(p => {
                     const card = document.createElement("div");
-                    // *** MODIFICACIÓN AQUÍ: Se añade 'glow-border' y se quitan las clases de borde anteriores ***
-                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card relative glow-border";
+                    // *** MODIFICACIÓN CLAVE AQUÍ: Se añade la clase 'themed-border' ***
+                    card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card relative themed-border";
                     card.innerHTML = `
-                        <button onclick="editProduct('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.quantity}, '${location}')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 p-1 z-10"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+                        <button onclick="editProduct('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.quantity}, '${location}')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 p-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
                         <div class="h-40 bg-gray-600 rounded mb-3"><img src="${p.image_url || 'https://via.placeholder.com/150'}" class="object-contain h-full w-full"></div>
                         <h3 class="font-semibold">${p.name}</h3>
                         <p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
@@ -459,7 +416,7 @@
             table.appendChild(tbody); container.appendChild(table);
         };
         
-        window.handleStatusChange = async (selectElement, saleId, location) => updateSaleStatus(saleId, selectElement.value, location);
+        const handleStatusChange = async (selectElement, saleId, location) => updateSaleStatus(saleId, selectElement.value, location);
 
         const populateSaleCategoryDropdown = (location) => {
             const inventorySource = location === 'local1' ? inventory : inventory2;
@@ -496,7 +453,7 @@
             } catch (e) { showModal("Error", e.message, "error"); } finally { await loadFn(); }
         }
         
-        window.editProduct = async (id, name, price, quantity, location) => {
+        const editProduct = async (id, name, price, quantity, location) => {
             const newName = prompt("Nuevo nombre:", name); if (newName === null) return;
             const newPrice = prompt("Nuevo precio:", price); if (newPrice === null) return;
             const newQuantity = prompt("Nueva cantidad:", quantity); if (newQuantity === null) return;
@@ -543,7 +500,7 @@
             catch (e) { showModal("Error", e.message, "error"); } finally { await loadFn(); }
         }
         
-        window.updateInventoryQuantity = async (id, delta, location) => {
+        const updateInventoryQuantity = async (id, delta, location) => {
             const table = location === 'local1' ? 'inventory' : 'inventory2';
             const inventorySource = location === 'local1' ? inventory : inventory2;
             const loadFn = location === 'local1' ? loadInventory : loadInventory2;
@@ -553,7 +510,7 @@
             catch (e) { showModal("Error", e.message, "error"); } finally { await loadFn(); }
         };
 
-        window.deleteProduct = async (id, name, location) => {
+        const deleteProduct = async (id, name, location) => {
             if (!confirm(`¿Eliminar ${name}?`)) return;
             const table = location === 'local1' ? 'inventory' : 'inventory2';
             const loadFn = location === 'local1' ? loadInventory : loadInventory2;
@@ -561,7 +518,7 @@
             catch(e) { showModal("Error", e.message, "error"); } finally { await loadFn(); }
         };
 
-        window.deleteSale = async (id, name, location) => {
+        const deleteSale = async (id, name, location) => {
             if (!confirm(`¿Eliminar venta de ${name}?`)) return;
             const table = location === 'local1' ? 'sales' : 'sales2';
             const loadFn = location === 'local1' ? loadSalesHistory : loadSalesHistory2;
@@ -569,11 +526,19 @@
             catch(e) { showModal("Error", e.message, "error"); } finally { await loadFn(); }
         };
 
-        window.deleteExpense = async (id, description) => {
+        const deleteExpense = async (id, description) => {
             if (!confirm(`¿Eliminar gasto ${description}?`)) return;
             try { await supabase.from('gastos').delete().eq('id', id); } 
             catch(e) { showModal("Error", e.message, "error"); } finally { await loadExpenses(); }
         };
+        
+        // Asignar funciones al objeto window para que sean accesibles desde el HTML onclick
+        window.editProduct = editProduct;
+        window.updateInventoryQuantity = updateInventoryQuantity;
+        window.deleteProduct = deleteProduct;
+        window.deleteSale = deleteSale;
+        window.deleteExpense = deleteExpense;
+        window.handleStatusChange = handleStatusChange;
 
         window.onload = () => {
             initializeApp();
