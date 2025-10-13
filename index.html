@@ -1028,25 +1028,36 @@
             }
         }
         
-        // MODIFICADO: Esta función ahora también actualiza la cantidad de stock
+        // --- INICIO DE LA CORRECCIÓN ---
         async function handleEditProduct(event) {
             event.preventDefault();
+            const form = event.currentTarget;
+            const submitButton = form.querySelector('button[type="submit"]');
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Guardando...';
+            }
+
             const id = document.getElementById('edit-product-id').value;
             const location = document.getElementById('edit-product-location').value;
             const table = location === 'local2' ? 'inventory2' : 'inventory';
             const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
             const fileInput = document.getElementById('edit-product-image-file');
-
             const newQuantity = parseInt(document.getElementById('edit-product-quantity').value, 10);
 
             const updateData = {
                 name: document.getElementById('edit-product-name').value.trim(),
                 category: document.getElementById('edit-product-category').value,
                 price: parseFloat(document.getElementById('edit-product-price').value),
-                quantity: isNaN(newQuantity) ? 0 : newQuantity // Asegura que sea un número
+                quantity: isNaN(newQuantity) ? 0 : newQuantity
             };
 
             if (!id || !updateData.name || !updateData.category || updateData.price <= 0 || updateData.quantity < 0) {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Guardar Cambios';
+                }
                 return showModal("Error", "Todos los campos son requeridos y deben tener valores válidos.", "error");
             }
 
@@ -1069,9 +1080,14 @@
                 showModal("Error", `No se pudo actualizar el producto. ${e.message}`, "error"); 
             }
             finally { 
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Guardar Cambios';
+                }
                 await loadFunction(); 
             }
         }
+        // --- FIN DE LA CORRECCIÓN ---
 
         async function handleLogoFileSelect(event) {
             const file = event.target.files[0];
