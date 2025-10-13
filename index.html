@@ -449,6 +449,12 @@
                     <label for="edit-product-price" class="block text-sm font-medium">Precio ($)</label>
                     <input type="number" id="edit-product-price" required min="0.01" step="0.01" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                 </div>
+                
+                <div>
+                    <label for="edit-product-quantity" class="block text-sm font-medium">Cantidad Disponible (Stock)</label>
+                    <input type="number" id="edit-product-quantity" required min="0" step="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                </div>
+                
                 <div class="flex space-x-4 pt-4">
                     <button type="button" onclick="closeEditModal()" class="flex-1 py-2 rounded-lg font-semibold border transition-colors" style="color: var(--text-accent); border-color: var(--text-accent);">Cancelar</button>
                     <button type="submit" class="flex-1 p-3 rounded-lg font-bold shadow-lg" style="background-color: var(--button-primary-bg); color: var(--button-primary-text);">Guardar Cambios</button>
@@ -456,7 +462,6 @@
             </form>
         </div>
     </div>
-    
     <div id="add-product-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
         <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all border-l-4" style="background-color: var(--bg-card); border-color: var(--text-accent);">
             <h3 class="text-2xl font-bold mb-4" style="color: var(--text-accent);">Añadir Nuevo Producto</h3>
@@ -590,6 +595,7 @@
             document.getElementById('image-modal-content').src = '';
         };
 
+        // MODIFICADO: Esta función ahora también carga la cantidad de stock
         window.openEditModal = (id, location = 'local1') => {
             const productSource = location === 'local2' ? inventory2 : inventory;
             const product = productSource.find(p => p.id === id);
@@ -597,11 +603,11 @@
             
             const placeholder = `https://placehold.co/150x150/1f2937/d97706?text=${product.name.substring(0,3).toUpperCase()}`;
             document.getElementById('edit-product-image-preview').src = product.image_url || placeholder;
-
             document.getElementById('edit-product-id').value = product.id;
             document.getElementById('edit-product-name').value = product.name;
             document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
             document.getElementById('edit-product-category').value = product.category || 'Otro';
+            document.getElementById('edit-product-quantity').value = product.quantity; // Carga la cantidad actual
             document.getElementById('edit-product-location').value = location;
             document.getElementById('edit-product-image-file').value = ''; 
             document.getElementById('edit-modal-container').classList.remove('hidden');
@@ -750,7 +756,8 @@
         const renderHeaderSummary = () => {
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
             
-            const todaySales = salesHistory.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
+            const allSales = [...salesHistory, ...salesHistory2];
+            const todaySales = allSales.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
             const todayExpenses = expensesHistory.filter(expense => new Date(expense.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
 
             const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
@@ -761,6 +768,7 @@
             document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
             document.getElementById('today-expenses-total').textContent = `$${todayExpensesTotal.toFixed(2)}`;
         };
+
 
         window.filterInventory = () => {
             const searchTerm = document.getElementById('search-inventory').value;
@@ -812,11 +820,11 @@
                     const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
                     const placeholder = `https://placehold.co/150x150/d97706/1f2937?text=${initials}&font=inter`;
                     
-                    // *** FIX: Escapa comillas simples en los nombres para evitar errores en onclick ***
                     const escapedName = p.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
                     const item = document.createElement('div');
                     item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
+                    item.setAttribute('data-product-id', p.id); // Add data attribute for easier selection
                     
                     item.innerHTML = `
                         <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" 
@@ -826,9 +834,9 @@
                         <h3 class="text-xl font-bold text-center truncate w-full px-2" style="color: var(--text-main);">${p.name}</h3>
                         <p class="text-sm my-2">Precio: <span class="font-bold text-green-400">$${parseFloat(p.price).toFixed(2)}</span></p>
                         <div class="flex items-center space-x-4 mb-4">
-                            <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : ''}" style="color: ${p.quantity >= 5 ? 'var(--text-accent)' : ''};">Disponibles: ${p.quantity}</p>
-                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${escapedName}', '${location}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
-                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${escapedName}', '${location}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
+                            <p class="product-quantity text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : ''}" style="color: ${p.quantity >= 5 ? 'var(--text-accent)' : ''};">Disponibles: ${p.quantity}</p>
+                            <button onclick="updateInventoryQuantity(this, '${p.id}', -1, '${location}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
+                            <button onclick="updateInventoryQuantity(this, '${p.id}', 1, '${location}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
                         </div>
                         <div class="flex space-x-4 w-full justify-center text-sm">
                             <button onclick="openEditModal('${p.id}', '${location}')" class="font-medium p-1" style="color: var(--text-accent-hover);">Editar</button>
@@ -879,7 +887,7 @@
                         </select>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onclick="deleteSale('${sale.id}', '${sale.product_name}', '${location}')" class="text-red-500 hover:text-red-400">Eliminar</button>
+                        <button onclick="deleteSale('${sale.id}', '${sale.product_name.replace(/'/g, "\\'")}', '${location}')" class="text-red-500 hover:text-red-400">Eliminar</button>
                     </td>
                 `;
             });
@@ -887,6 +895,7 @@
                 tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">No hay ventas registradas.</td></tr>`;
             }
         };
+
 
         const renderExpenses = () => {
             const tbody = document.getElementById('expenses-history-body');
@@ -901,7 +910,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                        <button onclick="deleteExpense('${expense.id}', '${expense.description}')" class="text-red-500 hover:text-red-400">Eliminar</button>
+                        <button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}')" class="text-red-500 hover:text-red-400">Eliminar</button>
                     </td>
                 `;
             });
@@ -1018,7 +1027,8 @@
                 await loadFunction(); 
             }
         }
-
+        
+        // MODIFICADO: Esta función ahora también actualiza la cantidad de stock
         async function handleEditProduct(event) {
             event.preventDefault();
             const id = document.getElementById('edit-product-id').value;
@@ -1027,14 +1037,17 @@
             const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
             const fileInput = document.getElementById('edit-product-image-file');
 
+            const newQuantity = parseInt(document.getElementById('edit-product-quantity').value, 10);
+
             const updateData = {
                 name: document.getElementById('edit-product-name').value.trim(),
                 category: document.getElementById('edit-product-category').value,
-                price: parseFloat(document.getElementById('edit-product-price').value)
+                price: parseFloat(document.getElementById('edit-product-price').value),
+                quantity: isNaN(newQuantity) ? 0 : newQuantity // Asegura que sea un número
             };
 
-            if (!id || !updateData.name || !updateData.category || updateData.price <= 0) {
-                return showModal("Error", "Nombre, categoría y precio válidos son requeridos.", "error");
+            if (!id || !updateData.name || !updateData.category || updateData.price <= 0 || updateData.quantity < 0) {
+                return showModal("Error", "Todos los campos son requeridos y deben tener valores válidos.", "error");
             }
 
             try {
@@ -1188,48 +1201,50 @@
             }
         }
         
-        // *** FUNCIÓN CORREGIDA Y MEJORADA ***
-        window.updateInventoryQuantity = async (id, delta, name, location = 'local1') => {
+        window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
             const inventorySource = location === 'local2' ? inventory2 : inventory;
             const table = location === 'local2' ? 'inventory2' : 'inventory';
-            const renderContainerId = location === 'local2' ? 'inventory-list-2' : 'inventory-list';
-
+            
             const product = inventorySource.find(p => p.id === id);
             if (!product) return;
 
             const originalQty = product.quantity;
             const newQty = originalQty + Number(delta);
 
-            if (newQty < 0) {
-                return; // No hace nada si se intenta bajar de 0
-            }
+            if (newQty < 0) return;
 
-            // 1. Actualización Optimista: Actualiza la UI inmediatamente.
-            product.quantity = newQty;
-            const searchTerm = location === 'local1' ? document.getElementById('search-inventory').value.toLowerCase() : '';
-            renderInventoryList(inventorySource, renderContainerId, location, searchTerm);
+            // Actualización optimista de la UI
+            const productCard = button.closest('[data-product-id]');
+            const quantityElement = productCard.querySelector('.product-quantity');
+            quantityElement.textContent = `Disponibles: ${newQty}`;
+            product.quantity = newQty; // Actualiza el estado local
 
-            // 2. Sincronización en segundo plano con la base de datos.
+            // Actualiza estilos y estado del botón
+            const subtractButton = productCard.querySelector('button:nth-of-type(1)');
+            subtractButton.disabled = newQty <= 0;
+            subtractButton.classList.toggle('opacity-50', newQty <= 0);
+            quantityElement.classList.toggle('text-red-400', newQty < 5);
+            if (newQty >= 5) quantityElement.style.color = 'var(--text-accent)';
+
+            // Sincronización con la base de datos
             try {
                 const { error } = await supabase.from(table)
                     .update({ quantity: newQty })
                     .eq('id', id)
                     .eq('user_id', currentUserId);
-
-                // 3. Si hay un error, revierte el cambio en la UI y notifica al usuario.
-                if (error) {
-                    console.error("Error al actualizar stock:", error);
-                    product.quantity = originalQty; // Revertir
-                    renderInventoryList(inventorySource, renderContainerId, location, searchTerm); // Volver a dibujar
-                    showModal("Error de Sincronización", `No se pudo guardar el cambio en la base de datos. ${error.message}`, "error");
-                }
+                if (error) throw error;
             } catch (e) {
-                console.error("Excepción al actualizar stock:", e);
-                product.quantity = originalQty; // Revertir
-                renderInventoryList(inventorySource, renderContainerId, location, searchTerm); // Volver a dibujar
-                showModal("Error de Conexión", `No se pudo guardar el cambio. ${e.message}`, "error");
+                // Si falla, revierte la UI al estado original
+                product.quantity = originalQty;
+                quantityElement.textContent = `Disponibles: ${originalQty}`;
+                subtractButton.disabled = originalQty <= 0;
+                subtractButton.classList.toggle('opacity-50', originalQty <= 0);
+                quantityElement.classList.toggle('text-red-400', originalQty < 5);
+                if (originalQty >= 5) quantityElement.style.color = 'var(--text-accent)';
+                showModal("Error de Sincronización", `No se pudo guardar el cambio. ${e.message}`, "error");
             }
         };
+
 
         window.deleteProduct = (id, name, location = 'local1') => {
             const table = location === 'local2' ? 'inventory2' : 'inventory';
