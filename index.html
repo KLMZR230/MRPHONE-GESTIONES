@@ -422,6 +422,7 @@
                     <input type="file" id="edit-product-image-file" accept="image/*" class="hidden">
                     <p class="text-xs text-gray-400">Haz clic en la imagen para cambiarla (máx 500KB)</p>
                 </div>
+
                 <div>
                     <label for="edit-product-name" class="block text-sm font-medium">Nombre</label>
                     <input type="text" id="edit-product-name" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
@@ -455,6 +456,7 @@
             </form>
         </div>
     </div>
+    
     <div id="add-product-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
         <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all border-l-4" style="background-color: var(--bg-card); border-color: var(--text-accent);">
             <h3 class="text-2xl font-bold mb-4" style="color: var(--text-accent);">Añadir Nuevo Producto</h3>
@@ -588,13 +590,11 @@
             document.getElementById('image-modal-content').src = '';
         };
 
-        // MODIFICADO: Esta función ahora carga la imagen actual en el modal de edición
         window.openEditModal = (id, location = 'local1') => {
             const productSource = location === 'local2' ? inventory2 : inventory;
             const product = productSource.find(p => p.id === id);
             if (!product) return;
             
-            // Carga la imagen actual en la vista previa del modal
             const placeholder = `https://placehold.co/150x150/1f2937/d97706?text=${product.name.substring(0,3).toUpperCase()}`;
             document.getElementById('edit-product-image-preview').src = product.image_url || placeholder;
 
@@ -603,7 +603,7 @@
             document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
             document.getElementById('edit-product-category').value = product.category || 'Otro';
             document.getElementById('edit-product-location').value = location;
-            document.getElementById('edit-product-image-file').value = ''; // Resetea el input de archivo
+            document.getElementById('edit-product-image-file').value = ''; 
             document.getElementById('edit-modal-container').classList.remove('hidden');
         };
         window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
@@ -811,6 +811,10 @@
                 groupedInventory[category].forEach(p => {
                     const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
                     const placeholder = `https://placehold.co/150x150/d97706/1f2937?text=${initials}&font=inter`;
+                    
+                    // *** FIX: Escapa comillas simples en los nombres para evitar errores en onclick ***
+                    const escapedName = p.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
                     const item = document.createElement('div');
                     item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
                     
@@ -823,12 +827,12 @@
                         <p class="text-sm my-2">Precio: <span class="font-bold text-green-400">$${parseFloat(p.price).toFixed(2)}</span></p>
                         <div class="flex items-center space-x-4 mb-4">
                             <p class="text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : ''}" style="color: ${p.quantity >= 5 ? 'var(--text-accent)' : ''};">Disponibles: ${p.quantity}</p>
-                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${p.name}', '${location}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
-                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${p.name}', '${location}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
+                            <button onclick="updateInventoryQuantity('${p.id}', -1, '${escapedName}', '${location}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
+                            <button onclick="updateInventoryQuantity('${p.id}', 1, '${escapedName}', '${location}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
                         </div>
                         <div class="flex space-x-4 w-full justify-center text-sm">
                             <button onclick="openEditModal('${p.id}', '${location}')" class="font-medium p-1" style="color: var(--text-accent-hover);">Editar</button>
-                            <button onclick="deleteProduct('${p.id}', '${p.name}', '${location}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
+                            <button onclick="deleteProduct('${p.id}', '${escapedName}', '${location}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
                         </div>`;
                     categoryGrid.appendChild(item);
                 });
@@ -1015,7 +1019,6 @@
             }
         }
 
-        // MODIFICADO: Esta función ahora comprueba si se subió un nuevo archivo de imagen
         async function handleEditProduct(event) {
             event.preventDefault();
             const id = document.getElementById('edit-product-id').value;
@@ -1035,9 +1038,8 @@
             }
 
             try {
-                // Si el usuario seleccionó un nuevo archivo, lo procesamos y lo añadimos a los datos a actualizar
                 if (fileInput.files[0]) {
-                    const imageData = await fileToBase64(fileInput.files[0], 512000); // Límite de 500KB
+                    const imageData = await fileToBase64(fileInput.files[0], 512000);
                     updateData.image_url = imageData;
                 }
 
@@ -1185,27 +1187,47 @@
                 await loadAllData(false);
             }
         }
-
+        
+        // *** FUNCIÓN CORREGIDA Y MEJORADA ***
         window.updateInventoryQuantity = async (id, delta, name, location = 'local1') => {
             const inventorySource = location === 'local2' ? inventory2 : inventory;
             const table = location === 'local2' ? 'inventory2' : 'inventory';
-            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+            const renderContainerId = location === 'local2' ? 'inventory-list-2' : 'inventory-list';
 
             const product = inventorySource.find(p => p.id === id);
             if (!product) return;
 
-            const newQty = product.quantity + delta;
+            const originalQty = product.quantity;
+            const newQty = originalQty + Number(delta);
+
             if (newQty < 0) {
-                return showModal("Error de Cantidad", `La cantidad de '${name}' no puede ser negativa.`, "error");
+                return; // No hace nada si se intenta bajar de 0
             }
+
+            // 1. Actualización Optimista: Actualiza la UI inmediatamente.
+            product.quantity = newQty;
+            const searchTerm = location === 'local1' ? document.getElementById('search-inventory').value.toLowerCase() : '';
+            renderInventoryList(inventorySource, renderContainerId, location, searchTerm);
+
+            // 2. Sincronización en segundo plano con la base de datos.
             try {
-                const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
-                if (error) throw error;
-            } catch (e) { 
-                showModal("Error de Cantidad", e.message, "error"); 
-            }
-            finally { 
-                await loadFunction(); 
+                const { error } = await supabase.from(table)
+                    .update({ quantity: newQty })
+                    .eq('id', id)
+                    .eq('user_id', currentUserId);
+
+                // 3. Si hay un error, revierte el cambio en la UI y notifica al usuario.
+                if (error) {
+                    console.error("Error al actualizar stock:", error);
+                    product.quantity = originalQty; // Revertir
+                    renderInventoryList(inventorySource, renderContainerId, location, searchTerm); // Volver a dibujar
+                    showModal("Error de Sincronización", `No se pudo guardar el cambio en la base de datos. ${error.message}`, "error");
+                }
+            } catch (e) {
+                console.error("Excepción al actualizar stock:", e);
+                product.quantity = originalQty; // Revertir
+                renderInventoryList(inventorySource, renderContainerId, location, searchTerm); // Volver a dibujar
+                showModal("Error de Conexión", `No se pudo guardar el cambio. ${e.message}`, "error");
             }
         };
 
@@ -1304,7 +1326,6 @@
                 }
             });
             
-            // NUEVO: Listener para que la imagen de vista previa cambie al seleccionar un archivo nuevo
             document.getElementById('edit-product-image-file').addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
