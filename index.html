@@ -401,7 +401,7 @@
             </div>
         </div>
     </div>
-
+    
     <div id="edit-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
         <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all border-l-4" style="background-color: var(--bg-card); border-color: var(--text-accent);">
             <h3 class="text-2xl font-bold mb-4" style="color: var(--text-accent);">Editar Producto</h3>
@@ -410,7 +410,7 @@
                 <input type="hidden" id="edit-product-location">
                 
                 <div class="flex flex-col items-center space-y-3">
-                    <label for="edit-product-image-file" class="relative cursor-pointer group">
+                    <label for="edit-product-image-file" class="relative cursor-pointer group" title="Haz clic para cambiar la imagen">
                         <img id="edit-product-image-preview" src="https://placehold.co/150x150/1f2937/d97706?text=IMG" alt="Vista previa" class="w-32 h-32 object-cover rounded-lg border-2" style="border-color: var(--border-color);">
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center rounded-lg transition-opacity">
                             <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -422,7 +422,6 @@
                     <input type="file" id="edit-product-image-file" accept="image/*" class="hidden">
                     <p class="text-xs text-gray-400">Haz clic en la imagen para cambiarla (máx 500KB)</p>
                 </div>
-
                 <div>
                     <label for="edit-product-name" class="block text-sm font-medium">Nombre</label>
                     <input type="text" id="edit-product-name" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
@@ -456,7 +455,6 @@
             </form>
         </div>
     </div>
-    
     <div id="add-product-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
         <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all border-l-4" style="background-color: var(--bg-card); border-color: var(--text-accent);">
             <h3 class="text-2xl font-bold mb-4" style="color: var(--text-accent);">Añadir Nuevo Producto</h3>
@@ -590,19 +588,22 @@
             document.getElementById('image-modal-content').src = '';
         };
 
+        // MODIFICADO: Esta función ahora carga la imagen actual en el modal de edición
         window.openEditModal = (id, location = 'local1') => {
             const productSource = location === 'local2' ? inventory2 : inventory;
             const product = productSource.find(p => p.id === id);
             if (!product) return;
-
+            
+            // Carga la imagen actual en la vista previa del modal
             const placeholder = `https://placehold.co/150x150/1f2937/d97706?text=${product.name.substring(0,3).toUpperCase()}`;
             document.getElementById('edit-product-image-preview').src = product.image_url || placeholder;
+
             document.getElementById('edit-product-id').value = product.id;
             document.getElementById('edit-product-name').value = product.name;
             document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
             document.getElementById('edit-product-category').value = product.category || 'Otro';
             document.getElementById('edit-product-location').value = location;
-            document.getElementById('edit-product-image-file').value = ''; // Reset file input
+            document.getElementById('edit-product-image-file').value = ''; // Resetea el input de archivo
             document.getElementById('edit-modal-container').classList.remove('hidden');
         };
         window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
@@ -1014,6 +1015,7 @@
             }
         }
 
+        // MODIFICADO: Esta función ahora comprueba si se subió un nuevo archivo de imagen
         async function handleEditProduct(event) {
             event.preventDefault();
             const id = document.getElementById('edit-product-id').value;
@@ -1033,8 +1035,9 @@
             }
 
             try {
+                // Si el usuario seleccionó un nuevo archivo, lo procesamos y lo añadimos a los datos a actualizar
                 if (fileInput.files[0]) {
-                    const imageData = await fileToBase64(fileInput.files[0], 512000); // 500KB limit
+                    const imageData = await fileToBase64(fileInput.files[0], 512000); // Límite de 500KB
                     updateData.image_url = imageData;
                 }
 
@@ -1054,7 +1057,6 @@
                 await loadFunction(); 
             }
         }
-
 
         async function handleLogoFileSelect(event) {
             const file = event.target.files[0];
@@ -1301,7 +1303,8 @@
                     priceInput.value = parseFloat(selectedProduct.price).toFixed(2);
                 }
             });
-            // Listener para la vista previa de la imagen en el modal de edición
+            
+            // NUEVO: Listener para que la imagen de vista previa cambie al seleccionar un archivo nuevo
             document.getElementById('edit-product-image-file').addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
