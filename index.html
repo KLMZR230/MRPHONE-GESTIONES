@@ -1,6 +1,5 @@
 <!doctype html>
-<html lang="es">
-<head>
+<html lang="es" class="theme-dark"> <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>MRPHONE PRODUCTOS Y VENTAS</title>
@@ -24,19 +23,25 @@
         #logo-upload { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; border: 0; }
         .view-section.hidden { display: none; }
         
-        .skeleton-card { background-color: transparent; border-radius: 0.5rem; padding: 1rem; display: flex; flex-direction: column; }
-        .skeleton-line {
+        /* --- ESTILOS PARA SKELETON LOADER --- */
+        .skeleton-card {
             background-color: var(--bg-secondary);
-            opacity: 0.7;
+            opacity: 0.5;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .skeleton-line {
+            background-color: var(--bg-primary);
+            opacity: 0.8;
             border-radius: 0.25rem;
             animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        @keyframes pulse { 50% { opacity: .4; } }
+        @keyframes pulse { 50% { opacity: .6; } }
 
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
         /********************************/
-        html, .theme-dark {
+        :root, .theme-dark {
             --bg-primary: #1f2937;
             --bg-secondary: #374151;
             --bg-header: rgba(31, 41, 55, 0.8);
@@ -133,7 +138,7 @@
         .status-returned { background-color: #dc2626 !important; color: #ffffff !important; border-color: #b91c1c !important; }
         
         /********************************/
-        /* --- NUEVO ESTILO: LÍNEA EN EL BORDE --- */
+        /* --- ESTILO: LÍNEA EN EL BORDE --- */
         /********************************/
         .themed-border {
             border: 2px solid var(--accent-color) !important;
@@ -141,7 +146,7 @@
         }
     </style>
 </head>
-<body class="theme-dark"> 
+<body> 
     <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between themed-border">
         <div class="flex items-center space-x-4">
             <img id="store-logo-img" src="https://via.placeholder.com/60/4f46e5/ffffff?text=MP" alt="Logo negocio" class="h-12 w-12 object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105 cursor-pointer" title="Haz clic para cambiar el logo" />
@@ -191,14 +196,16 @@
             <section>
                 <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">📦 Inventario Principal</h2></div>
                 <div class="mb-6 flex items-center space-x-3"><input type="text" id="search-inventory" placeholder="Buscar..." class="p-2 border rounded-md w-full max-w-lg bg-gray-800 border-gray-600 text-white" /></div>
-                <div id="inventory-list" class="space-y-8"></div>
+                <div id="inventory-list" class="space-y-8">
+                    </div>
             </section>
         </div>
 
         <div id="local2_inventory-view" class="view-section hidden">
             <section>
                 <div class="flex items-center justify-between mb-4"><h2 class="text-xl font-semibold text-indigo-300">🚚 Inventario Local 2</h2></div>
-                <div id="inventory-list-2" class="space-y-8"></div>
+                <div id="inventory-list-2" class="space-y-8">
+                     </div>
             </section>
         </div>
         
@@ -265,13 +272,12 @@
                 return data.url;
             } catch (error) { console.error('Error subiendo archivo a R2:', error); throw error; }
         };
-        
-        // --- FUNCIONES GLOBALES RESTAURADAS PARA CORREGIR EL ERROR ---
+
+        // --- CORRECCIÓN: La clase del tema se aplica a <html> (documentElement) ---
         window.applyTheme = (theme) => { document.documentElement.className = theme; };
         window.changeTheme = (theme) => { window.applyTheme(theme); localStorage.setItem('mrphone_theme_v2', theme); };
-
         window.showModal = (title, body, type = 'success') => { alert(`[${type.toUpperCase()}] ${title}: ${body}`); };
-
+        
         window.toggleView = (viewName) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.view-btn').forEach(b => {
@@ -290,22 +296,52 @@
                 populateSaleCategoryDropdown(currentLocal);
             }
         };
+
+        const renderSkeletonLoader = (container) => {
+            let skeletonHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">';
+            for(let i = 0; i < 8; i++) {
+                skeletonHTML += `
+                    <div class="skeleton-card">
+                        <div class="skeleton-line h-40 mb-3"></div>
+                        <div class="skeleton-line h-6 w-3/4 mb-2"></div>
+                        <div class="skeleton-line h-8 w-1/2"></div>
+                    </div>
+                `;
+            }
+            skeletonHTML += '</div>';
+            container.innerHTML = skeletonHTML;
+        };
         
         const initializeApp = () => {
             const savedTheme = localStorage.getItem('mrphone_theme_v2') || 'theme-dark';
             document.getElementById('theme-selector').value = savedTheme;
             window.applyTheme(savedTheme);
+
+            // CORRECCIÓN: Mostrar la vista y el skeleton loader INMEDIATAMENTE
+            window.toggleView('inventory');
+            renderSkeletonLoader(document.getElementById('inventory-list'));
+            renderSkeletonLoader(document.getElementById('inventory-list-2'));
+
             try {
                 supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
                 currentUserId = PUBLIC_STORE_ID; 
-                loadAllData(true);
+                loadAllData();
             } catch (error) { window.showModal('Error de Conexión', error.message, 'error'); }
         };
 
-        async function loadAllData(showSpinner = false) {
-            try { await Promise.all([ loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2(), loadExpenses(), loadSettings() ]); } 
-            catch (e) { window.showModal("Error al cargar datos", e.message, "error"); }
-            finally { if (showSpinner) { window.toggleView('inventory'); } }
+        async function loadAllData() {
+            try { 
+                await Promise.all([ 
+                    loadInventory(), 
+                    loadInventory2(), 
+                    loadSalesHistory(), 
+                    loadSalesHistory2(), 
+                    loadExpenses(), 
+                    loadSettings() 
+                ]); 
+            } catch (e) { 
+                window.showModal("Error al cargar datos", e.message, "error"); 
+            }
         }
         
         async function loadInventory() {
