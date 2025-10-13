@@ -17,7 +17,7 @@
             --text-accent: #d97706;
             --text-accent-hover: #fbbf24;
             --border-color: #4b5563;
-            --glow-color: rgba(217, 119, 6, 0.5); /* Naranja/Oro */
+            --glow-color: rgba(217, 119, 6, 0.5);
             --button-primary-bg: #d97706;
             --button-primary-text: #111827;
             --button-primary-hover: #b45309;
@@ -30,7 +30,7 @@
             --text-accent: #ef4444;
             --text-accent-hover: #f87171;
             --border-color: #5c5c5c;
-            --glow-color: rgba(239, 68, 68, 0.5); /* Rojo */
+            --glow-color: rgba(239, 68, 68, 0.5);
             --button-primary-bg: #b91c1c;
             --button-primary-text: #ffffff;
             --button-primary-hover: #991b1b;
@@ -43,20 +43,20 @@
             --text-accent: #39ff14;
             --text-accent-hover: #adff2f;
             --border-color: #008f11;
-            --glow-color: rgba(57, 255, 20, 0.6); /* Verde */
+            --glow-color: rgba(57, 255, 20, 0.6);
             --button-primary-bg: #00ff00;
             --button-primary-text: #000000;
             --button-primary-hover: #00e600;
         }
         
         .theme-vino-celeste {
-            --bg-body: #2C001E; /* Fondo vino oscuro */
-            --bg-card: #4F002B; /* Tarjetas vino un poco más claro */
-            --text-main: #E0E0E0; /* Texto principal casi blanco */
-            --text-accent: #00C4FF; /* Celeste vibrante */
-            --text-accent-hover: #7AE5FF; /* Celeste más claro para hover */
-            --border-color: #7A0045; /* Borde vino */
-            --glow-color: rgba(0, 196, 255, 0.5); /* Resplandor celeste */
+            --bg-body: #2C001E;
+            --bg-card: #4F002B;
+            --text-main: #E0E0E0;
+            --text-accent: #00C4FF;
+            --text-accent-hover: #7AE5FF;
+            --border-color: #7A0045;
+            --glow-color: rgba(0, 196, 255, 0.5);
             --button-primary-bg: #00C4FF;
             --button-primary-text: #2C001E;
             --button-primary-hover: #00A3D4;
@@ -144,23 +144,23 @@
             </div>
             <nav class="flex justify-around space-x-2 border-b" style="border-color: var(--border-color);">
                 <button onclick="changeView('inventory')" id="nav-inventory"
-                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none" style="--tw-hover-border-color: var(--text-accent-hover); --tw-hover-text-color: var(--text-accent-hover);">
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none">
                     Inventario
                 </button>
                 <button onclick="changeView('sales')" id="nav-sales"
-                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none" style="--tw-hover-border-color: var(--text-accent-hover); --tw-hover-text-color: var(--text-accent-hover);">
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none">
                     Registrar Venta
                 </button>
                 <button onclick="changeView('expenses')" id="nav-expenses"
-                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none" style="--tw-hover-border-color: var(--text-accent-hover); --tw-hover-text-color: var(--text-accent-hover);">
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none">
                     Gastos
                 </button>
                 <button onclick="changeView('history')" id="nav-history"
-                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none" style="--tw-hover-border-color: var(--text-accent-hover); --tw-hover-text-color: var(--text-accent-hover);">
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none">
                     Historial de Ventas
                 </button>
                 <button onclick="changeView('local2')" id="nav-local2"
-                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none" style="--tw-hover-border-color: var(--text-accent-hover); --tw-hover-text-color: var(--text-accent-hover);">
+                    class="py-2 px-3 sm:px-4 text-sm md:text-base font-medium text-center transition-all duration-200 border-b-4 border-transparent text-gray-400 focus:outline-none">
                     LOCAL 2
                 </button>
             </nav>
@@ -168,7 +168,7 @@
 
         <main>
             <div id="loading-spinner" class="text-center p-8">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-4" style="border-color: var(--text-accent);"></div>
+                <div class="animate-spin rounded-full h-12 w-12 border-b-4 mx-auto" style="border-color: var(--text-accent);"></div>
                 <p class="mt-4" style="color: var(--text-accent);">Conectando a Supabase y sincronizando datos...</p>
             </div>
             <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden"></div>
@@ -304,7 +304,7 @@
 
             <section id="view-local2" class="view-content hidden">
                 <nav class="flex justify-center space-x-4 border-b mb-6" style="border-color: var(--border-color);">
-                    <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="py-2 px-4 text-sm font-medium text-center border-b-2">
+                    <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="active-nav py-2 px-4 text-sm font-medium text-center border-b-2">
                         Inventario
                     </button>
                     <button onclick="changeSubView('local2-sales')" id="nav-local2-sales" class="py-2 px-4 text-sm font-medium text-center text-gray-400 border-b-2 border-transparent">
@@ -515,766 +515,774 @@
         <img id="image-modal-content" src="" alt="Producto Ampliado" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl" onclick="event.stopPropagation()">
     </div>
 
-    <script type="module">
-        // --- SCRIPT COMPLETO ---
-        const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+<script type="module">
+    const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+    
+    let supabase = null; 
+    let inventory = [], salesHistory = [], expensesHistory = [];
+    let inventory2 = [], salesHistory2 = [];
+
+    const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
+    let currentUserId = null; 
+
+    // FUNCIÓN PARA SUBIR ARCHIVOS A CLOUDFLARE R2
+    const uploadToR2 = async (file) => {
+        if (!file) return null;
         
-        let supabase = null; 
-        let inventory = [], salesHistory = [], expensesHistory = [];
-        let inventory2 = [], salesHistory2 = [];
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
 
-        const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
-        let currentUserId = null; 
+            const response = await fetch(
+                `${supabaseUrl}/functions/v1/upload-to-r2`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${supabaseAnonKey}`
+                    },
+                    body: formData
+                }
+            );
 
-        // --- MANEJO DE TEMAS ---
-        const themes = {
-            'luxury-gold': 'Luxury Gold',
-            'fuego-infernal': 'theme-fuego-infernal',
-            'hacker-matrix': 'theme-hacker-matrix',
-            'vino-celeste': 'theme-vino-celeste'
-        };
-
-        window.applyTheme = (theme) => {
-            document.body.className = 'min-h-screen flex flex-col'; // Reset classes
-            if (themes[theme] && theme !== 'luxury-gold') {
-                document.body.classList.add(themes[theme]);
-            }
-        };
-
-        window.changeTheme = (theme) => {
-            applyTheme(theme);
-            localStorage.setItem('mrphone_theme', theme);
-        };
-
-        // --- FUNCIONES DE UTILIDAD (MODALES, VISTAS) ---
-        window.showModal = (title, body, type = 'success') => {
-            const modal = {
-                title: document.getElementById('modal-title'),
-                body: document.getElementById('modal-body'),
-                button: document.getElementById('modal-button'),
-                cancelButton: document.getElementById('modal-cancel-button'),
-                content: document.getElementById('modal-content'),
-                container: document.getElementById('modal-container')
-            };
-            modal.title.textContent = title;
-            modal.body.textContent = body;
-            modal.container.classList.remove('hidden');
-
-            const modalButton = document.getElementById('modal-button');
-            modalButton.className = 'w-full py-2 rounded-lg font-semibold transition-colors';
-            if (type === 'error') {
-                modal.title.style.color = '#f87171';
-                modalButton.style.backgroundColor = '#b91c1c';
-                modalButton.style.color = 'white';
-                modalButton.textContent = 'Entendido';
-            } else {
-                modal.title.style.color = 'var(--text-accent)';
-                modalButton.style.backgroundColor = 'var(--button-primary-bg)';
-                modalButton.style.color = 'var(--button-primary-text)';
-                modalButton.textContent = 'Cerrar';
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al subir archivo a R2');
             }
 
-            modal.cancelButton.classList.add('hidden');
-            modal.button.onclick = closeModal;
+            const data = await response.json();
+            return data.url;
+
+        } catch (error) {
+            console.error('Error subiendo archivo a R2:', error);
+            throw error;
+        }
+    };
+
+    const themes = {
+        'luxury-gold': 'Luxury Gold',
+        'fuego-infernal': 'theme-fuego-infernal',
+        'hacker-matrix': 'theme-hacker-matrix',
+        'vino-celeste': 'theme-vino-celeste'
+    };
+
+    window.applyTheme = (theme) => {
+        document.body.className = 'min-h-screen flex flex-col';
+        if (themes[theme] && theme !== 'luxury-gold') {
+            document.body.classList.add(themes[theme]);
+        }
+    };
+
+    window.changeTheme = (theme) => {
+        applyTheme(theme);
+        localStorage.setItem('mrphone_theme', theme);
+    };
+
+    window.showModal = (title, body, type = 'success') => {
+        const modal = {
+            title: document.getElementById('modal-title'),
+            body: document.getElementById('modal-body'),
+            button: document.getElementById('modal-button'),
+            cancelButton: document.getElementById('modal-cancel-button'),
+            content: document.getElementById('modal-content'),
+            container: document.getElementById('modal-container')
         };
-        window.closeModal = () => {
-            document.getElementById('modal-container').classList.add('hidden');
-            document.getElementById('modal-cancel-button').classList.add('hidden');
+        modal.title.textContent = title;
+        modal.body.textContent = body;
+        modal.container.classList.remove('hidden');
+
+        const modalButton = document.getElementById('modal-button');
+        modalButton.className = 'w-full py-2 rounded-lg font-semibold transition-colors';
+        if (type === 'error') {
+            modal.title.style.color = '#f87171';
+            modalButton.style.backgroundColor = '#b91c1c';
+            modalButton.style.color = 'white';
+            modalButton.textContent = 'Entendido';
+        } else {
+            modal.title.style.color = 'var(--text-accent)';
+            modalButton.style.backgroundColor = 'var(--button-primary-bg)';
+            modalButton.style.color = 'var(--button-primary-text)';
+            modalButton.textContent = 'Cerrar';
         }
 
-        window.openImageModal = (imageUrl) => {
-            if (!imageUrl) return;
-            document.getElementById('image-modal-content').src = imageUrl;
-            document.getElementById('image-modal-container').classList.remove('hidden');
-        };
+        modal.cancelButton.classList.add('hidden');
+        modal.button.onclick = closeModal;
+    };
+    window.closeModal = () => {
+        document.getElementById('modal-container').classList.add('hidden');
+        document.getElementById('modal-cancel-button').classList.add('hidden');
+    }
 
-        window.closeImageModal = () => {
-            document.getElementById('image-modal-container').classList.add('hidden');
-            document.getElementById('image-modal-content').src = '';
-        };
+    window.openImageModal = (imageUrl) => {
+        if (!imageUrl) return;
+        document.getElementById('image-modal-content').src = imageUrl;
+        document.getElementById('image-modal-container').classList.remove('hidden');
+    };
 
-        window.openEditModal = (id, location = 'local1') => {
-            const productSource = location === 'local2' ? inventory2 : inventory;
-            const product = productSource.find(p => p.id === id);
-            if (!product) return;
-            
-            const placeholder = `https://placehold.co/150x150/1f2937/d97706?text=${product.name.substring(0,3).toUpperCase()}`;
-            document.getElementById('edit-product-image-preview').src = product.image_url || placeholder;
-            document.getElementById('edit-product-id').value = product.id;
-            document.getElementById('edit-product-name').value = product.name;
-            document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
-            document.getElementById('edit-product-category').value = product.category || 'Otro';
-            document.getElementById('edit-product-quantity').value = product.quantity;
-            document.getElementById('edit-product-location').value = location;
-            document.getElementById('edit-product-image-file').value = ''; 
-            document.getElementById('edit-modal-container').classList.remove('hidden');
-        };
-        window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
+    window.closeImageModal = () => {
+        document.getElementById('image-modal-container').classList.add('hidden');
+        document.getElementById('image-modal-content').src = '';
+    };
+
+    window.openEditModal = (id, location = 'local1') => {
+        const productSource = location === 'local2' ? inventory2 : inventory;
+        const product = productSource.find(p => p.id === id);
+        if (!product) return;
         
-        window.openAddProductModal = (location = 'local1') => {
-            document.getElementById('add-product-location').value = location;
-            document.getElementById('add-product-modal-container').classList.remove('hidden');
-        };
-        window.closeAddProductModal = () => {
-            document.getElementById('add-product-modal-container').classList.add('hidden');
-            document.getElementById('add-product-form').reset();
+        const placeholder = `https://placehold.co/150x150/1f2937/d97706?text=${product.name.substring(0,3).toUpperCase()}`;
+        document.getElementById('edit-product-image-preview').src = product.image_url || placeholder;
+        document.getElementById('edit-product-id').value = product.id;
+        document.getElementById('edit-product-name').value = product.name;
+        document.getElementById('edit-product-price').value = parseFloat(product.price).toFixed(2);
+        document.getElementById('edit-product-category').value = product.category || 'Otro';
+        document.getElementById('edit-product-quantity').value = product.quantity;
+        document.getElementById('edit-product-location').value = location;
+        document.getElementById('edit-product-image-file').value = ''; 
+        document.getElementById('edit-modal-container').classList.remove('hidden');
+    };
+    window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
+    
+    window.openAddProductModal = (location = 'local1') => {
+        document.getElementById('add-product-location').value = location;
+        document.getElementById('add-product-modal-container').classList.remove('hidden');
+    };
+    window.closeAddProductModal = () => {
+        document.getElementById('add-product-modal-container').classList.add('hidden');
+        document.getElementById('add-product-form').reset();
+    }
+
+    window.handleStatusChange = async (selectElement, saleId, location = 'local1') => {
+        const newStatus = selectElement.value;
+        await updateSaleStatus(saleId, newStatus, location);
+    };
+
+    window.changeView = (viewId) => {
+        document.querySelectorAll('.view-content').forEach(s => s.classList.add('hidden'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
+        document.getElementById(`view-${viewId}`).classList.remove('hidden');
+        document.getElementById(`nav-${viewId}`).classList.add('active-nav');
+
+        if (viewId === 'sales') populateSaleCategoryDropdown('local1');
+        if (viewId === 'local2') changeSubView('local2-inventory');
+    };
+
+    window.changeSubView = (subViewId) => {
+        document.querySelectorAll('#view-local2 .subview-content').forEach(s => s.classList.add('hidden'));
+        document.querySelectorAll('#view-local2 nav button').forEach(b => b.classList.remove('active-nav'));
+        document.getElementById(`subview-${subViewId}`).classList.remove('hidden');
+        document.getElementById(`nav-${subViewId}`).classList.add('active-nav');
+
+        if (subViewId === 'local2-sales') populateSaleCategoryDropdown('local2');
+    };
+
+    const initializeApp = () => {
+        const savedTheme = localStorage.getItem('mrphone_theme') || 'luxury-gold';
+        document.getElementById('theme-selector').value = savedTheme;
+        applyTheme(savedTheme);
+
+        try {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+            currentUserId = PUBLIC_STORE_ID; 
+            localStorage.setItem('mrphone_user_id', currentUserId);
+            loadAllData(true);
+        } catch (error) {
+            document.getElementById('error-message').textContent = `Error de Conexión: ${error.message}`;
+            document.getElementById('error-message').classList.remove('hidden');
+            document.getElementById('loading-spinner').classList.add('hidden');
         }
+    };
 
-        window.handleStatusChange = async (selectElement, saleId, location = 'local1') => {
-            const newStatus = selectElement.value;
-            await updateSaleStatus(saleId, newStatus, location);
-        };
+    async function loadAllData(showSpinner = false) {
+        const loadingSpinner = document.getElementById('loading-spinner');
+        if (showSpinner) loadingSpinner.classList.remove('hidden');
+        
+        try {
+            await Promise.all([
+                loadInventory(), 
+                loadInventory2(), 
+                loadSalesHistory(), 
+                loadSalesHistory2(), 
+                loadExpenses(), 
+                loadSettings()
+            ]); 
+            renderHeaderSummary();
+        } catch (e) { 
+            console.error("Error cargando datos:", e);
+            document.getElementById('error-message').textContent = `Error al cargar datos. Mensaje: ${e.message}`;
+            document.getElementById('error-message').classList.remove('hidden'); 
+        }
+        finally {
+            loadingSpinner.classList.add('hidden');
+            if (showSpinner) {
+                changeView('inventory');
+            }
+        }
+    }
+    
+    async function loadInventory() {
+        const { data, error } = await supabase.from('inventory').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
+        if (error) throw error;
+        inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
+        renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase());
+    }
 
-        window.changeView = (viewId) => {
-            document.querySelectorAll('.view-content').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
-            document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            document.getElementById(`nav-${viewId}`).classList.add('active-nav');
+    async function loadInventory2() {
+        const { data, error } = await supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
+        if (error) throw error;
+        inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
+        renderInventoryList(inventory2, 'inventory-list-2', 'local2');
+    }
 
-            if (viewId === 'sales') populateSaleCategoryDropdown('local1');
-            if (viewId === 'local2') changeSubView('local2-inventory');
-        };
+    async function loadSalesHistory() {
+        const { data, error } = await supabase.from('sales').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
+        if (error) throw error;
+        salesHistory = data || [];
+        renderSalesHistory(salesHistory, 'sales-history-body', 'local1');
+    }
+    
+    async function loadSalesHistory2() {
+        const { data, error } = await supabase.from('sales2').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
+        if (error) throw error;
+        salesHistory2 = data || [];
+        renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2');
+    }
 
-        window.changeSubView = (subViewId) => {
-            document.querySelectorAll('#view-local2 .subview-content').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('#view-local2 nav button').forEach(b => b.classList.remove('active-nav'));
-            document.getElementById(`subview-${subViewId}`).classList.remove('hidden');
-            document.getElementById(`nav-${subViewId}`).classList.add('active-nav');
+    async function loadExpenses() {
+        const { data, error } = await supabase.from('gastos').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
+        if (error) throw error;
+        expensesHistory = data || [];
+        renderExpenses();
+    }
 
-            if (subViewId === 'local2-sales') populateSaleCategoryDropdown('local2');
-        };
+    async function loadSettings() {
+        const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', currentUserId).single();
+        if (error && error.code !== 'PGRST116') console.error("Error cargando settings:", error); 
+        if (data?.store_logo_url) renderStoreLogo(data.store_logo_url);
+    }
 
-        const fileToBase64 = (file, maxSize) => new Promise((resolve, reject) => {
-            if (!file) return resolve(null);
-            if (file.size > maxSize) return reject(`Archivo demasiado grande. Límite: ${(maxSize / 1048576).toFixed(0)} MB.`); 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject("Error al leer archivo.");
+    const renderStoreLogo = (url) => {
+        const logoImg = document.getElementById('store-logo-img');
+        const placeholder = "https://placehold.co/240x80/d97706/1f2937?text=MRPHONE";
+        logoImg.src = url || placeholder;
+        logoImg.onerror = () => { logoImg.src = placeholder; };
+    };
+    
+    const renderHeaderSummary = () => {
+        const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
+        
+        const allSales = [...salesHistory, ...salesHistory2];
+        const todaySales = allSales.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
+        const todayExpenses = expensesHistory.filter(expense => new Date(expense.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
+
+        const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
+        const todayPaidTotal = todaySales.filter(sale => (sale.status || 'Pagado') === 'Pagado').reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
+        const todayExpensesTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+
+        document.getElementById('today-sold-total').textContent = `$${todaySoldTotal.toFixed(2)}`;
+        document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
+        document.getElementById('today-expenses-total').textContent = `$${todayExpensesTotal.toFixed(2)}`;
+    };
+
+    window.filterInventory = () => {
+        const searchTerm = document.getElementById('search-inventory').value;
+        renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm.toLowerCase());
+    }
+    
+    const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
+        const listContainer = document.getElementById(containerId);
+        listContainer.innerHTML = '';
+        listContainer.className = 'space-y-8';
+
+        const searchWords = searchTerm.toLowerCase().split(' ').filter(word => word.length > 0);
+
+        const filteredInventory = searchTerm.trim() === '' ? inventorySource : inventorySource.filter(p => {
+            const searchableText = `${p.name.toLowerCase()} ${p.category ? p.category.toLowerCase() : ''}`;
+            return searchWords.every(word => searchableText.includes(word));
         });
 
-        // --- INICIALIZACIÓN Y GESTIÓN DEL ID DE TIENDA COMPARTIDO ---
+        if (filteredInventory.length === 0) {
+            listContainer.innerHTML = `<p class="text-gray-400 text-center col-span-full">No se encontraron productos ${searchTerm ? `que coincidan con "${searchTerm}"` : ''}.</p>`;
+            return;
+        }
 
-        const initializeApp = () => {
-            const savedTheme = localStorage.getItem('mrphone_theme') || 'luxury-gold';
-            document.getElementById('theme-selector').value = savedTheme;
-            applyTheme(savedTheme);
+        const groupedInventory = filteredInventory.reduce((acc, product) => {
+            const category = product.category || 'Sin Categoría';
+            if (!acc[category]) acc[category] = [];
+            acc[category].push(product);
+            return acc;
+        }, {});
 
-            try {
-                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-                currentUserId = PUBLIC_STORE_ID; 
-                localStorage.setItem('mrphone_user_id', currentUserId);
-                loadAllData(true); // Carga inicial de datos, sin polling
-            } catch (error) {
-                document.getElementById('error-message').textContent = `Error de Conexión: ${error.message}`;
-                document.getElementById('error-message').classList.remove('hidden');
-                document.getElementById('loading-spinner').classList.add('hidden');
-            }
-        };
+        const sortedCategories = Object.keys(groupedInventory).sort();
 
-        async function loadAllData(showSpinner = false) {
-            const loadingSpinner = document.getElementById('loading-spinner');
-            if (showSpinner) loadingSpinner.classList.remove('hidden');
+        sortedCategories.forEach(category => {
+            const header = document.createElement('h2');
+            header.className = 'text-xl font-semibold pt-6 pb-2 border-b-2';
+            header.style.color = 'var(--text-accent)';
+            header.style.borderColor = 'var(--border-color)';
+            header.textContent = category;
             
-            try {
-                // Carga todos los datos en paralelo para mayor eficiencia
-                await Promise.all([
-                    loadInventory(), 
-                    loadInventory2(), 
-                    loadSalesHistory(), 
-                    loadSalesHistory2(), 
-                    loadExpenses(), 
-                    loadSettings()
-                ]); 
-                renderHeaderSummary();
-            } catch (e) { 
-                console.error("Error cargando datos:", e);
-                document.getElementById('error-message').textContent = `Error al cargar datos. Mensaje: ${e.message}`;
-                document.getElementById('error-message').classList.remove('hidden'); 
-            }
-            finally {
-                loadingSpinner.classList.add('hidden');
-                if (showSpinner) {
-                    changeView('inventory'); // Muestra la vista de inventario por defecto
-                }
-            }
-        }
-        
-        // --- FUNCIONES DE CARGA DE DATOS ---
-        
-        async function loadInventory() {
-            const { data, error } = await supabase.from('inventory').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
-            if (error) throw error;
-            inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
-            renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase());
-        }
+            const categoryGrid = document.createElement('div');
+            categoryGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
 
-        async function loadInventory2() {
-            const { data, error } = await supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false });
-            if (error) throw error;
-            inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 }));
-            renderInventoryList(inventory2, 'inventory-list-2', 'local2');
-        }
-
-        async function loadSalesHistory() {
-            const { data, error } = await supabase.from('sales').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
-            if (error) throw error;
-            salesHistory = data || [];
-            renderSalesHistory(salesHistory, 'sales-history-body', 'local1');
-        }
-        
-        async function loadSalesHistory2() {
-            const { data, error } = await supabase.from('sales2').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
-            if (error) throw error;
-            salesHistory2 = data || [];
-            renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2');
-        }
-
-        async function loadExpenses() {
-            const { data, error } = await supabase.from('gastos').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false });
-            if (error) throw error;
-            expensesHistory = data || [];
-            renderExpenses();
-        }
-
-        async function loadSettings() {
-            const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', currentUserId).single();
-            if (error && error.code !== 'PGRST116') console.error("Error cargando settings:", error); 
-            if (data?.store_logo_url) renderStoreLogo(data.store_logo_url);
-        }
-
-        // --- FUNCIONES DE RENDERIZADO ---
-
-        const renderStoreLogo = (url) => {
-            const logoImg = document.getElementById('store-logo-img');
-            const placeholder = "https://placehold.co/240x80/d97706/1f2937?text=MRPHONE";
-            logoImg.src = url || placeholder;
-            logoImg.onerror = () => { logoImg.src = placeholder; };
-        };
-        
-        const renderHeaderSummary = () => {
-            const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            groupedInventory[category].forEach(p => {
+                const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+                const placeholder = `https://placehold.co/150x150/d97706/1f2937?text=${initials}&font=inter`;
+                
+                const escapedName = p.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                
+                const item = document.createElement('div');
+                item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
+                item.setAttribute('data-product-id', p.id);
+                
+                item.innerHTML = `
+                    <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" 
+                         class="w-40 h-40 object-cover rounded-lg mb-3 border-2 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                         style="border-color: var(--border-color);"
+                         onclick="openImageModal('${p.image_url || placeholder}')">
+                    <h3 class="text-xl font-bold text-center truncate w-full px-2" style="color: var(--text-main);">${p.name}</h3>
+                    <p class="text-sm my-2">Precio: <span class="font-bold text-green-400">$${parseFloat(p.price).toFixed(2)}</span></p>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <p class="product-quantity text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : ''}" style="color: ${p.quantity >= 5 ? 'var(--text-accent)' : ''};">Disponibles: ${p.quantity}</p>
+                        <button onclick="updateInventoryQuantity(this, '${p.id}', -1, '${location}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
+                        <button onclick="updateInventoryQuantity(this, '${p.id}', 1, '${location}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
+                    </div>
+                    <div class="flex space-x-4 w-full justify-center text-sm">
+                        <button onclick="openEditModal('${p.id}', '${location}')" class="font-medium p-1" style="color: var(--text-accent-hover);">Editar</button>
+                        <button onclick="deleteProduct('${p.id}', '${escapedName}', '${location}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
+                    </div>`;
+                categoryGrid.appendChild(item);
+            });
             
-            const allSales = [...salesHistory, ...salesHistory2];
-            const todaySales = allSales.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
-            const todayExpenses = expensesHistory.filter(expense => new Date(expense.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
+            listContainer.appendChild(header);
+            listContainer.appendChild(categoryGrid);
+        });
+    };
+    
+    const renderSalesHistory = (historySource, tbodyId, location) => {
+        const tbody = document.getElementById(tbodyId);
+        tbody.innerHTML = '';
+        historySource.forEach(sale => {
+            const date = new Date(sale.timestamp).toLocaleDateString();
+            const currentStatus = sale.status || 'Pagado';
+            const row = tbody.insertRow();
+            row.className = 'hover:bg-gray-600 transition-colors';
 
-            const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
-            const todayPaidTotal = todaySales.filter(sale => (sale.status || 'Pagado') === 'Pagado').reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
-            const todayExpensesTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+            let statusColorClass = '';
+            switch (currentStatus) {
+                case 'Pagado': statusColorClass = 'bg-green-900/50 border-green-700 text-green-300'; break;
+                case 'Pendiente': statusColorClass = 'bg-yellow-900/50 border-yellow-700 text-yellow-300'; break;
+                case 'Devuelto': statusColorClass = 'bg-red-900/50 border-red-700 text-red-300'; break;
+                default: statusColorClass = 'bg-gray-800 border-gray-600 text-white';
+            }
 
-            document.getElementById('today-sold-total').textContent = `$${todaySoldTotal.toFixed(2)}`;
-            document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
-            document.getElementById('today-expenses-total').textContent = `$${todayExpensesTotal.toFixed(2)}`;
-        };
-
-        window.filterInventory = () => {
-            const searchTerm = document.getElementById('search-inventory').value;
-            renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm.toLowerCase());
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${sale.product_name} (x${sale.quantity || 1})</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${sale.recipient}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold">$${parseFloat(sale.price).toFixed(2)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <select onchange="handleStatusChange(this, '${sale.id}', '${location}')" class="status-select text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2 font-semibold transition-colors ${statusColorClass}">
+                        <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                        <option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto / Cancelado</option>
+                    </select>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onclick="deleteSale('${sale.id}', '${sale.product_name.replace(/'/g, "\\'")}', '${location}')" class="text-red-500 hover:text-red-400">Eliminar</button>
+                </td>`;
+        });
+        if (historySource.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">No hay ventas registradas.</td></tr>`;
         }
-        
-        const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
-            const listContainer = document.getElementById(containerId);
-            listContainer.innerHTML = '';
-            listContainer.className = 'space-y-8';
+    };
 
-            const searchWords = searchTerm.toLowerCase().split(' ').filter(word => word.length > 0);
+    const renderExpenses = () => {
+        const tbody = document.getElementById('expenses-history-body');
+        tbody.innerHTML = '';
+        expensesHistory.forEach(expense => {
+            const date = new Date(expense.timestamp).toLocaleDateString();
+            const row = tbody.insertRow();
+            row.className = 'hover:bg-gray-600 transition-colors';
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-400">Eliminar</button>
+                </td>`;
+        });
+        if (expensesHistory.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados.</td></tr>';
+        }
+    };
 
-            const filteredInventory = searchTerm.trim() === '' ? inventorySource : inventorySource.filter(p => {
-                const searchableText = `${p.name.toLowerCase()} ${p.category ? p.category.toLowerCase() : ''}`;
-                return searchWords.every(word => searchableText.includes(word));
-            });
+    const populateSaleCategoryDropdown = (location) => {
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const categorySelectId = location === 'local2' ? 'sale-category-2' : 'sale-category';
+        const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
+        const categorySelect = document.getElementById(categorySelectId);
+        const productSelect = document.getElementById(productSelectId);
+        productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
+        productSelect.disabled = true;
+        const categories = [...new Set(inventorySource.map(p => p.category || 'Sin Categoría'))].sort();
+        categorySelect.innerHTML = '<option value="" disabled selected>Primero selecciona una categoría</option>';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    };
 
-            if (filteredInventory.length === 0) {
-                listContainer.innerHTML = `<p class="text-gray-400 text-center col-span-full">No se encontraron productos ${searchTerm ? `que coincidan con "${searchTerm}"` : ''}.</p>`;
-                return;
-            }
-
-            const groupedInventory = filteredInventory.reduce((acc, product) => {
-                const category = product.category || 'Sin Categoría';
-                if (!acc[category]) acc[category] = [];
-                acc[category].push(product);
-                return acc;
-            }, {});
-
-            const sortedCategories = Object.keys(groupedInventory).sort();
-
-            sortedCategories.forEach(category => {
-                const header = document.createElement('h2');
-                header.className = 'text-xl font-semibold pt-6 pb-2 border-b-2';
-                header.style.color = 'var(--text-accent)';
-                header.style.borderColor = 'var(--border-color)';
-                header.textContent = category;
-                
-                const categoryGrid = document.createElement('div');
-                categoryGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
-
-                groupedInventory[category].forEach(p => {
-                    const initials = p.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-                    const placeholder = `https://placehold.co/150x150/d97706/1f2937?text=${initials}&font=inter`;
-                    
-                    const escapedName = p.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-
-                    const item = document.createElement('div');
-                    item.className = 'flex flex-col items-center p-4 luxury-card rounded-xl shadow-lg hover:shadow-amber-900/40 transition-shadow duration-300 transform hover:scale-[1.01]';
-                    item.setAttribute('data-product-id', p.id);
-                    
-                    item.innerHTML = `
-                        <img src="${p.image_url || placeholder}" onerror="this.src='${placeholder}'" alt="${p.name}" 
-                             class="w-40 h-40 object-cover rounded-lg mb-3 border-2 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                             style="border-color: var(--border-color);"
-                             onclick="openImageModal('${p.image_url || placeholder}')">
-                        <h3 class="text-xl font-bold text-center truncate w-full px-2" style="color: var(--text-main);">${p.name}</h3>
-                        <p class="text-sm my-2">Precio: <span class="font-bold text-green-400">$${parseFloat(p.price).toFixed(2)}</span></p>
-                        <div class="flex items-center space-x-4 mb-4">
-                            <p class="product-quantity text-2xl font-extrabold ${p.quantity < 5 ? 'text-red-400' : ''}" style="color: ${p.quantity >= 5 ? 'var(--text-accent)' : ''};">Disponibles: ${p.quantity}</p>
-                            <button onclick="updateInventoryQuantity(this, '${p.id}', -1, '${location}')" title="Restar Disponibles" class="quantity-btn ${p.quantity <= 0 ? 'opacity-50' : ''}" ${p.quantity <= 0 ? 'disabled' : ''}>&minus;</button>
-                            <button onclick="updateInventoryQuantity(this, '${p.id}', 1, '${location}')" title="Añadir Disponibles" class="quantity-btn">&#x2b;</button>
-                        </div>
-                        <div class="flex space-x-4 w-full justify-center text-sm">
-                            <button onclick="openEditModal('${p.id}', '${location}')" class="font-medium p-1" style="color: var(--text-accent-hover);">Editar</button>
-                            <button onclick="deleteProduct('${p.id}', '${escapedName}', '${location}')" class="text-red-500 hover:text-red-400 font-medium p-1">Eliminar</button>
-                        </div>`;
-                    categoryGrid.appendChild(item);
-                });
-                
-                listContainer.appendChild(header);
-                listContainer.appendChild(categoryGrid);
-            });
-        };
-        
-        const renderSalesHistory = (historySource, tbodyId, location) => {
-            const tbody = document.getElementById(tbodyId);
-            tbody.innerHTML = '';
-            historySource.forEach(sale => {
-                const date = new Date(sale.timestamp).toLocaleDateString();
-                const currentStatus = sale.status || 'Pagado';
-                const row = tbody.insertRow();
-                row.className = 'hover:bg-gray-600 transition-colors';
-
-                let statusColorClass = '';
-                switch (currentStatus) {
-                    case 'Pagado': statusColorClass = 'bg-green-900/50 border-green-700 text-green-300'; break;
-                    case 'Pendiente': statusColorClass = 'bg-yellow-900/50 border-yellow-700 text-yellow-300'; break;
-                    case 'Devuelto': statusColorClass = 'bg-red-900/50 border-red-700 text-red-300'; break;
-                    default: statusColorClass = 'bg-gray-800 border-gray-600 text-white';
-                }
-
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${sale.product_name} (x${sale.quantity || 1})</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${sale.recipient}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold">$${parseFloat(sale.price).toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <select onchange="handleStatusChange(this, '${sale.id}', '${location}')" class="status-select text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2 font-semibold transition-colors ${statusColorClass}">
-                            <option value="Pagado" ${currentStatus === 'Pagado' ? 'selected' : ''}>Pagado</option>
-                            <option value="Pendiente" ${currentStatus === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                            <option value="Devuelto" ${currentStatus === 'Devuelto' ? 'selected' : ''}>Devuelto / Cancelado</option>
-                        </select>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onclick="deleteSale('${sale.id}', '${sale.product_name.replace(/'/g, "\\'")}', '${location}')" class="text-red-500 hover:text-red-400">Eliminar</button>
-                    </td>`;
-            });
-            if (historySource.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">No hay ventas registradas.</td></tr>`;
-            }
-        };
-
-        const renderExpenses = () => {
-            const tbody = document.getElementById('expenses-history-body');
-            tbody.innerHTML = '';
-            expensesHistory.forEach(expense => {
-                const date = new Date(expense.timestamp).toLocaleDateString();
-                const row = tbody.insertRow();
-                row.className = 'hover:bg-gray-600 transition-colors';
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                        <button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}')" class="text-red-500 hover:text-red-400">Eliminar</button>
-                    </td>`;
-            });
-            if (expensesHistory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados.</td></tr>';
-            }
-        };
-
-        const populateSaleCategoryDropdown = (location) => {
-            const inventorySource = location === 'local2' ? inventory2 : inventory;
-            const categorySelectId = location === 'local2' ? 'sale-category-2' : 'sale-category';
-            const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
-            const categorySelect = document.getElementById(categorySelectId);
-            const productSelect = document.getElementById(productSelectId);
-            productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
+    const populateSaleProductDropdown = (category, location) => {
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
+        const priceInputId = location === 'local2' ? 'sale-price-2' : 'sale-price';
+        const productSelect = document.getElementById(productSelectId);
+        const priceInput = document.getElementById(priceInputId);
+        productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
+        priceInput.value = '0.00';
+        if (!category) {
             productSelect.disabled = true;
-            const categories = [...new Set(inventorySource.map(p => p.category || 'Sin Categoría'))].sort();
-            categorySelect.innerHTML = '<option value="" disabled selected>Primero selecciona una categoría</option>';
-            categories.forEach(category => {
+            return;
+        }
+        const productsInCategory = inventorySource.filter(p => (p.category || 'Sin Categoría') === category && p.quantity > 0);
+        if (productsInCategory.length > 0) {
+            productsInCategory.forEach(product => {
                 const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categorySelect.appendChild(option);
+                option.value = product.id;
+                option.textContent = `${product.name} (${product.quantity} disponibles)`;
+                productSelect.appendChild(option);
             });
+            productSelect.disabled = false;
+        } else {
+            productSelect.disabled = true;
+        }
+    };
+    
+    async function handleAddProduct(event) {
+        event.preventDefault();
+        const submitButton = document.getElementById('add-product-submit-button');
+        const location = document.getElementById('add-product-location').value || 'local1';
+        const table = location === 'local2' ? 'inventory2' : 'inventory';
+        const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const form = {
+            name: document.getElementById('product-name').value.trim(),
+            category: document.getElementById('product-category').value,
+            quantity: parseInt(document.getElementById('product-quantity').value, 10),
+            price: parseFloat(document.getElementById('product-price-initial').value),
+            file: document.getElementById('product-image-file').files[0]
         };
-
-        const populateSaleProductDropdown = (category, location) => {
-            const inventorySource = location === 'local2' ? inventory2 : inventory;
-            const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
-            const priceInputId = location === 'local2' ? 'sale-price-2' : 'sale-price';
-            const productSelect = document.getElementById(productSelectId);
-            const priceInput = document.getElementById(priceInputId);
-            productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
-            priceInput.value = '0.00';
-            if (!category) {
-                productSelect.disabled = true;
-                return;
-            }
-            const productsInCategory = inventorySource.filter(p => (p.category || 'Sin Categoría') === category && p.quantity > 0);
-            if (productsInCategory.length > 0) {
-                productsInCategory.forEach(product => {
-                    const option = document.createElement('option');
-                    option.value = product.id;
-                    option.textContent = `${product.name} (${product.quantity} disponibles)`;
-                    productSelect.appendChild(option);
-                });
-                productSelect.disabled = false;
+        if (!form.name || !form.category || form.quantity <= 0 || form.price <= 0) {
+            return showModal("Error", "Nombre, categoría, cantidad y precio son obligatorios.", "error");
+        }
+        submitButton.disabled = true;
+        submitButton.innerHTML = `<div class="flex items-center justify-center"><div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-3"></div><span>Guardando...</span></div>`;
+        try {
+            const imageData = form.file ? await uploadToR2(form.file) : null;
+            const existing = inventorySource.find(p => p.name.toLowerCase() === form.name.toLowerCase() && p.category === form.category);
+            if (existing) {
+                const newQty = existing.quantity + form.quantity;
+                const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
+                if (error) throw error; 
+                showModal("Cantidad Actualizada", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
             } else {
-                productSelect.disabled = true;
+                const { error } = await supabase.from(table).insert([{ user_id: currentUserId, name: form.name, category: form.category, quantity: form.quantity, price: form.price, image_url: imageData }]);
+                if (error) throw error;
+                showModal("Producto Agregado", `El producto '${form.name}' fue añadido con éxito.`, "success");
+            }
+            closeAddProductModal();
+        } catch (e) { 
+            showModal("Error al Guardar Producto", `No se pudo completar la operación. Mensaje: ${e.message || "Error desconocido."}`, "error"); 
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Guardar Producto';
+            await loadFunction(); 
+            renderHeaderSummary();
+        }
+    }
+    
+    async function handleEditProduct(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = 'Guardando...';
+
+        const id = document.getElementById('edit-product-id').value;
+        const location = document.getElementById('edit-product-location').value;
+        const table = location === 'local2' ? 'inventory2' : 'inventory';
+        const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+        const fileInput = document.getElementById('edit-product-image-file');
+        const newQuantity = parseInt(document.getElementById('edit-product-quantity').value, 10);
+
+        const updateData = {
+            name: document.getElementById('edit-product-name').value.trim(),
+            category: document.getElementById('edit-product-category').value,
+            price: parseFloat(document.getElementById('edit-product-price').value),
+            quantity: isNaN(newQuantity) ? 0 : newQuantity
+        };
+        if (!id || !updateData.name || !updateData.category || updateData.price <= 0 || updateData.quantity < 0) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Guardar Cambios';
+            return showModal("Error", "Todos los campos son requeridos y deben tener valores válidos.", "error");
+        }
+        try {
+            if (fileInput.files[0]) {
+                updateData.image_url = await uploadToR2(fileInput.files[0]);
+            }
+            const { error } = await supabase.from(table).update(updateData).eq('id', id).eq('user_id', currentUserId);
+            if (error) throw error;
+            closeEditModal();
+            showModal("Éxito", "Producto actualizado correctamente.", "success");
+        } catch (e) { 
+            showModal("Error", `No se pudo actualizar el producto. ${e.message}`, "error"); 
+        } finally { 
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Guardar Cambios';
+            await loadFunction(); 
+            renderHeaderSummary();
+        }
+    }
+
+    async function handleLogoFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+            const logoUrl = await uploadToR2(file);
+            const { error } = await supabase.from('settings').upsert({ user_id: currentUserId, store_logo_url: logoUrl }, { onConflict: 'user_id' });
+            if (error) throw error;
+            renderStoreLogo(logoUrl);
+            showModal("Logo Actualizado", "El logo de la tienda se guardó con éxito.", "success");
+        } catch (e) { showModal("Error de Logo", e.message, "error"); }
+        finally { event.target.value = ''; }
+    }
+
+    async function handleRecordSale(event, location = 'local1') {
+        event.preventDefault();
+        const formSuffix = location === 'local2' ? '-2' : '';
+        const productId = document.getElementById(`sale-product-id${formSuffix}`).value;
+        const saleQuantity = parseInt(document.getElementById(`sale-quantity${formSuffix}`).value, 10);
+        const recipient = document.getElementById(`sale-recipient${formSuffix}`).value.trim();
+        const price = parseFloat(document.getElementById(`sale-price${formSuffix}`).value);
+        const status = document.getElementById(`sale-status${formSuffix}`).value;
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const salesTable = location === 'local2' ? 'sales2' : 'sales';
+        const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory';
+        const formId = location === 'local2' ? 'record-sale-form-2' : 'record-sale-form';
+
+        if (!productId || !recipient || !price || price <= 0 || saleQuantity <= 0) {
+            return showModal("Datos Incompletos", "Categoría, producto, destinatario y precio son obligatorios.", "error");
+        }
+        const product = inventorySource.find(p => p.id === productId);
+        if (!product) {
+            return showModal("Error de Producto", "El producto seleccionado no es válido.", "error");
+        }
+        if (product.quantity < saleQuantity) {
+            return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error");
+        }
+        try {
+            const { error: saleError } = await supabase.from(salesTable).insert([{ user_id: currentUserId, product_name: product.name, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
+            if (saleError) throw saleError;
+            const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity - saleQuantity }).eq('id', productId).eq('user_id', currentUserId);
+            if (stockError) throw stockError;
+            showModal("Venta Exitosa", `Venta de '${product.name}' x${saleQuantity} registrada.`, "success");
+            document.getElementById(formId).reset();
+            populateSaleCategoryDropdown(location);
+        } catch (e) { 
+            showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error"); 
+        } finally { 
+            await Promise.all([location === 'local1' ? loadInventory() : loadInventory2(), location === 'local1' ? loadSalesHistory() : loadSalesHistory2()]);
+            renderHeaderSummary();
+        }
+    }
+
+    async function handleRecordExpense(event) {
+        event.preventDefault();
+        const description = document.getElementById('expense-description').value.trim();
+        const amount = parseFloat(document.getElementById('expense-amount').value);
+        if (!description || !amount || amount <= 0) {
+            return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error");
+        }
+        try {
+            const { error } = await supabase.from('gastos').insert([{ user_id: currentUserId, description: description, amount: amount, timestamp: new Date() }]);
+            if (error) throw error;
+            showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success");
+            document.getElementById('record-expense-form').reset();
+        } catch (e) {
+            showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error");
+        } finally {
+            await loadExpenses();
+            renderHeaderSummary();
+        }
+    }
+
+    async function updateSaleStatus(saleId, newStatus, location = 'local1') {
+        const historySource = location === 'local2' ? salesHistory2 : salesHistory;
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const salesTable = location === 'local2' ? 'sales2' : 'sales';
+        const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory';
+        const sale = historySource.find(s => s.id === saleId);
+        if (!sale) return showModal("Error", "Venta no encontrada.", "error");
+        const oldStatus = sale.status || 'Pagado';
+        if (oldStatus === newStatus) return; 
+
+        try {
+            if (sale.product_id) {
+                const product = inventorySource.find(p => p.id === sale.product_id);
+                const saleQuantity = sale.quantity || 1; 
+                let stockChange = 0;
+                if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; 
+                else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity;
+                
+                if (stockChange !== 0 && product) {
+                    if (product.quantity + stockChange < 0) {
+                        throw new Error(`No hay stock suficiente para esta operación.`);
+                    }
+                    const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id);
+                    if (stockError) throw stockError;
+                }
+            }
+            const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId);
+            if (updateError) throw updateError;
+            showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success");
+        } catch (e) {
+            showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error");
+        } finally {
+            await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]);
+            renderHeaderSummary();
+        }
+    }
+    
+    window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const table = location === 'local2' ? 'inventory2' : 'inventory';
+        const product = inventorySource.find(p => p.id === id);
+        if (!product) return;
+        const originalQty = product.quantity;
+        const newQty = originalQty + Number(delta);
+        if (newQty < 0) return;
+
+        const productCard = button.closest('[data-product-id]');
+        const quantityElement = productCard.querySelector('.product-quantity');
+        quantityElement.textContent = `Disponibles: ${newQty}`;
+        product.quantity = newQty;
+
+        const subtractButton = productCard.querySelector('button[title="Restar Disponibles"]');
+        subtractButton.disabled = newQty <= 0;
+        subtractButton.classList.toggle('opacity-50', newQty <= 0);
+        quantityElement.classList.toggle('text-red-400', newQty < 5);
+        if (newQty >= 5) quantityElement.style.color = 'var(--text-accent)';
+
+        try {
+            const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
+            if (error) throw error;
+        } catch (e) {
+            product.quantity = originalQty;
+            quantityElement.textContent = `Disponibles: ${originalQty}`;
+            subtractButton.disabled = originalQty <= 0;
+            subtractButton.classList.toggle('opacity-50', originalQty <= 0);
+            quantityElement.classList.toggle('text-red-400', originalQty < 5);
+            if (originalQty >= 5) quantityElement.style.color = 'var(--text-accent)';
+            showModal("Error de Sincronización", `No se pudo guardar el cambio. ${e.message}`, "error");
+        }
+    };
+
+    window.deleteProduct = (id, name, location = 'local1') => {
+        const table = location === 'local2' ? 'inventory2' : 'inventory';
+        const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
+        showModal("Confirmar Eliminación", `¿Estás seguro de que quieres eliminar '${name}'? Esta acción no se puede deshacer.`, "error");
+        const confirmButton = document.getElementById('modal-button');
+        const cancelButton = document.getElementById('modal-cancel-button');
+        confirmButton.textContent = 'Sí, Eliminar';
+        confirmButton.onclick = async () => {
+            try {
+                const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', currentUserId);
+                if (error) throw error;
+                showModal("Eliminado", `'${name}' fue eliminado con éxito.`, "success");
+            } catch(e) { 
+                showModal("Error", `No se pudo eliminar el producto. ${e.message}`, "error"); 
+            } finally {
+                await loadFunction();
+                renderHeaderSummary();
             }
         };
-        
-        // --- MANEJADORES DE ACCIONES ---
+        cancelButton.classList.remove('hidden');
+    };
 
-        async function handleAddProduct(event) {
-            event.preventDefault();
-            const submitButton = document.getElementById('add-product-submit-button');
-            const location = document.getElementById('add-product-location').value || 'local1';
-            const table = location === 'local2' ? 'inventory2' : 'inventory';
-            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
-            const inventorySource = location === 'local2' ? inventory2 : inventory;
-            const form = {
-                name: document.getElementById('product-name').value.trim(),
-                category: document.getElementById('product-category').value,
-                quantity: parseInt(document.getElementById('product-quantity').value, 10),
-                price: parseFloat(document.getElementById('product-price-initial').value),
-                file: document.getElementById('product-image-file').files[0]
-            };
-            if (!form.name || !form.category || form.quantity <= 0 || form.price <= 0) {
-                return showModal("Error", "Nombre, categoría, cantidad y precio son obligatorios.", "error");
-            }
-            submitButton.disabled = true;
-            submitButton.innerHTML = `<div class="flex items-center justify-center"><div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-3"></div><span>Guardando...</span></div>`;
+    window.deleteSale = (id, name, location = 'local1') => {
+        const table = location === 'local2' ? 'sales2' : 'sales';
+        const loadFunction = location === 'local2' ? loadSalesHistory2 : loadSalesHistory;
+        showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar la venta de '${name}' del historial?`, "error");
+        const confirmButton = document.getElementById('modal-button');
+        const cancelButton = document.getElementById('modal-cancel-button');
+        confirmButton.textContent = 'Confirmar Eliminación';
+        confirmButton.onclick = async () => {
             try {
-                const imageData = form.file ? await fileToBase64(form.file, 512000) : null;
-                const existing = inventorySource.find(p => p.name.toLowerCase() === form.name.toLowerCase() && p.category === form.category);
-                if (existing) {
-                    const newQty = existing.quantity + form.quantity;
-                    const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId);
-                    if (error) throw error; 
-                    showModal("Cantidad Actualizada", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
-                } else {
-                    const { error } = await supabase.from(table).insert([{ user_id: currentUserId, name: form.name, category: form.category, quantity: form.quantity, price: form.price, image_url: imageData }]);
-                    if (error) throw error;
-                    showModal("Producto Agregado", `El producto '${form.name}' fue añadido con éxito.`, "success");
-                }
-                closeAddProductModal();
-            } catch (e) { 
-                showModal("Error al Guardar Producto", `No se pudo completar la operación. Mensaje: ${e.message || "Error desconocido."}`, "error"); 
+                const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', currentUserId);
+                if (error) throw error;
+                showModal("Venta Eliminada", "La venta fue eliminada del historial.", "success");
+            } catch(e) { 
+                showModal("Error", e.message, "error"); 
             } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Guardar Producto';
-                await loadFunction(); 
+                await loadFunction();
                 renderHeaderSummary();
             }
-        }
-        
-        async function handleEditProduct(event) {
-            event.preventDefault();
-            const form = event.currentTarget;
-            const submitButton = form.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.innerHTML = 'Guardando...';
+        };
+        cancelButton.classList.remove('hidden');
+    };
 
-            const id = document.getElementById('edit-product-id').value;
-            const location = document.getElementById('edit-product-location').value;
-            const table = location === 'local2' ? 'inventory2' : 'inventory';
-            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
-            const fileInput = document.getElementById('edit-product-image-file');
-            const newQuantity = parseInt(document.getElementById('edit-product-quantity').value, 10);
-
-            const updateData = {
-                name: document.getElementById('edit-product-name').value.trim(),
-                category: document.getElementById('edit-product-category').value,
-                price: parseFloat(document.getElementById('edit-product-price').value),
-                quantity: isNaN(newQuantity) ? 0 : newQuantity
-            };
-            if (!id || !updateData.name || !updateData.category || updateData.price <= 0 || updateData.quantity < 0) {
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Guardar Cambios';
-                return showModal("Error", "Todos los campos son requeridos y deben tener valores válidos.", "error");
-            }
+    window.deleteExpense = (id, description) => {
+        showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial?`, "error");
+        const confirmButton = document.getElementById('modal-button');
+        const cancelButton = document.getElementById('modal-cancel-button');
+        confirmButton.textContent = 'Confirmar Eliminación';
+        confirmButton.onclick = async () => {
             try {
-                if (fileInput.files[0]) {
-                    updateData.image_url = await fileToBase64(fileInput.files[0], 512000);
-                }
-                const { error } = await supabase.from(table).update(updateData).eq('id', id).eq('user_id', currentUserId);
+                const { error } = await supabase.from('gastos').delete().eq('id', id).eq('user_id', currentUserId);
                 if (error) throw error;
-                closeEditModal();
-                showModal("Éxito", "Producto actualizado correctamente.", "success");
-            } catch (e) { 
-                showModal("Error", `No se pudo actualizar el producto. ${e.message}`, "error"); 
-            } finally { 
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Guardar Cambios';
-                await loadFunction(); 
-                renderHeaderSummary();
-            }
-        }
-
-        async function handleLogoFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            try {
-                const logoBase64 = await fileToBase64(file, 2097152);
-                const { error } = await supabase.from('settings').upsert({ user_id: currentUserId, store_logo_url: logoBase64 }, { onConflict: 'user_id' });
-                if (error) throw error;
-                renderStoreLogo(logoBase64);
-                showModal("Logo Actualizado", "El logo de la tienda se guardó con éxito.", "success");
-            } catch (e) { showModal("Error de Logo", e.message, "error"); }
-            finally { event.target.value = ''; }
-        }
-
-        async function handleRecordSale(event, location = 'local1') {
-            event.preventDefault();
-            const formSuffix = location === 'local2' ? '-2' : '';
-            const productId = document.getElementById(`sale-product-id${formSuffix}`).value;
-            const saleQuantity = parseInt(document.getElementById(`sale-quantity${formSuffix}`).value, 10);
-            const recipient = document.getElementById(`sale-recipient${formSuffix}`).value.trim();
-            const price = parseFloat(document.getElementById(`sale-price${formSuffix}`).value);
-            const status = document.getElementById(`sale-status${formSuffix}`).value;
-            const inventorySource = location === 'local2' ? inventory2 : inventory;
-            const salesTable = location === 'local2' ? 'sales2' : 'sales';
-            const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory';
-            const formId = location === 'local2' ? 'record-sale-form-2' : 'record-sale-form';
-
-            if (!productId || !recipient || !price || price <= 0 || saleQuantity <= 0) {
-                return showModal("Datos Incompletos", "Categoría, producto, destinatario y precio son obligatorios.", "error");
-            }
-            const product = inventorySource.find(p => p.id === productId);
-            if (!product) {
-                return showModal("Error de Producto", "El producto seleccionado no es válido.", "error");
-            }
-            if (product.quantity < saleQuantity) {
-                return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error");
-            }
-            try {
-                const { error: saleError } = await supabase.from(salesTable).insert([{ user_id: currentUserId, product_name: product.name, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
-                if (saleError) throw saleError;
-                const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity - saleQuantity }).eq('id', productId).eq('user_id', currentUserId);
-                if (stockError) throw stockError;
-                showModal("Venta Exitosa", `Venta de '${product.name}' x${saleQuantity} registrada.`, "success");
-                document.getElementById(formId).reset();
-                populateSaleCategoryDropdown(location);
-            } catch (e) { 
-                showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error"); 
-            } finally { 
-                await Promise.all([location === 'local1' ? loadInventory() : loadInventory2(), location === 'local1' ? loadSalesHistory() : loadSalesHistory2()]);
-                renderHeaderSummary();
-            }
-        }
-
-        async function handleRecordExpense(event) {
-            event.preventDefault();
-            const description = document.getElementById('expense-description').value.trim();
-            const amount = parseFloat(document.getElementById('expense-amount').value);
-            if (!description || !amount || amount <= 0) {
-                return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error");
-            }
-            try {
-                const { error } = await supabase.from('gastos').insert([{ user_id: currentUserId, description: description, amount: amount, timestamp: new Date() }]);
-                if (error) throw error;
-                showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success");
-                document.getElementById('record-expense-form').reset();
-            } catch (e) {
-                showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error");
-            } finally {
+                showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success");
+            } catch(e) { showModal("Error", e.message, "error"); }
+            finally {
                 await loadExpenses();
                 renderHeaderSummary();
             }
-        }
+        };
+        cancelButton.classList.remove('hidden');
+    };
 
-        async function updateSaleStatus(saleId, newStatus, location = 'local1') {
-            const historySource = location === 'local2' ? salesHistory2 : salesHistory;
-            const inventorySource = location === 'local2' ? inventory2 : inventory;
-            const salesTable = location === 'local2' ? 'sales2' : 'sales';
-            const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory';
-            const sale = historySource.find(s => s.id === saleId);
-            if (!sale) return showModal("Error", "Venta no encontrada.", "error");
-            const oldStatus = sale.status || 'Pagado';
-            if (oldStatus === newStatus) return; 
-
-            try {
-                if (sale.product_id) {
-                    const product = inventorySource.find(p => p.id === sale.product_id);
-                    const saleQuantity = sale.quantity || 1; 
-                    let stockChange = 0;
-                    if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; 
-                    else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity;
-                    
-                    if (stockChange !== 0 && product) {
-                        if (product.quantity + stockChange < 0) {
-                            throw new Error(`No hay stock suficiente para esta operación.`);
-                        }
-                        const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id);
-                        if (stockError) throw stockError;
-                    }
-                }
-                const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId);
-                if (updateError) throw updateError;
-                showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success");
-            } catch (e) {
-                showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error");
-            } finally {
-                await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]);
-                renderHeaderSummary();
-            }
-        }
+    window.onload = () => {
+        initializeApp();
+        document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+        document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct);
+        document.getElementById('record-sale-form').addEventListener('submit', (e) => handleRecordSale(e, 'local1'));
+        document.getElementById('record-expense-form').addEventListener('submit', handleRecordExpense);
+        document.getElementById('record-sale-form-2').addEventListener('submit', (e) => handleRecordSale(e, 'local2'));
+        document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click());
+        document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect);
         
-        window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
-            const inventorySource = location === 'local2' ? inventory2 : inventory;
-            const table = location === 'local2' ? 'inventory2' : 'inventory';
-            const product = inventorySource.find(p => p.id === id);
-            if (!product) return;
-            const originalQty = product.quantity;
-            const newQty = originalQty + Number(delta);
-            if (newQty < 0) return;
+        document.getElementById('sale-category').addEventListener('change', (e) => populateSaleProductDropdown(e.target.value, 'local1'));
+        document.getElementById('sale-product-id').addEventListener('change', (e) => {
+            const selectedProduct = inventory.find(p => p.id === e.target.value);
+            if (selectedProduct) document.getElementById('sale-price').value = parseFloat(selectedProduct.price).toFixed(2);
+        });
 
-            // Actualización optimista de la UI (respuesta instantánea)
-            const productCard = button.closest('[data-product-id]');
-            const quantityElement = productCard.querySelector('.product-quantity');
-            quantityElement.textContent = `Disponibles: ${newQty}`;
-            product.quantity = newQty; // Actualiza el estado local en memoria
-
-            const subtractButton = productCard.querySelector('button[title="Restar Disponibles"]');
-            subtractButton.disabled = newQty <= 0;
-            subtractButton.classList.toggle('opacity-50', newQty <= 0);
-            quantityElement.classList.toggle('text-red-400', newQty < 5);
-            if (newQty >= 5) quantityElement.style.color = 'var(--text-accent)';
-
-            // Sincronización con la base de datos en segundo plano
-            try {
-                const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId);
-                if (error) throw error;
-            } catch (e) {
-                // Si falla, revierte la UI al estado original
-                product.quantity = originalQty;
-                quantityElement.textContent = `Disponibles: ${originalQty}`;
-                subtractButton.disabled = originalQty <= 0;
-                subtractButton.classList.toggle('opacity-50', originalQty <= 0);
-                quantityElement.classList.toggle('text-red-400', originalQty < 5);
-                if (originalQty >= 5) quantityElement.style.color = 'var(--text-accent)';
-                showModal("Error de Sincronización", `No se pudo guardar el cambio. ${e.message}`, "error");
+        document.getElementById('sale-category-2').addEventListener('change', (e) => populateSaleProductDropdown(e.target.value, 'local2'));
+        document.getElementById('sale-product-id-2').addEventListener('change', (e) => {
+            const selectedProduct = inventory2.find(p => p.id === e.target.value);
+            if (selectedProduct) document.getElementById('sale-price-2').value = parseFloat(selectedProduct.price).toFixed(2);
+        });
+        
+        document.getElementById('edit-product-image-file').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => { document.getElementById('edit-product-image-preview').src = e.target.result; };
+                reader.readAsDataURL(file);
             }
-        };
-
-        window.deleteProduct = (id, name, location = 'local1') => {
-            const table = location === 'local2' ? 'inventory2' : 'inventory';
-            const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
-            showModal("Confirmar Eliminación", `¿Estás seguro de que quieres eliminar '${name}'? Esta acción no se puede deshacer.`, "error");
-            const confirmButton = document.getElementById('modal-button');
-            const cancelButton = document.getElementById('modal-cancel-button');
-            confirmButton.textContent = 'Sí, Eliminar';
-            confirmButton.onclick = async () => {
-                try {
-                    const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', currentUserId);
-                    if (error) throw error;
-                    showModal("Eliminado", `'${name}' fue eliminado con éxito.`, "success");
-                } catch(e) { 
-                    showModal("Error", `No se pudo eliminar el producto. ${e.message}`, "error"); 
-                } finally {
-                    await loadFunction();
-                    renderHeaderSummary();
-                }
-            };
-            cancelButton.classList.remove('hidden');
-        };
-
-        window.deleteSale = (id, name, location = 'local1') => {
-            const table = location === 'local2' ? 'sales2' : 'sales';
-            const loadFunction = location === 'local2' ? loadSalesHistory2 : loadSalesHistory;
-            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar la venta de '${name}' del historial?`, "error");
-            const confirmButton = document.getElementById('modal-button');
-            const cancelButton = document.getElementById('modal-cancel-button');
-            confirmButton.textContent = 'Confirmar Eliminación';
-            confirmButton.onclick = async () => {
-                try {
-                    const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', currentUserId);
-                    if (error) throw error;
-                    showModal("Venta Eliminada", "La venta fue eliminada del historial.", "success");
-                } catch(e) { 
-                    showModal("Error", e.message, "error"); 
-                } finally {
-                    await loadFunction();
-                    renderHeaderSummary();
-                }
-            };
-            cancelButton.classList.remove('hidden');
-        };
-
-        window.deleteExpense = (id, description) => {
-            showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial?`, "error");
-            const confirmButton = document.getElementById('modal-button');
-            const cancelButton = document.getElementById('modal-cancel-button');
-            confirmButton.textContent = 'Confirmar Eliminación';
-            confirmButton.onclick = async () => {
-                try {
-                    const { error } = await supabase.from('gastos').delete().eq('id', id).eq('user_id', currentUserId);
-                    if (error) throw error;
-                    showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success");
-                } catch(e) { showModal("Error", e.message, "error"); }
-                finally {
-                    await loadExpenses();
-                    renderHeaderSummary();
-                }
-            };
-            cancelButton.classList.remove('hidden');
-        };
-
-        // --- INICIALIZACIÓN Y EVENT LISTENERS ---
-        window.onload = () => {
-            initializeApp();
-            document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
-            document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct);
-            document.getElementById('record-sale-form').addEventListener('submit', (e) => handleRecordSale(e, 'local1'));
-            document.getElementById('record-expense-form').addEventListener('submit', handleRecordExpense);
-            document.getElementById('record-sale-form-2').addEventListener('submit', (e) => handleRecordSale(e, 'local2'));
-            document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click());
-            document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect);
-            
-            document.getElementById('sale-category').addEventListener('change', (e) => populateSaleProductDropdown(e.target.value, 'local1'));
-            document.getElementById('sale-product-id').addEventListener('change', (e) => {
-                const selectedProduct = inventory.find(p => p.id === e.target.value);
-                if (selectedProduct) document.getElementById('sale-price').value = parseFloat(selectedProduct.price).toFixed(2);
-            });
-
-            document.getElementById('sale-category-2').addEventListener('change', (e) => populateSaleProductDropdown(e.target.value, 'local2'));
-            document.getElementById('sale-product-id-2').addEventListener('change', (e) => {
-                const selectedProduct = inventory2.find(p => p.id === e.target.value);
-                if (selectedProduct) document.getElementById('sale-price-2').value = parseFloat(selectedProduct.price).toFixed(2);
-            });
-            
-            document.getElementById('edit-product-image-file').addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => { document.getElementById('edit-product-image-preview').src = e.target.result; };
-                    reader.readAsDataURL(file);
-                }
-            });
-        };
-    </script>
+        });
+    };
+</script>
 </body>
 </html>
