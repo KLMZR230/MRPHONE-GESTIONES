@@ -15,7 +15,6 @@
     <script>
         (function() {
             try {
-                // Ahora incluye los nuevos temas en la validación
                 const theme = localStorage.getItem('selectedTheme');
                 if (theme && ['theme-dark', 'theme-infernal', 'theme-gold', 'theme-cyber', 'theme-galactic'].includes(theme)) {
                     document.documentElement.className = theme;
@@ -53,28 +52,10 @@
             50% { box-shadow: 0 0 20px rgba(255, 69, 0, 0.5), 0 0 40px rgba(255, 69, 0, 0.3); }
         }
         
-        /* --- NUEVO: Animación de estrellas para tema Galactic --- */
         @keyframes twinkle {
             0%, 100% { opacity: 0.8; }
             50% { opacity: 0.2; }
         }
-        .stars {
-            background-image:
-                radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 150px 120px, #ddd, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 130px 20px, #fff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 160px 170px, #ddd, rgba(0,0,0,0));
-            background-repeat: repeat;
-            background-size: 200px 200px;
-            animation: twinkle 5s infinite linear;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: -1;
-        }
-
 
         .view-content > div:not(.grid) {
             border: 1px solid var(--border-color);
@@ -164,7 +145,7 @@
         }
         
         /********************************/
-        /* TEMA 4: Cyber Neon (NUEVO) */
+        /* TEMA 4: Cyber Neon */
         /********************************/
         .theme-cyber {
             --bg-primary: #0d0c1d;
@@ -197,7 +178,7 @@
 
 
         /********************************/
-        /* TEMA 5: Galactic Horizon (NUEVO) */
+        /* TEMA 5: Galactic Horizon */
         /********************************/
         .theme-galactic {
             --bg-primary: #0a0f1e;
@@ -709,7 +690,8 @@
 
 <script type="module">
     const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDYOSNX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
+    // --- CLAVE CORREGIDA ---
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
     
     let supabase = null; 
     let inventory = [], salesHistory = [], expensesHistory = [];
