@@ -212,13 +212,13 @@
     window.deleteProduct = (id, name, location = 'local1') => {
         const table = location === 'local2' ? 'inventory2' : 'inventory';
         const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
-        showModal("Confirmar Eliminación", `¿Eliminar '${name}'? Esta acción no se puede deshacer.`, "error");
+        window.showModal("Confirmar Eliminación", `¿Eliminar '${name}'? Esta acción no se puede deshacer.`, "error");
         const confirmButton = document.getElementById('modal-button');
         const cancelButton = document.getElementById('modal-cancel-button');
         confirmButton.textContent = 'Sí, Eliminar';
         confirmButton.onclick = async () => {
-            try { const { error } = await supabase.from(table).delete().eq('id', id); if (error) throw error; showModal("Eliminado", `'${name}' fue eliminado.`, "success"); } 
-            catch(e) { showModal("Error", `No se pudo eliminar. ${e.message}`, "error"); } 
+            try { const { error } = await supabase.from(table).delete().eq('id', id); if (error) throw error; window.showModal("Eliminado", `'${name}' fue eliminado.`, "success"); } 
+            catch(e) { window.showModal("Error", `No se pudo eliminar. ${e.message}`, "error"); } 
             finally { await loadFunction(); renderHeaderSummary(); }
         };
         cancelButton.classList.remove('hidden');
@@ -226,25 +226,25 @@
     window.deleteSale = (id, name, location = 'local1') => {
         const table = location === 'local2' ? 'sales2' : 'sales';
         const loadFunction = location === 'local2' ? loadSalesHistory2 : loadSalesHistory;
-        showModal("Confirmar Eliminación", `¿Eliminar la venta de '${name}'?`, "error");
+        window.showModal("Confirmar Eliminación", `¿Eliminar la venta de '${name}'?`, "error");
         const confirmButton = document.getElementById('modal-button');
         const cancelButton = document.getElementById('modal-cancel-button');
         confirmButton.textContent = 'Sí, Eliminar';
         confirmButton.onclick = async () => {
-            try { const { error } = await supabase.from(table).delete().eq('id', id); if (error) throw error; showModal("Venta Eliminada", "La venta fue eliminada.", "success"); } 
-            catch(e) { showModal("Error", e.message, "error"); } 
+            try { const { error } = await supabase.from(table).delete().eq('id', id); if (error) throw error; window.showModal("Venta Eliminada", "La venta fue eliminada.", "success"); } 
+            catch(e) { window.showModal("Error", e.message, "error"); } 
             finally { await loadFunction(); renderHeaderSummary(); }
         };
         cancelButton.classList.remove('hidden');
     };
     window.deleteExpense = (id, description) => {
-        showModal("Confirmar Eliminación", `¿Eliminar el gasto '${description}'?`, "error");
+        window.showModal("Confirmar Eliminación", `¿Eliminar el gasto '${description}'?`, "error");
         const confirmButton = document.getElementById('modal-button');
         const cancelButton = document.getElementById('modal-cancel-button');
         confirmButton.textContent = 'Sí, Eliminar';
         confirmButton.onclick = async () => {
-            try { const { error } = await supabase.from('gastos').delete().eq('id', id); if (error) throw error; showModal("Gasto Eliminado", "El gasto fue eliminado.", "success"); } 
-            catch(e) { showModal("Error", e.message, "error"); } 
+            try { const { error } = await supabase.from('gastos').delete().eq('id', id); if (error) throw error; window.showModal("Gasto Eliminado", "El gasto fue eliminado.", "success"); } 
+            catch(e) { window.showModal("Error", e.message, "error"); } 
             finally { await loadExpenses(); renderHeaderSummary(); }
         };
         cancelButton.classList.remove('hidden');
