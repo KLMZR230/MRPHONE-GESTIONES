@@ -911,7 +911,86 @@
     async function handleAddProduct(event) { event.preventDefault(); const submitButton = document.getElementById('add-product-submit-button'); const location = document.getElementById('add-product-location').value || 'local1'; const table = location === 'local2' ? 'inventory2' : 'inventory'; const loadFunction = location === 'local2' ? loadInventory2 : loadInventory; const inventorySource = location === 'local2' ? inventory2 : inventory; const form = { name: document.getElementById('product-name').value.trim(), category: document.getElementById('product-category').value, quantity: parseInt(document.getElementById('product-quantity').value, 10), price: parseFloat(document.getElementById('product-price-initial').value), file: document.getElementById('product-image-file').files[0] }; if (!form.name || !form.category || form.quantity <= 0 || form.price <= 0) { return showModal("Error", "Nombre, categoría, cantidad y precio son obligatorios.", "error"); } submitButton.disabled = true; submitButton.innerHTML = `<div class="flex items-center justify-center"><div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-3"></div><span>Guardando...</span></div>`; try { const imageData = form.file ? await uploadToR2(form.file) : null; const existing = inventorySource.find(p => p.name.toLowerCase() === form.name.toLowerCase() && p.category === form.category); if (existing) { const newQty = existing.quantity + form.quantity; const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', existing.id).eq('user_id', currentUserId); if (error) throw error; showModal("Cantidad Actualizada", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success"); } else { const { error } = await supabase.from(table).insert([{ user_id: currentUserId, name: form.name, category: form.category, quantity: form.quantity, price: form.price, image_url: imageData }]); if (error) throw error; showModal("Producto Agregado", `El producto '${form.name}' fue añadido con éxito.`, "success"); } closeAddProductModal(); } catch (e) { showModal("Error al Guardar Producto", `No se pudo completar la operación. Mensaje: ${e.message || "Error desconocido."}`, "error"); } finally { submitButton.disabled = false; submitButton.innerHTML = 'Guardar Producto'; await loadFunction(); renderHeaderSummary(); } }
     async function handleEditProduct(event) { event.preventDefault(); const form = event.currentTarget; const submitButton = form.querySelector('button[type="submit"]'); submitButton.disabled = true; submitButton.innerHTML = 'Guardando...'; const id = document.getElementById('edit-product-id').value; const location = document.getElementById('edit-product-location').value; const table = location === 'local2' ? 'inventory2' : 'inventory'; const loadFunction = location === 'local2' ? loadInventory2 : loadInventory; const fileInput = document.getElementById('edit-product-image-file'); const newQuantity = parseInt(document.getElementById('edit-product-quantity').value, 10); const updateData = { name: document.getElementById('edit-product-name').value.trim(), category: document.getElementById('edit-product-category').value, price: parseFloat(document.getElementById('edit-product-price').value), quantity: isNaN(newQuantity) ? 0 : newQuantity }; if (!id || !updateData.name || !updateData.category || updateData.price <= 0 || updateData.quantity < 0) { submitButton.disabled = false; submitButton.innerHTML = 'Guardar Cambios'; return showModal("Error", "Todos los campos son requeridos y deben tener valores válidos.", "error"); } try { if (fileInput.files[0]) { updateData.image_url = await uploadToR2(fileInput.files[0]); } const { error } = await supabase.from(table).update(updateData).eq('id', id).eq('user_id', currentUserId); if (error) throw error; closeEditModal(); showModal("Éxito", "Producto actualizado correctamente.", "success"); } catch (e) { showModal("Error", `No se pudo actualizar el producto. ${e.message}`, "error"); } finally { submitButton.disabled = false; submitButton.innerHTML = 'Guardar Cambios'; await loadFunction(); renderHeaderSummary(); } }
     async function handleLogoFileSelect(event) { const file = event.target.files[0]; if (!file) return; try { const logoUrl = await uploadToR2(file); const { error } = await supabase.from('settings').upsert({ user_id: currentUserId, store_logo_url: logoUrl }, { onConflict: 'user_id' }); if (error) throw error; renderStoreLogo(logoUrl); showModal("Logo Actualizado", "El logo de la tienda se guardó con éxito.", "success"); } catch (e) { showModal("Error de Logo", e.message, "error"); } finally { event.target.value = ''; } }
-    async function handleRecordSale(event, location = 'local1') { event.preventDefault(); const formSuffix = location === 'local2' ? '-2' : ''; const productId = document.getElementById(`sale-product-id${formSuffix}`).value; const saleQuantity = parseInt(document.getElementById(`sale-quantity${formSuffix}`).value, 10); const recipient = document.getElementById(`sale-recipient${formSuffix}`).value.trim(); const price = parseFloat(document.getElementById(`sale-price${formSuffix}`).value); const status = document.getElementById(`sale-status${formSuffix}`).value; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const formId = location === 'local2' ? 'record-sale-form-2' : 'record-sale-form'; if (!productId || !recipient || !price || price <= 0 || saleQuantity <= 0) { return showModal("Datos Incompletos", "Categoría, producto, destinatario y precio son obligatorios.", "error"); } const product = inventorySource.find(p => p.id === productId); if (!product) { return showModal("Error de Producto", "El producto seleccionado no es válido.", "error"); } if (product.quantity < saleQuantity) { return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error"); } try { const { error: saleError } = await supabase.from(salesTable).insert([{ user_id: currentUserId, product_name: product.name, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]); if (saleError) throw saleError; const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity - saleQuantity }).eq('id', productId).eq('user_id', currentUserId); if (stockError) throw stockError; showModal("Venta Exitosa", `Venta de '${product.name}' x${saleQuantity} registrada.`, "success"); document.getElementById(formId).reset(); populateSaleCategoryDropdown(location); } catch (e) { showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error"); } finally { await Promise.all([location === 'local1' ? loadInventory() : loadInventory2(), location === 'local1' ? loadSalesHistory() : loadSalesHistory2()]); renderHeaderSummary(); } }
+    
+    // =================================================================================
+    // FUNCIÓN CORREGIDA
+    // =================================================================================
+    async function handleRecordSale(event, location = 'local1') {
+        event.preventDefault();
+
+        let productId, saleQuantity, recipient, price, status, inventorySource, salesTable, inventoryTable, formId, product;
+
+        // Se separa explícitamente la lógica para Local 1 y Local 2.
+        // Esto garantiza que se usen los elementos del formulario, las fuentes de datos y las tablas de la base de datos correctas para cada ubicación.
+        if (location === 'local2') {
+            // --- Lógica para Local 2 ---
+            formId = 'record-sale-form-2';
+            productId = document.getElementById('sale-product-id-2').value;
+            saleQuantity = parseInt(document.getElementById('sale-quantity-2').value, 10);
+            recipient = document.getElementById('sale-recipient-2').value.trim();
+            price = parseFloat(document.getElementById('sale-price-2').value);
+            status = document.getElementById('sale-status-2').value;
+            inventorySource = inventory2;
+            salesTable = 'sales2';
+            inventoryTable = 'inventory2';
+        } else {
+            // --- Lógica para Local 1 (Principal) ---
+            formId = 'record-sale-form';
+            productId = document.getElementById('sale-product-id').value;
+            saleQuantity = parseInt(document.getElementById('sale-quantity').value, 10);
+            recipient = document.getElementById('sale-recipient').value.trim();
+            price = parseFloat(document.getElementById('sale-price').value);
+            status = document.getElementById('sale-status').value;
+            inventorySource = inventory;
+            salesTable = 'sales';
+            inventoryTable = 'inventory';
+        }
+
+        // --- Validación y Lógica Común ---
+        if (!productId || !recipient || !price || price <= 0 || isNaN(saleQuantity) || saleQuantity <= 0) {
+            return showModal("Datos Incompletos", "Categoría, producto, destinatario, cantidad y precio válido son obligatorios.", "error");
+        }
+        product = inventorySource.find(p => p.id === productId);
+        if (!product) {
+            return showModal("Error de Producto", "El producto seleccionado no es válido.", "error");
+        }
+        if (product.quantity < saleQuantity) {
+            return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error");
+        }
+
+        try {
+            // --- Operaciones con la Base de Datos ---
+            // 1. Insertar el nuevo registro de venta en la tabla correcta ('sales' o 'sales2')
+            const { error: saleError } = await supabase.from(salesTable).insert([{ user_id: currentUserId, product_name: product.name, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
+            if (saleError) throw saleError;
+
+            // 2. Actualizar el stock en la tabla de inventario correcta ('inventory' o 'inventory2')
+            const newQuantity = product.quantity - saleQuantity;
+            const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: newQuantity }).eq('id', productId).eq('user_id', currentUserId);
+            if (stockError) throw stockError;
+            
+            // --- Feedback al Usuario y Reseteo del Formulario ---
+            showModal("Venta Exitosa", `Venta de '${product.name}' x${saleQuantity} registrada.`, "success");
+            document.getElementById(formId).reset();
+            populateSaleCategoryDropdown(location);
+
+        } catch (e) {
+            showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error");
+        } finally {
+            // --- Recarga de Datos ---
+            // Recargar los datos de la ubicación afectada y actualizar el resumen del encabezado
+            if (location === 'local2') {
+                await Promise.all([loadInventory2(), loadSalesHistory2()]);
+            } else {
+                await Promise.all([loadInventory(), loadSalesHistory()]);
+            }
+            renderHeaderSummary();
+        }
+    }
+    // =================================================================================
+    // FIN DE LA FUNCIÓN CORREGIDA
+    // =================================================================================
+    
     async function handleRecordExpense(event) { event.preventDefault(); const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: currentUserId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
     async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); } }
     window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => { const inventorySource = location === 'local2' ? inventory2 : inventory; const table = location === 'local2' ? 'inventory2' : 'inventory'; const product = inventorySource.find(p => p.id === id); if (!product) return; const originalQty = product.quantity; const newQty = originalQty + Number(delta); if (newQty < 0) return; const productCard = button.closest('[data-product-id]'); const quantityElement = productCard.querySelector('.product-quantity'); quantityElement.textContent = `Stock: ${newQty}`; product.quantity = newQty; const subtractButton = productCard.querySelector('button'); subtractButton.disabled = newQty <= 0; try { const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', id).eq('user_id', currentUserId); if (error) throw error; } catch (e) { product.quantity = originalQty; quantityElement.textContent = `Stock: ${originalQty}`; subtractButton.disabled = originalQty <= 0; showModal("Error de Sincronización", `No se pudo guardar el cambio. ${e.message}`, "error"); } };
