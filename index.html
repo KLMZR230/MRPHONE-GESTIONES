@@ -311,7 +311,12 @@
                     <p>Pagado HOY: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
                     <p class="pr-2 border-r border-gray-600">Gastos HOY: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
                 </div>
-                 <div class="flex items-center space-x-2">
+
+                <div class="text-sm bg-yellow-900/50 p-2 rounded-lg border border-yellow-700 text-center">
+                    <p class="text-yellow-300 font-bold text-base">PRÓXIMA FACTURA</p>
+                    <p class="text-yellow-400 text-xs">Paga a tu proveedor y disfruta de tu sitio web sin interrupciones.</p>
+                </div>
+                <div class="flex items-center space-x-2">
                      <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
                      <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
                          <option value="theme-dark">Predeterminado</option>
@@ -889,7 +894,7 @@
                 const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=${p.name.substring(0,3).toUpperCase()}`;
                 const escapedName = p.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 card.innerHTML = `
-                    <button onclick="openEditModal('${p.id}', '${location}')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+                    <button onclick="openEditModal('${p.id}', '${location}')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
                     <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden cursor-pointer" onclick="openImageModal('${p.image_url || 'https://via.placeholder.com/400x300/1f2937/ffffff?text=No+Imagen'}')">
                         <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
                     </div>
