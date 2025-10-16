@@ -640,7 +640,7 @@
                 <input type="hidden" id="edit-product-location">
                 
                 <div class="flex flex-col items-center space-y-3">
-                    <label for="edit-product-image-file" class="relative cursor-pointer group" title="Haz clic para cambiar la imagen">
+                    <label for="edit-product-image-file" class="relative cursor-pointer group" title="Haz clic para cambiar la imagen" onclick="document.getElementById('edit-product-image-file').click()">
                         <img id="edit-product-image-preview" src="https://placehold.co/150x150/1f2937/d97706?text=IMG" alt="Vista previa" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-700">
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center rounded-lg transition-opacity">
                             <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -863,6 +863,7 @@
         }
     };
     
+    // ✅ INICIO DE LA CORRECCIÓN 1: FUNCIÓN RENDERINVENTORYLIST
     const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
         const listContainer = document.getElementById(containerId);
         listContainer.innerHTML = '';
@@ -904,18 +905,23 @@
                     <p class="mt-1 text-sm text-gray-400 product-quantity">Stock: ${p.quantity}</p>
                     <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-700">
                         <div class="flex gap-2">
-                            <button onclick="updateInventoryQuantity(this, '${p.id}', -1, '${location}')" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white" ${p.quantity <=0 ? 'disabled' : ''}>-</button>
-                            <button onclick="updateInventoryQuantity(this, '${p.id}', 1, '${location}')" class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white">+</button>
+                            <button class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white stock-decrement-btn" ${p.quantity <=0 ? 'disabled' : ''}>-</button>
+                            <button class="px-3 py-1 border rounded bg-gray-700 hover:bg-gray-600 border-gray-600 transition text-white stock-increment-btn">+</button>
                         </div>
                         <button onclick="deleteProduct('${p.id}', '${escapedName}', '${location}')" class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white shadow-md text-sm transition">Eliminar</button>
                     </div>`;
                 card.setAttribute('data-product-id', p.id);
+                
+                card.querySelector('.stock-decrement-btn').addEventListener('click', (e) => updateInventoryQuantity(e.currentTarget, p.id, -1, location));
+                card.querySelector('.stock-increment-btn').addEventListener('click', (e) => updateInventoryQuantity(e.currentTarget, p.id, 1, location));
+                
                 grid.appendChild(card);
             });
             section.appendChild(grid);
             listContainer.appendChild(section);
         });
     };
+    // ✅ FIN DE LA CORRECCIÓN 1
 
     const renderSalesHistory = (historySource, tbodyId, location) => {
         const tbody = document.getElementById(tbodyId);
@@ -974,26 +980,18 @@
     
     const renderStoreLogo = (url) => { const logoImg = document.getElementById('store-logo-img'); const placeholder = "https://placehold.co/240x80/1f2937/d97706?text=MRPHONE"; logoImg.src = url || placeholder; logoImg.onerror = () => { logoImg.src = placeholder; }; };
     
-    // ✅ FUNCIÓN CORREGIDA: Ahora solo calcula el total del Local Principal
     const renderHeaderSummary = () => { 
         const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
-        
-        // ✅ CAMBIO: Se eliminó la suma de salesHistory2 para que solo cuente el local principal.
         const todaySales = salesHistory.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
-        
-        // ✅ CAMBIO: Se eliminó la suma de expensesHistory2 para que solo cuente el local principal.
         const todayExpenses = expensesHistory.filter(expense => new Date(expense.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
-        
         const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
         const todayPaidTotal = todaySales.filter(sale => (sale.status || 'Pagado') === 'Pagado').reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0);
         const todayExpensesTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
-        
         document.getElementById('today-sold-total').textContent = `$${todaySoldTotal.toFixed(2)}`;
         document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`;
         document.getElementById('today-expenses-total').textContent = `$${todayExpensesTotal.toFixed(2)}`;
     };
 
-    // Función EXCLUSIVA para el resumen del Local 2 (sin cambios, ya era independiente)
     const renderLocal2HeaderSummary = () => {
         const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' });
         const todaySales = salesHistory2.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today);
