@@ -290,7 +290,14 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <div id="auth-container" class="flex-grow flex items-center justify-center p-4">
+    <div id="initial-loading-container" class="flex-grow flex items-center justify-center p-4">
+        <div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-4 mx-auto" style="border-color: var(--accent-color);"></div>
+            <p class="mt-4 text-lg" style="color: var(--accent-color);">Verificando sesión...</p>
+        </div>
+    </div>
+
+    <div id="auth-container" class="hidden flex-grow flex items-center justify-center p-4">
         <div class="max-w-md w-full space-y-8 p-8 bg-gray-800 rounded-xl shadow-2xl border border-gray-700">
             <div>
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-indigo-300">
@@ -789,6 +796,7 @@
     let inventory2 = [], salesHistory2 = [], expensesHistory2 = [];
 
     // =========== ELEMENTOS DEL DOM ===========
+    const initialLoadingContainer = document.getElementById('initial-loading-container');
     const authContainer = document.getElementById('auth-container');
     const appContainer = document.getElementById('app-container');
     const loginForm = document.getElementById('login-form');
@@ -796,15 +804,21 @@
     const logoutButton = document.getElementById('logout-button');
     const authError = document.getElementById('auth-error');
 
-    // =========== GESTIÓN DE AUTENTICACIÓN ===========
+    // =========== GESTIÓN DE AUTENTICACIÓN (CORREGIDA) ===========
     supabase.auth.onAuthStateChange((event, session) => {
+        initialLoadingContainer.classList.add('hidden'); // Ocultar el loader inicial
+        
         if (session) {
             authContainer.classList.add('hidden');
             appContainer.classList.remove('hidden');
-            initializeApp();
+            // Solo inicializar la app completamente al cargar la sesión por primera vez o al iniciar sesión.
+            // Esto evita recargas innecesarias cuando el token se refresca.
+            if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+                initializeApp();
+            }
         } else {
-            authContainer.classList.remove('hidden');
             appContainer.classList.add('hidden');
+            authContainer.classList.remove('hidden');
         }
     });
 
@@ -849,9 +863,10 @@
         const { data: { user } } = await supabase.auth.getUser();
         return user ? user.id : null;
     };
-
-    // =========== FUNCIONES DE LA APLICACIÓN ===========
     
+    // El resto de las funciones JavaScript permanecen igual que en la respuesta anterior.
+    // Pega aquí todo el bloque de funciones desde 'const initializeApp = () => {' hasta el final.
+
     const initializeApp = () => {
         const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
         document.getElementById('theme-selector').value = savedTheme;
@@ -862,7 +877,7 @@
     const uploadToR2 = async (file) => {
         if (!file) return null;
         try {
-            const userId = await getCurrentUserId();
+            const userId = (await supabase.auth.getUser())?.data?.user?.id ?? 'public';
             const filePath = `${userId}/${Date.now()}-${file.name}`;
             const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, file);
             if (uploadError) throw uploadError;
@@ -938,7 +953,6 @@
         if (subViewId === 'local2-sales') populateSaleCategoryDropdown('local2');
     };
     
-    // ✅ INICIO DE LA CORRECCIÓN 1: FUNCIÓN RENDERINVENTORYLIST
     const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
         const listContainer = document.getElementById(containerId);
         listContainer.innerHTML = '';
@@ -1037,11 +1051,8 @@
         finally { loadingSpinner.classList.add('hidden'); if (showSpinner) { changeView('inventory'); } }
     }
     
-    // ✅ MODIFICADO: Se elimina el filtro por 'user_id' para que todos vean el inventario
     async function loadInventory() { const { data, error } = await supabase.from('inventory').select('*').order('created_at', { ascending: false }); if (error) throw error; inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase()); }
     async function loadInventory2() { const { data, error } = await supabase.from('inventory2').select('*').order('created_at', { ascending: false }); if (error) throw error; inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory2, 'inventory-list-2', 'local2'); }
-    
-    // ❗️ SIN CAMBIOS: Las ventas y gastos siguen siendo privados para cada usuario
     async function loadSalesHistory() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('sales').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory = data || []; renderSalesHistory(salesHistory, 'sales-history-body', 'local1'); }
     async function loadSalesHistory2() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('sales2').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory2 = data || []; renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2'); }
     async function loadExpenses() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('gastos').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; expensesHistory = data || []; renderExpenses(); }
@@ -1050,17 +1061,16 @@
     
     const renderStoreLogo = (url) => { const logoImg = document.getElementById('store-logo-img'); const placeholder = "https://placehold.co/240x80/1f2937/d97706?text=MRPHONE"; logoImg.src = url || placeholder; logoImg.onerror = () => { logoImg.src = placeholder; }; };
     
-    const renderHeaderSummary = () => { /* ... (código sin cambios) ... */ };
-    const renderLocal2HeaderSummary = () => { /* ... (código sin cambios) ... */ };
+    const renderHeaderSummary = () => { const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }); const todaySales = salesHistory.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today); const todayExpenses = expensesHistory.filter(expense => new Date(expense.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today); const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0); const todayPaidTotal = todaySales.filter(sale => (sale.status || 'Pagado') === 'Pagado').reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0); const todayExpensesTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0); document.getElementById('today-sold-total').textContent = `$${todaySoldTotal.toFixed(2)}`; document.getElementById('today-paid-total').textContent = `$${todayPaidTotal.toFixed(2)}`; document.getElementById('today-expenses-total').textContent = `$${todayExpensesTotal.toFixed(2)}`; };
+    const renderLocal2HeaderSummary = () => { const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }); const todaySales = salesHistory2.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today); const todayExpenses = expensesHistory2.filter(expense => new Date(expense.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today); const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0); const todayPaidTotal = todaySales.filter(sale => (sale.status || 'Pagado') === 'Pagado').reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0); const todayExpensesTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0); document.getElementById('today-sold-total-local2').textContent = `$${todaySoldTotal.toFixed(2)}`; document.getElementById('today-paid-total-local2').textContent = `$${todayPaidTotal.toFixed(2)}`; document.getElementById('today-expenses-total-local2').textContent = `$${todayExpensesTotal.toFixed(2)}`; };
 
     window.filterInventory = () => { const searchTerm = document.getElementById('search-inventory').value; renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm.toLowerCase()); }
-    const renderExpenses = () => { /* ... (código sin cambios) ... */ };
-    const renderExpenses2 = () => { /* ... (código sin cambios) ... */ };
+    const renderExpenses = () => { const tbody = document.getElementById('expenses-history-body'); tbody.innerHTML = ''; expensesHistory.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti.</td></tr>'; } };
+    const renderExpenses2 = () => { const tbody = document.getElementById('expenses-history-body-2'); tbody.innerHTML = ''; expensesHistory2.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense2('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory2.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti en Local 2.</td></tr>'; } };
     
-    const populateSaleCategoryDropdown = (location) => { /* ... (código sin cambios) ... */ };
-    const populateSaleProductDropdown = (category, location) => { /* ... (código sin cambios) ... */ };
-
-    // ✅ MODIFICADO: Al añadir producto, ya no se pasa el user_id
+    const populateSaleCategoryDropdown = (location) => { const inventorySource = location === 'local2' ? inventory2 : inventory; const categorySelectId = location === 'local2' ? 'sale-category-2' : 'sale-category'; const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id'; const categorySelect = document.getElementById(categorySelectId); const productSelect = document.getElementById(productSelectId); productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; productSelect.disabled = true; const categories = [...new Set(inventorySource.map(p => p.category || 'Sin Categoría'))].sort(); categorySelect.innerHTML = '<option value="" disabled selected>Primero selecciona una categoría</option>'; categories.forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; categorySelect.appendChild(option); }); };
+    const populateSaleProductDropdown = (category, location) => { const inventorySource = location === 'local2' ? inventory2 : inventory; const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id'; const priceInputId = location === 'local2' ? 'sale-price-2' : 'sale-price'; const productSelect = document.getElementById(productSelectId); const priceInput = document.getElementById(priceInputId); productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; priceInput.value = '0.00'; if (!category) { productSelect.disabled = true; return; } const productsInCategory = inventorySource.filter(p => (p.category || 'Sin Categoría') === category && p.quantity > 0); if (productsInCategory.length > 0) { productsInCategory.forEach(product => { const option = document.createElement('option'); option.value = product.id; option.textContent = `${product.name} (${product.quantity} disponibles)`; productSelect.appendChild(option); }); productSelect.disabled = false; } else { productSelect.disabled = true; } };
+    
     async function handleAddProduct(event) {
         event.preventDefault();
         const submitButton = document.getElementById('add-product-submit-button');
@@ -1090,7 +1100,6 @@
         } finally { submitButton.disabled = false; submitButton.innerHTML = 'Guardar Producto'; await loadFunction(); if(location === 'local2') renderLocal2HeaderSummary(); else renderHeaderSummary(); }
     }
 
-    // ✅ MODIFICADO: Al editar, no se filtra por user_id
     async function handleEditProduct(event) {
         event.preventDefault();
         const form = event.currentTarget;
@@ -1114,10 +1123,8 @@
         } finally { submitButton.disabled = false; submitButton.innerHTML = 'Guardar Cambios'; await loadFunction(); if(location === 'local2') renderLocal2HeaderSummary(); else renderHeaderSummary(); }
     }
     
-    // ❗️ SIN CAMBIOS: El logo es una configuración personal del usuario
     async function handleLogoFileSelect(event) { const file = event.target.files[0]; if (!file) return; const userId = await getCurrentUserId(); if (!userId) return; try { const logoUrl = await uploadToR2(file); const { error } = await supabase.from('settings').upsert({ user_id: userId, store_logo_url: logoUrl }, { onConflict: 'user_id' }); if (error) throw error; renderStoreLogo(logoUrl); showModal("Logo Actualizado", "El logo de la tienda se guardó con éxito.", "success"); } catch (e) { showModal("Error de Logo", e.message, "error"); } finally { event.target.value = ''; } }
     
-    // ❗️ SIN CAMBIOS: Se sigue guardando el user_id para saber QUIÉN vendió
     async function handleRecordSale(event, location = 'local1') {
         event.preventDefault();
         const userId = await getCurrentUserId(); if (!userId) return showModal("Error de sesión", "Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error");
@@ -1150,12 +1157,10 @@
         }
     }
 
-    // ❗️ SIN CAMBIOS: Se sigue guardando el user_id para saber QUIÉN hizo el gasto
-    async function handleRecordExpense(event) { /* ... (código sin cambios, sigue usando user_id) ... */ }
-    async function handleRecordExpense2(event) { /* ... (código sin cambios, sigue usando user_id) ... */ }
-    async function updateSaleStatus(saleId, newStatus, location = 'local1') { /* ... (código sin cambios, sigue usando user_id para verificar permisos) ... */ }
+    async function handleRecordExpense(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
+    async function handleRecordExpense2(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description-2').value.trim(); const amount = parseFloat(document.getElementById('expense-amount-2').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos2').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado (Local 2)", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form-2').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }
+    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
     
-    // ✅ MODIFICADO: No se filtra por user_id al actualizar el stock
     window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
         const inventorySource = location === 'local2' ? inventory2 : inventory;
         const table = location === 'local2' ? 'inventory2' : 'inventory';
@@ -1170,7 +1175,6 @@
         } catch (e) { product.quantity = originalQty; quantityElement.textContent = `Stock: ${originalQty}`; subtractButton.disabled = originalQty <= 0; showModal("Error de Sincronización", `No se pudo guardar el cambio. ${e.message}`, "error"); }
     };
 
-    // ✅ MODIFICADO: No se filtra por user_id al eliminar producto
     window.deleteProduct = (id, name, location = 'local1') => {
         const table = location === 'local2' ? 'inventory2' : 'inventory';
         const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
@@ -1188,10 +1192,9 @@
         cancelButton.classList.remove('hidden');
     };
 
-    // ❗️ SIN CAMBIOS: Se sigue usando user_id para eliminar solo las ventas propias
-    window.deleteSale = async (id, name, location = 'local1') => { const userId = await getCurrentUserId(); if(!userId) return; /* ... (resto del código igual) ... */ };
-    window.deleteExpense = async (id, description) => { const userId = await getCurrentUserId(); if(!userId) return; /* ... (resto del código igual) ... */ };
-    window.deleteExpense2 = async (id, description) => { const userId = await getCurrentUserId(); if(!userId) return; /* ... (resto del código igual) ... */ };
+    window.deleteSale = async (id, name, location = 'local1') => { const userId = await getCurrentUserId(); if(!userId) return; const table = location === 'local2' ? 'sales2' : 'sales'; const loadFunction = location === 'local2' ? loadSalesHistory2 : loadSalesHistory; showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar la venta de '${name}' del historial?`, "error"); const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); confirmButton.textContent = 'Confirmar Eliminación'; confirmButton.onclick = async () => { try { const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', userId); if (error) throw error; showModal("Venta Eliminada", "La venta fue eliminada del historial.", "success"); } catch(e) { showModal("Error", e.message, "error"); } finally { await loadFunction(); if(location === 'local1') renderHeaderSummary(); else renderLocal2HeaderSummary(); } }; cancelButton.classList.remove('hidden'); };
+    window.deleteExpense = async (id, description) => { const userId = await getCurrentUserId(); if(!userId) return; showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial?`, "error"); const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); confirmButton.textContent = 'Confirmar Eliminación'; confirmButton.onclick = async () => { try { const { error } = await supabase.from('gastos').delete().eq('id', id).eq('user_id', userId); if (error) throw error; showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success"); } catch(e) { showModal("Error", e.message, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }; cancelButton.classList.remove('hidden'); };
+    window.deleteExpense2 = async (id, description) => { const userId = await getCurrentUserId(); if(!userId) return; showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial de Local 2?`, "error"); const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); confirmButton.textContent = 'Confirmar Eliminación'; confirmButton.onclick = async () => { try { const { error } = await supabase.from('gastos2').delete().eq('id', id).eq('user_id', userId); if (error) throw error; showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success"); } catch(e) { showModal("Error", e.message, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }; cancelButton.classList.remove('hidden'); };
 
     // Event Listeners
     document.getElementById('add-product-form').addEventListener('submit', handleAddProduct); 
