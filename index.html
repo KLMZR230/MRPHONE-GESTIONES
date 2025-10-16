@@ -292,54 +292,7 @@
 
     <input type="file" id="logo-file-input" class="hidden" accept="image/*">
 
-    <div id="auth-container" class="flex items-center justify-center min-h-screen">
-        <div class="w-full max-w-md">
-            <div id="login-form-container">
-                <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border-t-4" style="border-color: var(--accent-color);">
-                    <h2 class="text-3xl font-bold text-center mb-6 text-indigo-300">Iniciar Sesión</h2>
-                    <form id="login-form" class="space-y-6">
-                        <div>
-                            <label for="login-email" class="block text-sm font-medium">Correo Electrónico</label>
-                            <input type="email" id="login-email" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                        </div>
-                        <div>
-                            <label for="login-password" class="block text-sm font-medium">Contraseña</label>
-                            <input type="password" id="login-password" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                        </div>
-                        <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">Ingresar</button>
-                    </form>
-                    <p id="login-error-message" class="text-red-400 text-sm mt-4 text-center hidden"></p>
-                    <p class="text-center text-sm mt-6 text-gray-400">
-                        ¿No tienes cuenta? <a href="#" id="show-register-form" class="font-medium hover:underline" style="color: var(--accent-color);">Regístrate</a>
-                    </p>
-                </div>
-            </div>
-
-            <div id="register-form-container" class="hidden">
-                 <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border-t-4" style="border-color: var(--accent-color);">
-                    <h2 class="text-3xl font-bold text-center mb-6 text-indigo-300">Crear Cuenta</h2>
-                    <form id="register-form" class="space-y-6">
-                        <div>
-                            <label for="register-email" class="block text-sm font-medium">Correo Electrónico</label>
-                            <input type="email" id="register-email" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                        </div>
-                        <div>
-                            <label for="register-password" class="block text-sm font-medium">Contraseña</label>
-                            <input type="password" id="register-password" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                        </div>
-                        <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">Registrarme</button>
-                    </form>
-                    <p id="register-message" class="text-green-400 text-sm mt-4 text-center hidden"></p>
-                    <p class="text-center text-sm mt-6 text-gray-400">
-                        ¿Ya tienes cuenta? <a href="#" id="show-login-form" class="font-medium hover:underline" style="color: var(--accent-color);">Inicia Sesión</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="app" class="flex-grow p-4 md:p-8 hidden">
+    <div id="app" class="flex-grow p-4 md:p-8">
         <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700 mb-6 rounded-xl">
              <div class="flex items-center space-x-4">
                  <div id="store-logo-container" title="Haz clic para cambiar el logo">
@@ -358,7 +311,6 @@
                     <p>Pagado HOY: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
                     <p class="pr-2 border-r border-gray-600">Gastos HOY: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
                 </div>
-
                 <div class="flex items-center space-x-2">
                      <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
                      <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
@@ -368,7 +320,6 @@
                          <option value="theme-cyber">Cyber Neon</option>
                          <option value="theme-galactic">Galactic Horizon</option>
                      </select>
-                     <button id="logout-button" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors bg-red-600 hover:bg-red-700 text-white">Cerrar Sesión</button>
                  </div>
              </div>
         </header>
@@ -392,7 +343,7 @@
         </nav>
 
         <main>
-            <div id="loading-spinner" class="text-center p-8 hidden">
+            <div id="loading-spinner" class="text-center p-8">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-4 mx-auto" style="border-color: var(--accent-color);"></div>
                 <p class="mt-4" style="color: var(--accent-color);">Conectando a Supabase y sincronizando datos...</p>
             </div>
@@ -560,7 +511,7 @@
                                     </svg>
                                 </div>
                                 <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap">
-                                    Añadir Producto (Local 2)
+                                    Añadir Producto
                                 </button>
                             </div>
                         </div>
@@ -804,7 +755,6 @@
     let inventory = [], salesHistory = [], expensesHistory = [];
     let inventory2 = [], salesHistory2 = [], expensesHistory2 = [];
 
-    // ✅ ID público y compartido para que todos vean el mismo inventario.
     const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
     let currentUserId = null; 
 
@@ -919,7 +869,6 @@
         applyTheme(savedTheme);
         try {
             supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-            // ✅ Comprueba si hay un usuario logueado al iniciar.
             checkUserSession();
             setupAuthEventListeners();
         } catch (error) {
@@ -931,14 +880,11 @@
     const checkUserSession = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-            // Si hay sesión, oculta el login y muestra la app
             authContainer.classList.add('hidden');
             appContainer.classList.remove('hidden');
-            // ✅ MUY IMPORTANTE: Asignamos el ID PÚBLICO para todas las consultas.
             currentUserId = PUBLIC_STORE_ID;
             loadAllData(true);
         } else {
-            // Si NO hay sesión, muestra el login y oculta la app
             authContainer.classList.remove('hidden');
             appContainer.classList.add('hidden');
         }
@@ -1149,7 +1095,7 @@
                 loginErrorMsg.classList.remove('hidden');
             } else {
                 loginErrorMsg.classList.add('hidden');
-                checkUserSession(); // Vuelve a verificar la sesión para mostrar la app
+                checkUserSession();
             }
         });
 
@@ -1157,7 +1103,7 @@
             e.preventDefault();
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
-            const { error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabase.auth.signUp({ email, password });
              if (error) {
                 registerMsg.textContent = 'Error: ' + error.message;
                 registerMsg.classList.add('text-red-400');
@@ -1173,10 +1119,9 @@
         logoutButton.addEventListener('click', async () => {
             await supabase.auth.signOut();
             currentUserId = null;
-            // Limpia los datos locales al cerrar sesión
             inventory = []; salesHistory = []; expensesHistory = [];
             inventory2 = []; salesHistory2 = []; expensesHistory2 = [];
-            checkUserSession(); // Vuelve a verificar, lo que mostrará el login
+            checkUserSession();
         });
 
         showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); loginFormContainer.classList.add('hidden'); registerFormContainer.classList.remove('hidden'); });
