@@ -806,13 +806,11 @@
 
     // =========== GESTIÓN DE AUTENTICACIÓN (CORREGIDA) ===========
     supabase.auth.onAuthStateChange((event, session) => {
-        initialLoadingContainer.classList.add('hidden'); // Ocultar el loader inicial
+        initialLoadingContainer.classList.add('hidden');
         
         if (session) {
             authContainer.classList.add('hidden');
             appContainer.classList.remove('hidden');
-            // Solo inicializar la app completamente al cargar la sesión por primera vez o al iniciar sesión.
-            // Esto evita recargas innecesarias cuando el token se refresca.
             if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
                 initializeApp();
             }
@@ -864,9 +862,6 @@
         return user ? user.id : null;
     };
     
-    // El resto de las funciones JavaScript permanecen igual que en la respuesta anterior.
-    // Pega aquí todo el bloque de funciones desde 'const initializeApp = () => {' hasta el final.
-
     const initializeApp = () => {
         const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
         document.getElementById('theme-selector').value = savedTheme;
@@ -920,7 +915,8 @@
     window.openEditModal = (id, location = 'local1') => {
         const productSource = location === 'local2' ? inventory2 : inventory;
         const product = productSource.find(p => p.id === id); if (!product) return;
-        const placeholder = `https://via.placeholder.com/150x150/4f46e5/ffffff?text=${product.name.substring(0,3).toUpperCase()}`;
+        // ✅ CORREGIDO
+        const placeholder = `https://placehold.co/150x150/4f46e5/ffffff?text=${product.name.substring(0,3).toUpperCase()}`;
         document.getElementById('edit-product-image-preview').src = product.image_url || placeholder;
         document.getElementById('edit-product-id').value = product.id;
         document.getElementById('edit-product-name').value = product.name;
@@ -982,11 +978,12 @@
             groupedInventory[category].forEach(p => {
                 const card = document.createElement("div");
                 card.className = "bg-gray-800 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-700 relative";
-                const imageUrl = p.image_url || `https://via.placeholder.com/150x100/4f46e5/ffffff?text=${p.name.substring(0,3).toUpperCase()}`;
+                // ✅ CORREGIDO
+                const imageUrl = p.image_url || `https://placehold.co/150x100/4f46e5/ffffff?text=${p.name.substring(0,3).toUpperCase()}`;
                 const escapedName = p.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 card.innerHTML = `
                     <button onclick="openEditModal('${p.id}', '${location}')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
-                    <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden cursor-pointer" onclick="openImageModal('${p.image_url || 'https://via.placeholder.com/400x300/1f2937/ffffff?text=No+Imagen'}')">
+                    <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden cursor-pointer" onclick="openImageModal('${p.image_url || 'https://placehold.co/400x300/1f2937/ffffff?text=No+Imagen'}')">
                         <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
                     </div>
                     <h3 class="font-semibold text-white">${p.name}</h3>
