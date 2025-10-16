@@ -82,12 +82,10 @@
         .bg-gray-600, input, select { background-color: var(--bg-secondary) !important; }
         .border-gray-500, .border-gray-600, .border-gray-700, input, select { border-color: var(--border-color); }
         
-        /* Acentos */
         .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
         .border-indigo-500 { border-color: var(--accent-color); }
         .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
         .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
-        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
         input:focus, select:focus {
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 0 1px var(--accent-color);
@@ -96,14 +94,9 @@
         .bg-blue-600, .bg-green-600, button[type="submit"] { background-color: var(--accent-color-dark); }
         .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover, button[type="submit"]:hover { background-color: var(--accent-color); }
 
-        /********************************/
-        /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
-        /********************************/
         .status-paid { background-color: #16a34a !important; color: #ffffff !important; border-color: #15803d !important; }
         .status-pending { background-color: #f59e0b !important; color: #1f2937 !important; border-color: #d97706 !important; }
-        .status-returned { background-color: #dc2626 !important; color: #ffffff !important; border-color: #b91c1c !important; }
-
-        /* Estilos ADICIONALES */
+        
         #store-logo-img { cursor: pointer; object-fit: contain; }
         #store-logo-container {
             width: 150px; height: 60px; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0;
@@ -138,12 +131,6 @@
                     <p>Pagado HOY: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
                     <p class="pr-2 border-r border-gray-600">Gastos HOY: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
                 </div>
-                <div class="flex items-center space-x-2">
-                     <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
-                     <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
-                         <option value="theme-dark">Predeterminado</option>
-                     </select>
-                 </div>
              </div>
         </header>
 
@@ -259,9 +246,9 @@
         document.getElementById('add-product-modal-container').classList.add('hidden');
         document.getElementById('add-product-form').reset();
     };
-
-    // --- RENDERIZADO Y FILTRADO DE INVENTARIO ---
-    const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
+    
+    // --- RENDERIZADO Y FILTRADO ---
+    const renderInventoryList = (inventorySource, containerId, searchTerm = '') => {
         const listContainer = document.getElementById(containerId);
         if (!listContainer) return;
         listContainer.innerHTML = '';
@@ -300,12 +287,12 @@
     
     window.filterInventory = () => {
         const searchTerm = document.getElementById('search-inventory').value;
-        renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm);
+        renderInventoryList(inventory, 'inventory-list', searchTerm);
     };
 
     window.filterInventory2 = () => {
         const searchTerm = document.getElementById('search-inventory-2').value;
-        renderInventoryList(inventory2, 'inventory-list-2', 'local2', searchTerm);
+        renderInventoryList(inventory2, 'inventory-list-2', searchTerm);
     };
 
     // --- LÓGICA DE DATOS ---
@@ -325,7 +312,7 @@
 
         if (error) {
             console.error('Error al añadir producto:', error);
-            alert('Error al guardar el producto: ' + error.message);
+            alert('Error al guardar: ' + error.message);
         } else {
             closeAddProductModal();
             loadAllData();
@@ -341,8 +328,8 @@
 
         try {
             const [inv1Res, inv2Res] = await Promise.all([
-                supabase.from('inventory').select('*').eq('user_id', currentUserId).order('name', { ascending: true }),
-                supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('name', { ascending: true })
+                supabase.from('inventory').select('*').eq('user_id', currentUserId).order('name'),
+                supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('name')
             ]);
 
             if (inv1Res.error) throw inv1Res.error;
@@ -351,11 +338,10 @@
             inventory = inv1Res.data.map(p => ({ ...p, price: p.price ?? 0.01 }));
             inventory2 = inv2Res.data.map(p => ({ ...p, price: p.price ?? 0.01 }));
 
-            renderInventoryList(inventory, 'inventory-list', 'local1');
-            renderInventoryList(inventory2, 'inventory-list-2', 'local2');
+            renderInventoryList(inventory, 'inventory-list');
+            renderInventoryList(inventory2, 'inventory-list-2');
             
             changeView('inventory');
-
         } catch (error) {
             console.error("Error cargando datos:", error);
             errorMessage.textContent = `Error al cargar datos: ${error.message}. Asegúrate de que RLS está DESACTIVADO en tus tablas de Supabase.`;
