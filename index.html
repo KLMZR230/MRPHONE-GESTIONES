@@ -509,9 +509,17 @@
                     <div id="subview-local2-inventory" class="subview-content">
                         <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
                             <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Local 2</h2>
-                            <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
-                                Añadir Producto (Local 2)
-                            </button>
+                            <div class="flex items-center space-x-2">
+                                 <div class="relative w-full md:w-72">
+                                    <input type="text" id="search-inventory-2" oninput="filterInventory2()" placeholder="Buscar en Local 2..." class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
+                                    Añadir Producto (Local 2)
+                                </button>
+                            </div>
                         </div>
                         <div id="inventory-list-2" class="space-y-8"></div>
                     </div>
@@ -965,7 +973,7 @@
         finally { loadingSpinner.classList.add('hidden'); if (showSpinner) { changeView('inventory'); } }
     }
     async function loadInventory() { const { data, error } = await supabase.from('inventory').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false }); if (error) throw error; inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase()); }
-    async function loadInventory2() { const { data, error } = await supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false }); if (error) throw error; inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory2, 'inventory-list-2', 'local2'); }
+    async function loadInventory2() { const { data, error } = await supabase.from('inventory2').select('*').eq('user_id', currentUserId).order('created_at', { ascending: false }); if (error) throw error; inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory2, 'inventory-list-2', 'local2', document.getElementById('search-inventory-2')?.value.toLowerCase() || ''); }
     async function loadSalesHistory() { const { data, error } = await supabase.from('sales').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory = data || []; renderSalesHistory(salesHistory, 'sales-history-body', 'local1'); }
     async function loadSalesHistory2() { const { data, error } = await supabase.from('sales2').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory2 = data || []; renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2'); }
     async function loadExpenses() { const { data, error } = await supabase.from('gastos').select('*').eq('user_id', currentUserId).order('timestamp', { ascending: false }); if (error) throw error; expensesHistory = data || []; renderExpenses(); }
@@ -1007,6 +1015,7 @@
     };
 
     window.filterInventory = () => { const searchTerm = document.getElementById('search-inventory').value; renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm.toLowerCase()); }
+    window.filterInventory2 = () => { const searchTerm = document.getElementById('search-inventory-2').value; renderInventoryList(inventory2, 'inventory-list-2', 'local2', searchTerm.toLowerCase()); }
     const renderExpenses = () => { const tbody = document.getElementById('expenses-history-body'); tbody.innerHTML = ''; expensesHistory.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados.</td></tr>'; } };
     const renderExpenses2 = () => { const tbody = document.getElementById('expenses-history-body-2'); tbody.innerHTML = ''; expensesHistory2.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense2('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory2.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados en Local 2.</td></tr>'; } };
     
