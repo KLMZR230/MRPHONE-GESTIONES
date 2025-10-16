@@ -225,8 +225,8 @@
     
     let supabase = null; 
     let inventory = [], inventory2 = [];
-    let salesHistory = [], salesHistory2 = [];
-    let expensesHistory = [], expensesHistory2 = [];
+    // Las demás variables (salesHistory, etc.) se pueden declarar aquí si las usas
+    // let salesHistory = [], expensesHistory = [];
 
     const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
     let currentUserId = PUBLIC_STORE_ID;
@@ -248,9 +248,9 @@
     window.closeAddProductModal = () => {
         document.getElementById('add-product-modal-container').classList.add('hidden');
     };
-    // ... (otras funciones auxiliares como openEditModal, etc.)
+    // ... (otras funciones auxiliares que puedas necesitar)
 
-    // --- RENDERIZADO Y FILTRADO ---
+    // --- RENDERIZADO Y FILTRADO DE INVENTARIO ---
     const renderInventoryList = (inventorySource, containerId, searchTerm = '') => {
         const listContainer = document.getElementById(containerId);
         if (!listContainer) return;
