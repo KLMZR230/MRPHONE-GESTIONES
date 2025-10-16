@@ -225,8 +225,8 @@
     
     let supabase = null; 
     let inventory = [], inventory2 = [];
-    // Las demás variables (salesHistory, etc.) se pueden declarar aquí si las usas
-    // let salesHistory = [], expensesHistory = [];
+    let salesHistory = [], salesHistory2 = [];
+    let expensesHistory = [], expensesHistory2 = [];
 
     const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
     let currentUserId = PUBLIC_STORE_ID;
@@ -250,7 +250,7 @@
     };
     // ... (otras funciones auxiliares que puedas necesitar)
 
-    // --- RENDERIZADO Y FILTRADO DE INVENTARIO ---
+    // --- RENDERIZADO Y FILTRADO ---
     const renderInventoryList = (inventorySource, containerId, searchTerm = '') => {
         const listContainer = document.getElementById(containerId);
         if (!listContainer) return;
@@ -345,6 +345,7 @@
             renderInventoryList(inventory2, 'inventory-list-2');
             
             changeView('inventory');
+
         } catch (error) {
             console.error("Error cargando datos:", error);
             errorMessage.textContent = `Error al cargar datos: ${error.message}. Asegúrate de que RLS está DESACTIVADO en tus tablas de Supabase.`;
