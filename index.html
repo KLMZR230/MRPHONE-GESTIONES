@@ -41,27 +41,6 @@
         
         @keyframes pulse { 50% { opacity: .4; } }
 
-        @keyframes breathing-glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 69, 0, 0.2), 0 0 20px rgba(255, 69, 0, 0.1); }
-            50% { box-shadow: 0 0 20px rgba(255, 69, 0, 0.5), 0 0 40px rgba(255, 69, 0, 0.3); }
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.2; }
-        }
-
-        .view-content > div:not(.grid) {
-            border: 1px solid var(--border-color);
-            transition: all 0.4s ease-in-out;
-        }
-        #view-expenses .lg\:col-span-2 > div,
-        #view-expenses .lg\:col-span-3 > div {
-             border: 1px solid var(--border-color);
-             transition: all 0.4s ease-in-out;
-        }
-
-
         /********************************/
         /* TEMA 1: Dark (Predeterminado) */
         /********************************/
@@ -82,149 +61,7 @@
             border-color: var(--accent-color);
             box-shadow: 0 0 15px rgba(129, 140, 248, 0.25);
         }
-
-        /********************************/
-        /* TEMA 2: Fuego Infernal */
-        /********************************/
-        .theme-infernal {
-            --bg-primary: #000000;
-            --bg-secondary: #2d1a1a;
-            --bg-header: rgba(17, 7, 0, 0.6);
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --border-color: #571e1e;
-            --accent-color: #ff4500;
-            --accent-color-dark: #e63e00;
-            --font-main: 'Roboto', sans-serif;
-            --font-headings: 'Roboto', sans-serif;
-        }
-        .theme-infernal { background-image: linear-gradient(180deg, #1a0000 0%, #000000 100%); }
-        .theme-infernal .product-card:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.5); border-color: rgba(255, 69, 0, 0.7); }
-        .theme-infernal .view-content > div:not(.grid),
-        .theme-infernal #view-expenses .lg\:col-span-2 > div,
-        .theme-infernal #view-expenses .lg\:col-span-3 > div {
-            animation: breathing-glow 5s ease-in-out infinite;
-        }
-
-
-        /********************************/
-        /* TEMA 3: Luxury Gold */
-        /********************************/
-        .theme-gold {
-            --bg-primary: #121212;
-            --bg-secondary: #2b2b2b;
-            --bg-header: rgba(18, 18, 18, 0.85);
-            --text-primary: #f1f1f1;
-            --text-secondary: #cccccc;
-            --text-muted: #a0a0a0;
-            --border-color: #444444;
-            --accent-color: #D4AF37;
-            --accent-color-dark: #B8860B;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Playfair Display', serif;
-        }
-        .theme-gold { background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%232a2a2a" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2-H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
-        .theme-gold .product-card:hover {
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4), 0 0 5px rgba(212, 175, 55, 0.6);
-            border-color: var(--accent-color);
-        }
-        .theme-gold .bg-indigo-500, .theme-gold .hover\:bg-indigo-600:hover { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #121212; }
-        .theme-gold .text-indigo-400, .theme-gold .text-indigo-300 { text-shadow: 0 0 8px #D4AF3788; }
-        .theme-gold .view-content > div:not(.grid),
-        .theme-gold #view-expenses .lg\:col-span-2 > div,
-        .theme-gold #view-expenses .lg\:col-span-3 > div {
-            border: 1px solid var(--accent-color-dark);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-        }
         
-        /********************************/
-        /* TEMA 4: Cyber Neon */
-        /********************************/
-        .theme-cyber {
-            --bg-primary: #0d0c1d;
-            --bg-secondary: #1a183d;
-            --bg-header: rgba(13, 12, 29, 0.7);
-            --text-primary: #e0e1dd;
-            --text-secondary: #c0c3d4;
-            --text-muted: #a0a3b8;
-            --border-color: #3d3b7a;
-            --accent-color: #00f5d4;
-            --accent-color-dark: #00bfa5;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Orbitron', sans-serif;
-        }
-        .theme-cyber {
-            background-color: var(--bg-primary);
-            background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(to right, var(--border-color) 1px, var(--bg-primary) 1px);
-            background-size: 40px 40px;
-        }
-        .theme-cyber .product-card:hover {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(0, 245, 212, 0.4), inset 0 0 10px rgba(0, 245, 212, 0.2);
-        }
-        .theme-cyber .view-content > div:not(.grid),
-        .theme-cyber #view-expenses .lg\:col-span-2 > div,
-        .theme-cyber #view-expenses .lg\:col-span-3 > div {
-            box-shadow: 0 0 15px rgba(0, 245, 212, 0.1);
-        }
-        .theme-cyber .text-indigo-400, .theme-cyber .text-indigo-300 { text-shadow: 0 0 6px var(--accent-color); }
-
-
-        /********************************/
-        /* TEMA 5: Galactic Horizon */
-        /********************************/
-        .theme-galactic {
-            --bg-primary: #0a0f1e;
-            --bg-secondary: #1c2541;
-            --bg-header: rgba(28, 37, 65, 0.75);
-            --text-primary: #f0f8ff;
-            --text-secondary: #d1d8e0;
-            --text-muted: #aeb8c4;
-            --border-color: #3a506b;
-            --accent-color: #87CEEB;
-            --accent-color-dark: #4682B4;
-            --font-main: 'Poppins', sans-serif;
-            --font-headings: 'Poppins', sans-serif;
-        }
-        .theme-galactic body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: linear-gradient(180deg, rgba(10, 15, 30, 0.9) 0%, rgba(28, 37, 65, 0.9) 100%),
-                              url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"%3E%3Cfilter id="f"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" stitchTiles="stitch"/%3E%3CfeColorMatrix values="0 0 0 0 0, 0 0 0 0 0, 0 0 0 0 0, 0 0 0 -0.5 1.2"/%3E%3C/filter%3E%3Crect width="100%" height="100%" filter="url(%23f)"/%3E%3C/svg%3E');
-            background-size: cover;
-            z-index: -2;
-        }
-        .theme-galactic body::after {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image:
-                radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 150px 120px, #ddd, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 130px 20px, #fff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 160px 170px, #ddd, rgba(0,0,0,0));
-            background-repeat: repeat;
-            background-size: 200px 200px;
-            animation: twinkle 5s infinite linear;
-            z-index: -1;
-        }
-        .theme-galactic .product-card:hover {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(135, 206, 235, 0.3);
-        }
-        .theme-galactic .view-content > div:not(.grid),
-        .theme-galactic #view-expenses .lg\:col-span-2 > div,
-        .theme-galactic #view-expenses .lg\:col-span-3 > div {
-            border-color: var(--border-color);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-
         /********************************/
         /* Aplicación de Variables CSS */
         /********************************/
@@ -245,12 +82,10 @@
         .bg-gray-600, input, select { background-color: var(--bg-secondary) !important; }
         .border-gray-500, .border-gray-600, .border-gray-700, input, select { border-color: var(--border-color); }
         
-        /* Acentos */
         .text-indigo-400, .text-indigo-300 { color: var(--accent-color); }
         .border-indigo-500 { border-color: var(--accent-color); }
         .bg-indigo-500 { background-color: var(--accent-color-dark); color: var(--text-primary); }
         .hover\:bg-indigo-600:hover { background-color: var(--accent-color); }
-        .focus\:ring-indigo-500:focus { --tw-ring-color: var(--accent-color); }
         input:focus, select:focus {
             border-color: var(--accent-color) !important;
             box-shadow: 0 0 0 1px var(--accent-color);
@@ -259,22 +94,14 @@
         .bg-blue-600, .bg-green-600, button[type="submit"] { background-color: var(--accent-color-dark); }
         .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover, button[type="submit"]:hover { background-color: var(--accent-color); }
 
-        /********************************/
-        /* ESTILOS FIJOS PARA ESTADOS DE VENTA */
-        /********************************/
         .status-paid { background-color: #16a34a !important; color: #ffffff !important; border-color: #15803d !important; }
         .status-pending { background-color: #f59e0b !important; color: #1f2937 !important; border-color: #d97706 !important; }
-        .status-returned { background-color: #dc2626 !important; color: #ffffff !important; border-color: #b91c1c !important; }
-
-        /* Estilos ADICIONALES para la estructura del segundo archivo */
+        
         #store-logo-img { cursor: pointer; object-fit: contain; }
         #store-logo-container {
-            width: 150px;
-            height: 60px;
-            display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0;
+            width: 150px; height: 60px; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0;
         }
         select.status-select option { background-color: #374151; }
-        
         .active-nav {
             background-color: var(--accent-color-dark) !important;
             color: var(--text-primary) !important;
@@ -290,8 +117,7 @@
         <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700 mb-6 rounded-xl">
              <div class="flex items-center space-x-4">
                  <div id="store-logo-container" title="Haz clic para cambiar el logo">
-                    <img id="store-logo-img" src="https://placehold.co/240x80/1f2937/d97706?text=MRPHONE" alt="Store Logo"
-                         class="h-full w-full object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105">
+                    <img id="store-logo-img" src="https://placehold.co/240x80/1f2937/d97706?text=MRPHONE" alt="Store Logo" class="h-full w-full object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105">
                  </div>
                  <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">
                     <span class="text-indigo-400">MRPHONE</span> PRODUCTOS
@@ -305,47 +131,21 @@
                     <p>Pagado HOY: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
                     <p class="pr-2 border-r border-gray-600">Gastos HOY: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
                 </div>
-
-                <div class="text-sm bg-blue-900/50 p-2 rounded-lg border border-blue-700 text-center">
-                    <p class="text-blue-300 font-bold text-base">Base de Datos Supabase</p>
-                    <p class="text-white font-semibold">Monto a pagar: <span class="text-green-400">$25.00</span></p>
-                    <p class="text-blue-400 text-xs mt-1">Fecha de pago: 29/10/2025</p>
-                </div>
-                <div class="flex items-center space-x-2">
-                     <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
-                     <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
-                         <option value="theme-dark">Predeterminado</option>
-                         <option value="theme-infernal">Fuego Infernal</option>
-                         <option value="theme-gold">Luxury Gold</option>
-                         <option value="theme-cyber">Cyber Neon</option>
-                         <option value="theme-galactic">Galactic Horizon</option>
-                     </select>
-                 </div>
              </div>
         </header>
 
         <nav class="flex justify-around space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6">
-            <button onclick="changeView('inventory')" id="nav-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                📦 Inventario
-            </button>
-            <button onclick="changeView('sales')" id="nav-sales" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                💰 Registrar Venta
-            </button>
-            <button onclick="changeView('expenses')" id="nav-expenses" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                💸 Gastos
-            </button>
-            <button onclick="changeView('history')" id="nav-history" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                📊 Historial Ventas
-            </button>
-            <button onclick="changeView('local2')" id="nav-local2" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                🚚 LOCAL 2
-            </button>
+            <button onclick="changeView('inventory')" id="nav-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">📦 Inventario</button>
+            <button onclick="changeView('sales')" id="nav-sales" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">💰 Registrar Venta</button>
+            <button onclick="changeView('expenses')" id="nav-expenses" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">💸 Gastos</button>
+            <button onclick="changeView('history')" id="nav-history" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">📊 Historial Ventas</button>
+            <button onclick="changeView('local2')" id="nav-local2" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">🚚 LOCAL 2</button>
         </nav>
 
         <main>
             <div id="loading-spinner" class="text-center p-8">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-4 mx-auto" style="border-color: var(--accent-color);"></div>
-                <p class="mt-4" style="color: var(--accent-color);">Conectando a Supabase y sincronizando datos...</p>
+                <p class="mt-4" style="color: var(--accent-color);">Conectando a Supabase...</p>
             </div>
             <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden"></div>
 
@@ -355,239 +155,39 @@
                         <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Principal</h2>
                         <div class="flex items-center space-x-2">
                              <div class="relative w-full md:w-72">
-                                <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
-                                       class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
-                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                                <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..." class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </div>
-                             <button onclick="openAddProductModal('local1')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
-                                Añadir
-                            </button>
+                             <button onclick="openAddProductModal('local1')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">Añadir</button>
                         </div>
                     </div>
-                    <div id="inventory-list" class="space-y-8">
-                        <p class="text-gray-500 text-center col-span-full">Cargando inventario...</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-sales" class="view-content">
-                <div class="max-w-xl mx-auto p-6 bg-gray-800 rounded-xl shadow-xl">
-                    <h2 class="text-2xl font-bold mb-6 text-indigo-300">Registrar Venta</h2>
-                    <form id="record-sale-form" class="space-y-4">
-                        <div>
-                            <label for="sale-category" class="block text-sm font-medium">Categoría</label>
-                            <select id="sale-category" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                <option value="" disabled selected>Primero selecciona una categoría</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="sale-product-id" class="block text-sm font-medium">Producto</label>
-                            <select id="sale-product-id" required disabled class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
-                                <option value="" disabled selected>Selecciona un producto</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="sale-quantity" class="block text-sm font-medium">Cantidad Vendida</label>
-                            <input type="number" id="sale-quantity" required min="1" step="1" value="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                        </div>
-                        <div>
-                            <label for="sale-recipient" class="block text-sm font-medium">Destinatario / Cliente</label>
-                            <input type="text" id="sale-recipient" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                        </div>
-                        <div>
-                            <label for="sale-price" class="block text-sm font-medium">Precio de Venta ($)</label>
-                            <input type="number" id="sale-price" required min="0.01" step="0.01" value="0.00" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                        </div>
-                         <div>
-                            <label for="sale-status" class="block text-sm font-medium">Estado de Pago</label>
-                            <select id="sale-status" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                <option value="Pagado">Pagado</option>
-                                <option value="Pendiente">Pendiente</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">
-                            Confirmar Venta
-                        </button>
-                    </form>
-                </div>
-            </section>
-            
-            <section id="view-expenses" class="view-content">
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                    <div class="lg:col-span-2">
-                        <div class="p-6 bg-gray-800 rounded-xl shadow-xl">
-                            <h2 class="text-2xl font-bold mb-6 text-indigo-300">Registrar Gasto (Principal)</h2>
-                            <form id="record-expense-form" class="space-y-4">
-                                <div>
-                                    <label for="expense-description" class="block text-sm font-medium">Descripción del Gasto</label>
-                                    <input type="text" id="expense-description" required placeholder="Ej: Alquiler, Salario, Compra de Herramientas"
-                                        class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                </div>
-                                <div>
-                                    <label for="expense-amount" class="block text-sm font-medium">Monto del Gasto ($)</label>
-                                    <input type="number" id="expense-amount" required min="0.01" step="0.01" value="0.00"
-                                        class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                </div>
-                                <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">
-                                    Confirmar Gasto
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-3">
-                        <div class="p-6 bg-gray-800 rounded-xl shadow-xl">
-                            <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Gastos (Principal)</h2>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-700">
-                                    <thead>
-                                        <tr class="bg-gray-700/50">
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descripción</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Monto</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="expenses-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-history" class="view-content">
-                <div class="p-6 bg-gray-800 rounded-xl shadow-xl">
-                    <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Ventas (Principal)</h2>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-700">
-                             <thead>
-                                <tr class="bg-gray-700/50">
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
-                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sales-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
-                        </table>
-                    </div>
+                    <div id="inventory-list" class="space-y-8"></div>
                 </div>
             </section>
             
             <section id="view-local2" class="view-content">
                 <div class="bg-gray-800 rounded-lg shadow-xl p-6">
-                    <nav class="flex justify-center space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6">
-                        <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                            📦 Inventario
-                        </button>
-                        <button onclick="changeSubView('local2-sales')" id="nav-local2-sales" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                            💰 Registrar Venta
-                        </button>
-                        <button onclick="changeSubView('local2-expenses')" id="nav-local2-expenses" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                            💸 Gastos
-                        </button>
-                        <button onclick="changeSubView('local2-history')" id="nav-local2-history" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                            📊 Historial de Ventas
-                        </button>
-                    </nav>
-
-                    <div id="daily-sales-summary-local2" class="flex items-center justify-center space-x-6 text-base bg-gray-900/50 p-3 rounded-lg mb-6 border border-gray-700">
-                        <p>Vendido HOY (L2): <span id="today-sold-total-local2" class="font-bold text-green-400">$0.00</span></p>
-                        <p>Pagado HOY (L2): <span id="today-paid-total-local2" class="font-bold text-green-500">$0.00</span></p>
-                        <p>Gastos HOY (L2): <span id="today-expenses-total-local2" class="font-bold text-red-400">$0.00</span></p>
-                    </div>
-                    <div id="subview-local2-inventory" class="subview-content">
-                        <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
-                            <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Local 2</h2>
-                            <div class="flex items-center space-x-2">
-                                 <div class="relative w-full md:w-72">
-                                    <input type="text" id="search-inventory-2" oninput="filterInventory2()" placeholder="Buscar en Local 2..." class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
-                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                                <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
-                                    Añadir Producto
-                                </button>
+                    <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
+                        <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Local 2</h2>
+                        <div class="flex items-center space-x-2">
+                             <div class="relative w-full md:w-72">
+                                <input type="text" id="search-inventory-2" oninput="filterInventory2()" placeholder="Buscar en Local 2..." class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </div>
-                        </div>
-                        <div id="inventory-list-2" class="space-y-8"></div>
-                    </div>
-                    <div id="subview-local2-sales" class="subview-content hidden">
-                        <div class="max-w-xl mx-auto">
-                            <h2 class="text-2xl font-bold mb-6 text-indigo-300">Registrar Venta (Local 2)</h2>
-                            <form id="record-sale-form-2" class="space-y-4">
-                                </form>
+                            <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">Añadir Producto</button>
                         </div>
                     </div>
-                     <div id="subview-local2-expenses" class="subview-content hidden">
-                        </div>
-                    <div id="subview-local2-history" class="subview-content hidden">
-                        <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Ventas (Local 2)</h2>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-700">
-                                 <thead>
-                                    <tr class="bg-gray-700/50">
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
-                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="sales-history-body-2" class="bg-gray-800 divide-y divide-gray-700"></tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <div id="inventory-list-2" class="space-y-8"></div>
                 </div>
             </section>
+
+            <section id="view-sales" class="view-content">
+                </section>
+            <section id="view-expenses" class="view-content">
+                </section>
+            <section id="view-history" class="view-content">
+                </section>
         </main>
-    </div>
-    
-    <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-        <div class="p-6 rounded-xl shadow-2xl max-w-sm w-full bg-gray-800 border-l-4 border-indigo-500">
-            <h3 id="modal-title" class="text-xl font-bold mb-3 text-indigo-300"></h3>
-            <p id="modal-body" class="mb-4"></p>
-            <div class="flex flex-col space-y-2 pt-4">
-                <button id="modal-button" class="w-full py-2 rounded-lg font-semibold"></button>
-                <button id="modal-cancel-button" onclick="closeModal()" class="w-full py-2 rounded-lg font-semibold border hidden" style="border-color: var(--border-color);">Cancelar</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="edit-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-        <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full bg-gray-800 border-l-4 border-indigo-500">
-            <h3 class="text-2xl font-bold mb-4 text-indigo-300">Editar Producto</h3>
-            <form id="edit-product-form" class="space-y-4">
-                <input type="hidden" id="edit-product-id">
-                <input type="hidden" id="edit-product-location">
-                <div>
-                    <label for="edit-product-name" class="block text-sm font-medium">Nombre</label>
-                    <input type="text" id="edit-product-name" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                </div>
-                <div>
-                    <label for="edit-product-category" class="block text-sm font-medium">Categoría</label>
-                    <input type="text" id="edit-product-category" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                </div>
-                <div>
-                    <label for="edit-product-price" class="block text-sm font-medium">Precio ($)</label>
-                    <input type="number" id="edit-product-price" required min="0.01" step="0.01" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                </div>
-                <div>
-                    <label for="edit-product-quantity" class="block text-sm font-medium">Cantidad</label>
-                    <input type="number" id="edit-product-quantity" required min="0" step="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                </div>
-                <div class="flex space-x-4 pt-4">
-                    <button type="button" onclick="closeEditModal()" class="flex-1 py-2 rounded-lg font-semibold border" style="color: var(--accent-color); border-color: var(--accent-color);">Cancelar</button>
-                    <button type="submit" class="flex-1 p-3 rounded-lg font-bold">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <div id="add-product-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
@@ -609,28 +209,29 @@
                 </div>
                 <div>
                     <label for="product-quantity" class="block text-sm font-medium">Cantidad</label>
-                    <input type="number" id="product-quantity" required min="1" step="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                    <input type="number" id="product-quantity" required min="0" step="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                 </div>
                 <div class="flex space-x-4 pt-4">
                     <button type="button" onclick="closeAddProductModal()" class="flex-1 py-2 rounded-lg font-semibold border" style="color: var(--accent-color); border-color: var(--accent-color);">Cancelar</button>
-                    <button type="submit" class="flex-1 p-3 rounded-lg font-bold">Guardar Producto</button>
+                    <button type="submit" class="flex-1 p-3 rounded-lg font-bold shadow-lg">Guardar Producto</button>
                 </div>
             </form>
         </div>
     </div>
-
+    
 <script type="module">
     const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
     
     let supabase = null; 
-    let inventory = [], salesHistory = [], expensesHistory = [];
-    let inventory2 = [], salesHistory2 = [], expensesHistory2 = [];
+    let inventory = [], inventory2 = [];
+    let salesHistory = [], salesHistory2 = [];
+    let expensesHistory = [], expensesHistory2 = [];
 
     const PUBLIC_STORE_ID = 'public_store_id_mrphone'; 
     let currentUserId = PUBLIC_STORE_ID;
 
-    // --- FUNCIONES AUXILIARES (Modales, Vistas, etc.) ---
+    // --- FUNCIONES AUXILIARES ---
     window.changeView = (viewId) => {
         document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
         document.getElementById(`view-${viewId}`).classList.add('active');
@@ -643,21 +244,11 @@
         document.getElementById('add-product-location').value = location;
         document.getElementById('add-product-modal-container').classList.remove('hidden');
     };
-    window.closeAddProductModal = () => document.getElementById('add-product-modal-container').classList.add('hidden');
-    window.openEditModal = (id, location) => {
-        const source = location === 'local1' ? inventory : inventory2;
-        const product = source.find(p => p.id === id);
-        if (!product) return;
-        document.getElementById('edit-product-id').value = product.id;
-        document.getElementById('edit-product-location').value = location;
-        document.getElementById('edit-product-name').value = product.name;
-        document.getElementById('edit-product-category').value = product.category;
-        document.getElementById('edit-product-price').value = product.price;
-        document.getElementById('edit-product-quantity').value = product.quantity;
-        document.getElementById('edit-modal-container').classList.remove('hidden');
+
+    window.closeAddProductModal = () => {
+        document.getElementById('add-product-modal-container').classList.add('hidden');
     };
-    window.closeEditModal = () => document.getElementById('edit-modal-container').classList.add('hidden');
-    // ... (otras funciones auxiliares que puedas necesitar)
+    // ... (otras funciones auxiliares como openEditModal, etc.)
 
     // --- RENDERIZADO Y FILTRADO ---
     const renderInventoryList = (inventorySource, containerId, searchTerm = '') => {
@@ -665,17 +256,17 @@
         if (!listContainer) return;
         listContainer.innerHTML = '';
         const searchWords = searchTerm.toLowerCase().split(' ').filter(word => word.length > 0);
-        const filtered = searchTerm.trim() === '' ? inventorySource : inventorySource.filter(p => {
+        const filteredInventory = searchTerm.trim() === '' ? inventorySource : inventorySource.filter(p => {
             const searchableText = `${p.name.toLowerCase()} ${p.category ? p.category.toLowerCase() : ''}`;
             return searchWords.every(word => searchableText.includes(word));
         });
 
-        if (filtered.length === 0) {
-            listContainer.innerHTML = `<p class="text-gray-400 text-center">No se encontraron productos.</p>`;
+        if (filteredInventory.length === 0) {
+            listContainer.innerHTML = `<p class="text-gray-400 text-center col-span-full">No se encontraron productos.</p>`;
             return;
         }
 
-        const grouped = filtered.reduce((acc, p) => {
+        const grouped = filteredInventory.reduce((acc, p) => {
             const cat = p.category || 'Sin Categoría';
             if (!acc[cat]) acc[cat] = [];
             acc[cat].push(p);
@@ -685,14 +276,9 @@
         Object.keys(grouped).sort().forEach(category => {
             let sectionHtml = `<div class="mb-10"><h2 class="text-2xl font-bold text-gray-200 border-b-2 border-indigo-500 pb-2 mb-4 uppercase tracking-wider">${category}</h2><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">`;
             grouped[category].forEach(p => {
-                const escapedName = p.name.replace(/'/g, "\\'");
                 sectionHtml += `
-                    <div class="bg-gray-700 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-600 relative">
-                        <div class="absolute top-2 right-2 flex space-x-2">
-                            <button onclick="openEditModal('${p.id}', '${containerId.includes('2') ? 'local2' : 'local1'}')" class="text-gray-400 hover:text-indigo-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
-                            <button onclick="deleteProduct('${p.id}', '${escapedName}', '${containerId.includes('2') ? 'local2' : 'local1'}')" class="text-gray-400 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
-                        </div>
-                        <h3 class="font-semibold text-white mt-8">${p.name}</h3>
+                    <div class="bg-gray-700 rounded-lg shadow-xl p-4 flex flex-col product-card border border-gray-600">
+                        <h3 class="font-semibold text-white">${p.name}</h3>
                         <p class="text-green-400 font-bold text-lg mt-2">$${Number(p.price).toFixed(2)}</p>
                         <p class="mt-1 text-sm text-gray-400">Stock: ${p.quantity}</p>
                     </div>`;
@@ -717,35 +303,23 @@
         event.preventDefault();
         const location = document.getElementById('add-product-location').value;
         const table = location === 'local2' ? 'inventory2' : 'inventory';
+        
         const name = document.getElementById('product-name').value;
         const category = document.getElementById('product-category').value;
         const price = parseFloat(document.getElementById('product-price').value);
         const quantity = parseInt(document.getElementById('product-quantity').value, 10);
-        const { error } = await supabase.from(table).insert([{ user_id: currentUserId, name, category, price, quantity }]);
-        if (error) { console.error('Error:', error); alert('Error: ' + error.message); } 
-        else { closeAddProductModal(); loadAllData(); }
-    }
 
-    async function handleEditProduct(event) {
-        event.preventDefault();
-        const id = document.getElementById('edit-product-id').value;
-        const location = document.getElementById('edit-product-location').value;
-        const table = location === 'local2' ? 'inventory2' : 'inventory';
-        const name = document.getElementById('edit-product-name').value;
-        const category = document.getElementById('edit-product-category').value;
-        const price = parseFloat(document.getElementById('edit-product-price').value);
-        const quantity = parseInt(document.getElementById('edit-product-quantity').value, 10);
-        const { error } = await supabase.from(table).update({ name, category, price, quantity }).eq('id', id);
-        if (error) { console.error('Error:', error); alert('Error: ' + error.message); }
-        else { closeEditModal(); loadAllData(); }
-    }
-    
-    window.deleteProduct = async (id, name, location) => {
-        if (!confirm(`¿Estás seguro de que quieres eliminar "${name}"?`)) return;
-        const table = location === 'local2' ? 'inventory2' : 'inventory';
-        const { error } = await supabase.from(table).delete().eq('id', id);
-        if (error) { console.error('Error:', error); alert('Error: ' + error.message); }
-        else { loadAllData(); }
+        const { error } = await supabase.from(table).insert([{
+            user_id: currentUserId, name, category, price, quantity
+        }]);
+
+        if (error) {
+            console.error('Error al añadir producto:', error);
+            alert('Error al guardar: ' + error.message);
+        } else {
+            closeAddProductModal();
+            loadAllData();
+        }
     }
 
     // --- CARGA DE DATOS ---
@@ -786,7 +360,6 @@
         loadAllData();
         
         document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
-        document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct);
     };
 </script>
 
