@@ -825,8 +825,16 @@
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const response = await fetch(`${supabaseUrl}/functions/v1/upload-to-r2`, { method: 'POST', headers: { 'Authorization': `Bearer ${supabaseAnonKey}` }, body: formData });
-            if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || 'Error al subir archivo a R2'); }
+            // Esta URL es un ejemplo, debes reemplazarla por tu endpoint si usas un worker/function para subir a R2.
+            const response = await fetch(`${supabaseUrl}/functions/v1/upload-to-r2`, { 
+                method: 'POST', 
+                headers: { 'Authorization': `Bearer ${supabaseAnonKey}` }, 
+                body: formData 
+            });
+            if (!response.ok) { 
+                const errorData = await response.json(); 
+                throw new Error(errorData.error || 'Error al subir archivo a R2'); 
+            }
             const data = await response.json();
             return data.url;
         } catch (error) { console.error('Error subiendo archivo a R2:', error); throw error; }
