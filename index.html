@@ -10,8 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Orbitron:wght@700&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
         (function() {
             try {
@@ -754,7 +752,7 @@
                         <select id="product-category" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                             <option value="" disabled selected>Selecciona una categoría</option>
                             <option value="Flex Main">Flex Main</option>
-                            <option value="Pantallas">Pantallas</option>
+                            <option value."Pantallas">Pantallas</option>
                             <option value="Jacks De Carga">Jacks De Carga</option>
                             <option value="Plaquitas de Carga">Plaquitas de Carga</option>
                             <option value="Protectores Fisicos">Protectores Fisicos</option>
@@ -797,12 +795,16 @@
     </div>
 
 <script type="module">
+    // =========== CAMBIO 1: Importar createClient desde la URL de Supabase (ESM) ===========
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
     // =========== CONFIGURACIÓN DE SUPABASE ===========
     // ❗️❗️❗️ REEMPLAZA ESTAS CLAVES CON LAS DE TU PROYECTO ❗️❗️❗️
     const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
     
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+    // =========== CAMBIO 2: Usar el createClient importado (ya no desde 'window.supabase') ===========
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // =========== VARIABLES GLOBALES Y ESTADO DE LA APP ===========
     let inventory = [], salesHistory = [], expensesHistory = [];
@@ -818,6 +820,7 @@
     const authError = document.getElementById('auth-error');
 
     // =========== GESTIÓN DE AUTENTICACIÓN (CORREGIDA) ===========
+    // Esta lógica estaba bien, el problema era que no se ejecutaba por el error de carga.
     supabase.auth.onAuthStateChange((event, session) => {
         initialLoadingContainer.classList.add('hidden');
         
@@ -1170,7 +1173,7 @@
 
     async function handleRecordExpense(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
     async function handleRecordExpense2(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description-2').value.trim(); const amount = parseFloat(document.getElementById('expense-amount-2').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos2').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado (Local 2)", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form-2').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }
-    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location ===D'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
+    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
     
     window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
         const inventorySource = location === 'local2' ? inventory2 : inventory;
