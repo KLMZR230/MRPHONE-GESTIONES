@@ -430,6 +430,10 @@
                                 </select>
                             </div>
                             <div>
+                                <label for="sale-model-detail" class="block text-sm font-medium">Modelo / Detalle (Opcional)</label>
+                                <input type="text" id="sale-model-detail" placeholder="Ej: iPhone 12, Samsung A32" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                            </div>
+                            <div>
                                 <label for="sale-quantity" class="block text-sm font-medium">Cantidad Vendida</label>
                                 <input type="number" id="sale-quantity" required min="1" step="1" value="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                             </div>
@@ -576,6 +580,10 @@
                                         </select>
                                     </div>
                                     <div>
+                                        <label for="sale-model-detail-2" class="block text-sm font-medium">Modelo / Detalle (Opcional)</label>
+                                        <input type="text" id="sale-model-detail-2" placeholder="Ej: iPhone 12, Samsung A32" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                    </div>
+                                    <div>
                                         <label for="sale-quantity-2" class="block text-sm font-medium">Cantidad Vendida</label>
                                         <input type="number" id="sale-quantity-2" required min="1" step="1" value="1" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                                     </div>
@@ -712,7 +720,7 @@
                             <option value="Vidrio Templado">Vidrio Templado</option>
                             <option value="Glass Privado">Glass Privado</option>
                             <option value="Glass Ceramico Privado">Glass Ceramico Privado</option>
-                            <option value="Glass Curvo">Glass Curvo</option>
+                            <option value."Glass Curvo">Glass Curvo</option>
                             <option value="Audifonos">Audifonos</option>
                             <option value="Lentes de Camara">Lentes de Camara</option>
                             <option value="Cargadores">Cargadores</option>
@@ -752,7 +760,7 @@
                         <select id="product-category" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                             <option value="" disabled selected>Selecciona una categoría</option>
                             <option value="Flex Main">Flex Main</option>
-                            <option value."Pantallas">Pantallas</option>
+                            <option value="Pantallas">Pantallas</option>
                             <option value="Jacks De Carga">Jacks De Carga</option>
                             <option value="Plaquitas de Carga">Plaquitas de Carga</option>
                             <option value="Protectores Fisicos">Protectores Fisicos</option>
@@ -762,7 +770,7 @@
                             <option value="Glass Curvo">Glass Curvo</option>
                             <option value="Audifonos">Audifonos</option>
                             <option value="Lentes de Camara">Lentes de Camara</option>
-                            <option value="Cargadores">Cargadores</option>
+                            <option value."Cargadores">Cargadores</option>
                             <option value="Cambio de Pantalla">Cambio de Pantalla</option>
                             <option value="Cambio de Jack de Carga">Cambio de Jack de Carga</option>
                             <option value="Otro">Otro</option>
@@ -795,15 +803,11 @@
     </div>
 
 <script type="module">
-    // =========== CAMBIO 1: Importar createClient desde la URL de Supabase (ESM) ===========
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     // =========== CONFIGURACIÓN DE SUPABASE ===========
-    // ❗️❗️❗️ REEMPLAZA ESTAS CLAVES CON LAS DE TU PROYECTO ❗️❗️❗️
     const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
-    
-    // =========== CAMBIO 2: Usar el createClient importado (ya no desde 'window.supabase') ===========
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // =========== VARIABLES GLOBALES Y ESTADO DE LA APP ===========
@@ -820,7 +824,6 @@
     const authError = document.getElementById('auth-error');
 
     // =========== GESTIÓN DE AUTENTICACIÓN (CORREGIDA) ===========
-    // Esta lógica estaba bien, el problema era que no se ejecutaba por el error de carga.
     supabase.auth.onAuthStateChange((event, session) => {
         initialLoadingContainer.classList.add('hidden');
         
@@ -1029,10 +1032,16 @@
             const date = new Date(sale.timestamp).toLocaleDateString();
             const currentStatus = sale.status || 'Pagado';
             const statusClass = { 'Pagado': 'status-paid', 'Pendiente': 'status-pending', 'Devuelto': 'status-returned' }[currentStatus] || 'status-pending';
+            
+            // === CAMBIO AQUÍ: Añadir el detalle del modelo si existe ===
+            const modelDetailHtml = sale.model_detail 
+                ? `<span class="text-indigo-300 font-normal">(${sale.model_detail})</span>` 
+                : '';
+            
             const row = tbody.insertRow();
             row.className = 'hover:bg-gray-900/50 transition-colors';
             row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${sale.product_name} (x${sale.quantity || 1})</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${sale.product_name} ${modelDetailHtml} (x${sale.quantity || 1})</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${sale.recipient}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-green-400 font-bold">$${parseFloat(sale.price).toFixed(2)}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td>
@@ -1046,6 +1055,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button onclick="deleteSale('${sale.id}', '${sale.product_name.replace(/'/g, "\\'")}', '${location}')" class="text-red-500 hover:text-red-300">Eliminar</button>
                 </td>`;
+            // === FIN DEL CAMBIO ===
         });
         if (historySource.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">No hay ventas registradas por ti.</td></tr>`;
@@ -1076,7 +1086,6 @@
     const renderLocal2HeaderSummary = () => { const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }); const todaySales = salesHistory2.filter(sale => new Date(sale.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today); const todayExpenses = expensesHistory2.filter(expense => new Date(expense.timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'numeric', day: 'numeric' }) === today); const todaySoldTotal = todaySales.reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0); const todayPaidTotal = todaySales.filter(sale => (sale.status || 'Pagado') === 'Pagado').reduce((sum, sale) => sum + parseFloat(sale.price || 0), 0); const todayExpensesTotal = todayExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0); document.getElementById('today-sold-total-local2').textContent = `$${todaySoldTotal.toFixed(2)}`; document.getElementById('today-paid-total-local2').textContent = `$${todayPaidTotal.toFixed(2)}`; document.getElementById('today-expenses-total-local2').textContent = `$${todayExpensesTotal.toFixed(2)}`; };
 
     window.filterInventory = () => { const searchTerm = document.getElementById('search-inventory').value; renderInventoryList(inventory, 'inventory-list', 'local1', searchTerm.toLowerCase()); }
-    // ✅ NUEVA FUNCIÓN para la búsqueda del Local 2
     window.filterInventory2 = () => { const searchTerm = document.getElementById('search-inventory-2').value; renderInventoryList(inventory2, 'inventory-list-2', 'local2', searchTerm.toLowerCase()); }
 
     const renderExpenses = () => { const tbody = document.getElementById('expenses-history-body'); tbody.innerHTML = ''; expensesHistory.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti.</td></tr>'; } };
@@ -1143,28 +1152,54 @@
         event.preventDefault();
         const userId = await getCurrentUserId(); if (!userId) return showModal("Error de sesión", "Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error");
         const formSuffix = location === 'local2' ? '-2' : '';
+        
+        // === CAMBIO AQUÍ: Capturar el valor del nuevo campo ===
         const productId = document.getElementById(`sale-product-id${formSuffix}`).value;
+        const modelDetail = document.getElementById(`sale-model-detail${formSuffix}`).value.trim(); // <-- NUEVA LÍNEA
         const saleQuantity = parseInt(document.getElementById(`sale-quantity${formSuffix}`).value, 10);
         const recipient = document.getElementById(`sale-recipient${formSuffix}`).value.trim();
         const price = parseFloat(document.getElementById(`sale-price${formSuffix}`).value);
         const status = document.getElementById(`sale-status${formSuffix}`).value;
+        // === FIN DEL CAMBIO ===
+        
         const inventorySource = location === 'local2' ? inventory2 : inventory;
         const salesTable = location === 'local2' ? 'sales2' : 'sales';
         const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory';
         const formId = location === 'local2' ? 'record-sale-form-2' : 'record-sale-form';
+        
         if (!productId || !recipient || !price || price <= 0 || saleQuantity <= 0) { return showModal("Datos Incompletos", "Categoría, producto, destinatario y precio son obligatorios.", "error"); }
+        
         const product = inventorySource.find(p => p.id === productId);
         if (!product) { return showModal("Error de Producto", "El producto seleccionado no es válido.", "error"); }
         if (product.quantity < saleQuantity) { return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error"); }
+        
         try {
-            const { error: saleError } = await supabase.from(salesTable).insert([{ user_id: userId, product_name: product.name, product_id: productId, recipient, price, status: status, quantity: saleQuantity, timestamp: new Date() }]);
+            // === CAMBIO AQUÍ: Añadir 'model_detail' al objeto que se inserta ===
+            const saleData = { 
+                user_id: userId, 
+                product_name: product.name, 
+                product_id: productId, 
+                recipient, 
+                price, 
+                status: status, 
+                quantity: saleQuantity, 
+                timestamp: new Date(),
+                model_detail: modelDetail // <-- NUEVA PROPIEDAD
+            };
+            
+            const { error: saleError } = await supabase.from(salesTable).insert([saleData]);
+            // === FIN DEL CAMBIO ===
+
             if (saleError) throw saleError;
+            
             const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity - saleQuantity }).eq('id', productId);
             if (stockError) throw stockError;
+            
             showModal("Venta Exitosa", `Venta de '${product.name}' x${saleQuantity} registrada.`, "success");
             document.getElementById(formId).reset();
             populateSaleCategoryDropdown(location);
-        } catch (e) { showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error");
+        } catch (e) { 
+            showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error");
         } finally {
             if (location === 'local2') { await loadInventory2(); await loadSalesHistory2(); renderLocal2HeaderSummary(); } 
             else { await loadInventory(); await loadSalesHistory(); renderHeaderSummary(); }
