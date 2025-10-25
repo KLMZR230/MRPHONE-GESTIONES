@@ -887,22 +887,54 @@
         applyTheme(savedTheme);
         loadAllData(true);
     };
-
+    
+    // ====================================================================
+    // FUNCIÓN CORREGIDA: Llama a la Edge Function 'upload-to-r2'
+    // Esta función llama a tu Edge Function, la cual tiene las credenciales R2
+    // y maneja la subida con la firma AWS v4.
+    // ====================================================================
     const uploadToR2 = async (file) => {
         if (!file) return null;
         try {
-            const userId = (await supabase.auth.getUser())?.data?.user?.id ?? 'public';
-            const filePath = `${userId}/${Date.now()}-${file.name}`;
-            const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, file);
-            if (uploadError) throw uploadError;
-            const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(filePath);
-            return publicUrl;
+            // Endpoint de tu Edge Function
+            const url = `${supabaseUrl}/functions/v1/upload-to-r2`;
+            
+            // La ANON KEY está definida en el scope del módulo (supabaseAnonKey)
+            const anonKey = supabaseAnonKey; 
+
+            // Prepara los datos para enviarlos como un formulario multipart (necesario para la función Edge)
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // 1. Llama a la Edge Function (el proxy a R2)
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${anonKey}` 
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                 const errorText = await response.text();
+                 throw new Error(`Error en la Edge Function: ${response.status} - ${errorText}`);
+            }
+            
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+
+            // 2. Retorna la URL de R2 que la función retorna (data.url)
+            return data.url; 
+            
         } catch (error) { 
             console.error('Error subiendo archivo:', error); 
-            showModal("Error de subida", "No se pudo subir la imagen. Asegúrate de que el bucket 'product-images' exista y tenga las políticas correctas.", "error");
+            showModal("Error de subida", `No se pudo subir la imagen a R2. Mensaje: ${error.message || "Error desconocido."}`, "error");
             return null;
         }
     };
+    // ====================================================================
+    // FIN DE LA FUNCIÓN CORREGIDA
+    // ====================================================================
 
     window.applyTheme = (theme) => { document.documentElement.className = theme; };
     window.changeTheme = (theme) => { applyTheme(theme); localStorage.setItem('selectedTheme', theme); };
