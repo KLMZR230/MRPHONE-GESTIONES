@@ -1290,19 +1290,20 @@
     
     async function handleLogoFileSelect(event) { const file = event.target.files[0]; if (!file) return; const userId = await getCurrentUserId(); if (!userId) return; try { const logoUrl = await uploadToR2(file); const { error } = await supabase.from('settings').upsert({ user_id: userId, store_logo_url: logoUrl }, { onConflict: 'user_id' }); if (error) throw error; renderStoreLogo(logoUrl); showModal("Logo Actualizado", "El logo de la tienda se guardó con éxito.", "success"); } catch (e) { showModal("Error de Logo", e.message, "error"); } finally { event.target.value = ''; } }
     
+    // ====================================================================
+    // FUNCIÓN CORREGIDA (Se eliminó el '}' extra)
+    // ====================================================================
     async function handleRecordSale(event, location = 'local1') {
         event.preventDefault();
         const userId = await getCurrentUserId(); if (!userId) return showModal("Error de sesión", "Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error");
         const formSuffix = location === 'local2' ? '-2' : '';
         
-        // === CAMBIO AQUÍ: Capturar el valor del nuevo campo ===
         const productId = document.getElementById(`sale-product-id${formSuffix}`).value;
-        const modelDetail = document.getElementById(`sale-model-detail${formSuffix}`).value.trim(); // <-- NUEVA LÍNEA
+        const modelDetail = document.getElementById(`sale-model-detail${formSuffix}`).value.trim();
         const saleQuantity = parseInt(document.getElementById(`sale-quantity${formSuffix}`).value, 10);
         const recipient = document.getElementById(`sale-recipient${formSuffix}`).value.trim();
         const price = parseFloat(document.getElementById(`sale-price${formSuffix}`).value);
         const status = document.getElementById(`sale-status${formSuffix}`).value;
-        // === FIN DEL CAMBIO ===
         
         const inventorySource = location === 'local2' ? inventory2 : inventory;
         const salesTable = location === 'local2' ? 'sales2' : 'sales';
@@ -1316,7 +1317,6 @@
         if (product.quantity < saleQuantity) { return showModal("Error de Cantidad", `Solo hay ${product.quantity} unidades de '${product.name}' disponibles. No puedes vender ${saleQuantity}.`, "error"); }
         
         try {
-            // === CAMBIO AQUÍ: Añadir 'model_detail' al objeto que se inserta ===
             const saleData = { 
                 user_id: userId, 
                 product_name: product.name, 
@@ -1326,12 +1326,10 @@
                 status: status, 
                 quantity: saleQuantity, 
                 timestamp: new Date(),
-                model_detail: modelDetail // <-- NUEVA PROPIEDAD
+                model_detail: modelDetail
             };
             
             const { error: saleError } = await supabase.from(salesTable).insert([saleData]);
-            // === FIN DEL CAMBIO ===
-
             if (saleError) throw saleError;
             
             const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity - saleQuantity }).eq('id', productId);
@@ -1340,9 +1338,10 @@
             showModal("Venta Exitosa", `Venta de '${product.name}' x${saleQuantity} registrada.`, "success");
             document.getElementById(formId).reset();
             
-            // const searchInputId = location === 'local2' ? 'sale-product-search-2' : 'sale-product-search';
+            const searchInputId = location === 'local2' ? 'sale-product-search-2' : 'sale-product-search';
             document.getElementById(searchInputId).value = '';
-            // populateSaleCategoryDropdown(location);
+        
+            populateSaleCategoryDropdown(location);
         } catch (e) { 
             showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error");
         } finally {
@@ -1350,10 +1349,13 @@
             else { await loadInventory(); await loadSalesHistory(); renderHeaderSummary(); }
         }
     }
+    // ====================================================================
+    // FIN DE LA FUNCIÓN CORREGIDA
+    // ====================================================================
 
     async function handleRecordExpense(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
     async function handleRecordExpense2(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description-2').value.trim(); const amount = parseFloat(document.getElementById('expense-amount-2').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos2').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado (Local 2)", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form-2').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }
-    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
+    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location ==='local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
     
     window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
         const inventorySource = location === 'local2' ? inventory2 : inventory;
