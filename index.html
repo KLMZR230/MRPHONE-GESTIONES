@@ -1093,7 +1093,6 @@
             const currentStatus = sale.status || 'Pagado';
             const statusClass = { 'Pagado': 'status-paid', 'Pendiente': 'status-pending', 'Devuelto': 'status-returned' }[currentStatus] || 'status-pending';
             
-            // === CAMBIO AQUÍ: Añadir el detalle del modelo si existe ===
             const modelDetailHtml = sale.model_detail 
                 ? `<span class="text-indigo-300 font-normal">(${sale.model_detail})</span>` 
                 : '';
@@ -1115,7 +1114,6 @@
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button onclick="deleteSale('${sale.id}', '${sale.product_name.replace(/'/g, "\\'")}', '${location}')" class="text-red-500 hover:text-red-300">Eliminar</button>
                 </td>`;
-            // === FIN DEL CAMBIO ===
         });
         if (historySource.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-gray-400">No hay ventas registradas por ti.</td></tr>`;
