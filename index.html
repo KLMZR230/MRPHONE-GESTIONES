@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-AR-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MRPHONE PRODUCTOS Y VENTAS</title>
     
@@ -423,20 +423,29 @@
                                     <option value="" disabled selected>Primero selecciona una categoría</option>
                                 </select>
                             </div>
+                            
                             <div>
-                                <label for="sale-product-id" class="block text-sm font-medium">Producto</label>
-                                <div class="relative mt-1">
-                                    <input type="text" id="sale-product-search" oninput="filterSaleProducts('local1')" placeholder="Buscar producto..."
-                                           class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
-                                           style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
-                                           autocomplete="off">
-                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
+                                <label for="sale-product-search" class="block text-sm font-medium">Producto</label>
+                                
+                                <div class="mt-1 w-full rounded-lg shadow-sm border focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500"
+                                     style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                                    
+                                    <div class="relative">
+                                        <input type="text" id="sale-product-search" oninput="filterSaleProducts('local1')" placeholder="Buscar producto..."
+                                               class="w-full rounded-t-lg text-white p-3 pl-10 border-0 border-b"
+                                               style="background-color: transparent; border-color: var(--border-color); outline: none; box-shadow: none;"
+                                               autocomplete="off">
+                                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                    
+                                    <select id="sale-product-id" required disabled 
+                                            class="block w-full rounded-b-lg text-white p-3 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            style="background-color: transparent !important; outline: none; box-shadow: none;">
+                                        <option value="" disabled selected>Selecciona un producto</option>
+                                    </select>
                                 </div>
-                                <select id="sale-product-id" required disabled class="mt-2 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <option value="" disabled selected>Selecciona un producto</option>
-                                </select>
                             </div>
                             <div>
                                 <label for="sale-model-detail" class="block text-sm font-medium">Modelo / Detalle (Opcional)</label>
@@ -582,20 +591,29 @@
                                             <option value="" disabled selected>Primero selecciona una categoría</option>
                                         </select>
                                     </div>
+
                                     <div>
-                                        <label for="sale-product-id-2" class="block text-sm font-medium">Producto</label>
-                                        <div class="relative mt-1">
-                                            <input type="text" id="sale-product-search-2" oninput="filterSaleProducts('local2')" placeholder="Buscar producto..."
-                                                   class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
-                                                   style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
-                                                   autocomplete="off">
-                                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
+                                        <label for="sale-product-search-2" class="block text-sm font-medium">Producto</label>
+                                        
+                                        <div class="mt-1 w-full rounded-lg shadow-sm border focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500"
+                                             style="border-color: var(--border-color); background-color: var(--bg-secondary);">
+                                            
+                                            <div class="relative">
+                                                <input type="text" id="sale-product-search-2" oninput="filterSaleProducts('local2')" placeholder="Buscar producto..."
+                                                       class="w-full rounded-t-lg text-white p-3 pl-10 border-0 border-b"
+                                                       style="background-color: transparent; border-color: var(--border-color); outline: none; box-shadow: none;"
+                                                       autocomplete="off">
+                                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            </div>
+                                            
+                                            <select id="sale-product-id-2" required disabled 
+                                                    class="block w-full rounded-b-lg text-white p-3 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    style="background-color: transparent !important; outline: none; box-shadow: none;">
+                                                <option value="" disabled selected>Selecciona un producto</option>
+                                            </select>
                                         </div>
-                                        <select id="sale-product-id-2" required disabled class="mt-2 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
-                                            <option value="" disabled selected>Selecciona un producto</option>
-                                        </select>
                                     </div>
                                     <div>
                                         <label for="sale-model-detail-2" class="block text-sm font-medium">Modelo / Detalle (Opcional)</label>
@@ -1141,18 +1159,21 @@
     const renderExpenses = () => { const tbody = document.getElementById('expenses-history-body'); tbody.innerHTML = ''; expensesHistory.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti.</td></tr>'; } };
     const renderExpenses2 = () => { const tbody = document.getElementById('expenses-history-body-2'); tbody.innerHTML = ''; expensesHistory2.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense2('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory2.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti en Local 2.</td></tr>'; } };
     
+    // ==================================================
+    // INICIO: FUNCIONES JS MODIFICADAS PARA LA BÚSQUEDA
+    // ==================================================
+    
     const populateSaleCategoryDropdown = (location) => { 
         const inventorySource = location === 'local2' ? inventory2 : inventory; 
-        const formSuffix = location === 'local2' ? '-2' : ''; // <-- AÑADIDO
+        const formSuffix = location === 'local2' ? '-2' : '';
         const categorySelectId = location === 'local2' ? 'sale-category-2' : 'sale-category'; 
         const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id'; 
         const categorySelect = document.getElementById(categorySelectId); 
         const productSelect = document.getElementById(productSelectId); 
         
-        // --- AÑADIDO: Limpiar búsqueda y productos ---
+        // Limpiar búsqueda y productos
         const searchInput = document.getElementById(`sale-product-search${formSuffix}`);
         if (searchInput) searchInput.value = '';
-        // --- FIN DE LO AÑADIDO ---
         
         productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; 
         productSelect.disabled = true; 
@@ -1180,14 +1201,13 @@
 
     const populateSaleProductDropdown = (category, location) => { 
         const inventorySource = location === 'local2' ? inventory2 : inventory; 
-        const formSuffix = location === 'local2' ? '-2' : ''; // <-- AÑADIDO
+        const formSuffix = location === 'local2' ? '-2' : '';
         const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id'; 
         const priceInputId = location === 'local2' ? 'sale-price-2' : 'sale-price'; 
         
-        // --- AÑADIDO: OBTENER TÉRMINO DE BÚSQUEDA ---
+        // OBTENER TÉRMINO DE BÚSQUEDA
         const searchInput = document.getElementById(`sale-product-search${formSuffix}`);
         const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-        // --- FIN DE LO AÑADIDO ---
         
         const productSelect = document.getElementById(productSelectId); 
         const priceInput = document.getElementById(priceInputId); 
@@ -1203,14 +1223,13 @@
             return; 
         } 
         
-        // --- MODIFICADO: FILTRO CON BÚSQUEDA ---
+        // FILTRO CON BÚSQUEDA
         const productsInCategory = inventorySource.filter(p => {
             const matchesCategory = (p.category || 'Sin Categoría') === category;
             const matchesStock = p.quantity > 0;
             const matchesSearch = searchTerm === '' || p.name.toLowerCase().includes(searchTerm);
             return matchesCategory && matchesStock && matchesSearch;
         });
-        // --- FIN DE LA MODIFICACIÓN ---
         
         if (productsInCategory.length > 0) { 
             productsInCategory.forEach(product => { 
@@ -1230,6 +1249,10 @@
             productSelect.disabled = true; 
         } 
     };
+
+    // ================================================
+    // FIN: FUNCIONES JS MODIFICADAS PARA LA BÚSQUEDA
+    // ================================================
     
     async function handleAddProduct(event) {
         event.preventDefault();
@@ -1345,7 +1368,7 @@
 
     async function handleRecordExpense(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
     async function handleRecordExpense2(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description-2').value.trim(); const amount = parseFloat(document.getElementById('expense-amount-2').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos2').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado (Local 2)", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form-2').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }
-    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
+    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location ==='local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
     
     window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
         const inventorySource = location === 'local2' ? inventory2 : inventory;
@@ -1391,10 +1414,31 @@
     document.getElementById('record-expense-form-2').addEventListener('submit', handleRecordExpense2);
     document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click()); 
     document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect); 
-    document.getElementById('sale-category').addEventListener('change', (e) => populateSaleProductDropdown(e.target.value, 'local1')); 
+    
+    // --- Event Listeners para la búsqueda en ventas ---
+    document.getElementById('sale-category').addEventListener('change', (e) => {
+        populateSaleProductDropdown(e.target.value, 'local1');
+        // Auto-seleccionar el primer producto si la lista se filtra a 1
+        const select = document.getElementById('sale-product-id');
+        if (select.options.length === 2) { // 1 real + "Selecciona un producto"
+            select.selectedIndex = 1;
+            select.dispatchEvent(new Event('change'));
+        }
+    });
     document.getElementById('sale-product-id').addEventListener('change', (e) => { const selectedProduct = inventory.find(p => p.id === e.target.value); if (selectedProduct) document.getElementById('sale-price').value = parseFloat(selectedProduct.price).toFixed(2); }); 
-    document.getElementById('sale-category-2').addEventListener('change', (e) => populateSaleProductDropdown(e.target.value, 'local2')); 
+    
+    document.getElementById('sale-category-2').addEventListener('change', (e) => {
+        populateSaleProductDropdown(e.target.value, 'local2');
+        // Auto-seleccionar el primer producto si la lista se filtra a 1
+        const select = document.getElementById('sale-product-id-2');
+        if (select.options.length === 2) { // 1 real + "Selecciona un producto"
+            select.selectedIndex = 1;
+            select.dispatchEvent(new Event('change'));
+        }
+    }); 
     document.getElementById('sale-product-id-2').addEventListener('change', (e) => { const selectedProduct = inventory2.find(p => p.id === e.target.value); if (selectedProduct) document.getElementById('sale-price-2').value = parseFloat(selectedProduct.price).toFixed(2); }); 
+    // --- Fin de Event Listeners para búsqueda ---
+
     document.getElementById('edit-product-image-file').addEventListener('change', (event) => { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { document.getElementById('edit-product-image-preview').src = e.target.result; }; reader.readAsDataURL(file); } }); 
 
 </script>
