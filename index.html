@@ -423,6 +423,20 @@
                                     <option value="" disabled selected>Primero selecciona una categoría</option>
                                 </select>
                             </div>
+                            
+                            <div>
+                                <label for="sale-product-search" class="block text-sm font-medium">Buscar Producto (en categoría)</label>
+                                <div class="relative mt-1">
+                                    <input type="text" id="sale-product-search" 
+                                           oninput="populateSaleProductDropdown(document.getElementById('sale-category').value, 'local1')" 
+                                           disabled placeholder="Escribe para filtrar..."
+                                           class="block w-full rounded-lg text-white shadow-sm p-3 pl-10 border disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            
                             <div>
                                 <label for="sale-product-id" class="block text-sm font-medium">Producto</label>
                                 <select id="sale-product-id" required disabled class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
@@ -573,6 +587,20 @@
                                             <option value="" disabled selected>Primero selecciona una categoría</option>
                                         </select>
                                     </div>
+
+                                    <div>
+                                        <label for="sale-product-search-2" class="block text-sm font-medium">Buscar Producto (en categoría)</label>
+                                        <div class="relative mt-1">
+                                            <input type="text" id="sale-product-search-2" 
+                                                   oninput="populateSaleProductDropdown(document.getElementById('sale-category-2').value, 'local2')" 
+                                                   disabled placeholder="Escribe para filtrar..."
+                                                   class="block w-full rounded-lg text-white shadow-sm p-3 pl-10 border disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <label for="sale-product-id-2" class="block text-sm font-medium">Producto</label>
                                         <select id="sale-product-id-2" required disabled class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border disabled:opacity-50 disabled:cursor-not-allowed">
@@ -1123,8 +1151,90 @@
     const renderExpenses = () => { const tbody = document.getElementById('expenses-history-body'); tbody.innerHTML = ''; expensesHistory.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti.</td></tr>'; } };
     const renderExpenses2 = () => { const tbody = document.getElementById('expenses-history-body-2'); tbody.innerHTML = ''; expensesHistory2.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense2('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory2.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti en Local 2.</td></tr>'; } };
     
-    const populateSaleCategoryDropdown = (location) => { const inventorySource = location === 'local2' ? inventory2 : inventory; const categorySelectId = location === 'local2' ? 'sale-category-2' : 'sale-category'; const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id'; const categorySelect = document.getElementById(categorySelectId); const productSelect = document.getElementById(productSelectId); productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; productSelect.disabled = true; const categories = [...new Set(inventorySource.map(p => p.category || 'Sin Categoría'))].sort(); categorySelect.innerHTML = '<option value="" disabled selected>Primero selecciona una categoría</option>'; categories.forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; categorySelect.appendChild(option); }); };
-    const populateSaleProductDropdown = (category, location) => { const inventorySource = location === 'local2' ? inventory2 : inventory; const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id'; const priceInputId = location === 'local2' ? 'sale-price-2' : 'sale-price'; const productSelect = document.getElementById(productSelectId); const priceInput = document.getElementById(priceInputId); productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; priceInput.value = '0.00'; if (!category) { productSelect.disabled = true; return; } const productsInCategory = inventorySource.filter(p => (p.category || 'Sin Categoría') === category && p.quantity > 0); if (productsInCategory.length > 0) { productsInCategory.forEach(product => { const option = document.createElement('option'); option.value = product.id; option.textContent = `${product.name} (${product.quantity} disponibles)`; productSelect.appendChild(option); }); productSelect.disabled = false; } else { productSelect.disabled = true; } };
+    // const populateSaleCategoryDropdown = (location) => {
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const categorySelectId = location === 'local2' ? 'sale-category-2' : 'sale-category';
+        const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
+        
+        // --- INICIO MODIFICACIÓN ---
+        const searchInputId = location === 'local2' ? 'sale-product-search-2' : 'sale-product-search';
+        const searchInput = document.getElementById(searchInputId);
+        // --- FIN MODIFICACIÓN ---
+
+        const categorySelect = document.getElementById(categorySelectId);
+        const productSelect = document.getElementById(productSelectId);
+        
+        productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
+        productSelect.disabled = true;
+
+        // --- INICIO MODIFICACIÓN ---
+        // Resetea y deshabilita el buscador cuando la categoría cambia
+        searchInput.disabled = true;
+        searchInput.value = '';
+        // --- FIN MODIFICACIÓN ---
+
+        const categories = [...new Set(inventorySource.map(p => p.category || 'Sin Categoría'))].sort();
+        categorySelect.innerHTML = '<option value="" disabled selected>Primero selecciona una categoría</option>';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    };
+    
+    // window.populateSaleProductDropdown = (category, location) => {
+        const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const productSelectId = location === 'local2' ? 'sale-product-id-2' : 'sale-product-id';
+        const priceInputId = location === 'local2' ? 'sale-price-2' : 'sale-price';
+        
+        // --- INICIO MODIFICACIÓN ---
+        const searchInputId = location === 'local2' ? 'sale-product-search-2' : 'sale-product-search';
+        const productSelect = document.getElementById(productSelectId);
+        const priceInput = document.getElementById(priceInputId);
+        const searchInput = document.getElementById(searchInputId);
+        const searchTerm = searchInput.value.toLowerCase();
+        // --- FIN MODIFICACIÓN ---
+
+        productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>';
+        priceInput.value = '0.00';
+        
+        if (!category) {
+            productSelect.disabled = true;
+            searchInput.disabled = true; // Deshabilita el buscador si no hay categoría
+            return;
+        }
+        
+        const productsInCategory = inventorySource.filter(p => (p.category || 'Sin Categoría') === category && p.quantity > 0);
+        
+        if (productsInCategory.length > 0) {
+            // --- INICIO MODIFICACIÓN ---
+            // Filtra los productos de la categoría según el término de búsqueda
+            const filteredProducts = searchTerm
+                ? productsInCategory.filter(p => p.name.toLowerCase().includes(searchTerm))
+                : productsInCategory;
+
+            if (filteredProducts.length > 0) {
+                 filteredProducts.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = `${product.name} (${product.quantity} disponibles)`;
+                    productSelect.appendChild(option);
+                });
+            } else {
+                // Si hay productos en la categoría pero ninguno coincide con la búsqueda
+                productSelect.innerHTML = '<option value="" disabled selected>Sin coincidencias...</option>';
+            }
+            
+            productSelect.disabled = false;
+            searchInput.disabled = false; // Habilita el buscador
+            // --- FIN MODIFICACIÓN ---
+        } else {
+            // No hay productos en esta categoría
+            productSelect.disabled = true;
+            searchInput.disabled = true; // Deshabilita el buscador
+        }
+    };
     
     async function handleAddProduct(event) {
         event.preventDefault();
@@ -1229,7 +1339,10 @@
             
             showModal("Venta Exitosa", `Venta de '${product.name}' x${saleQuantity} registrada.`, "success");
             document.getElementById(formId).reset();
-            populateSaleCategoryDropdown(location);
+            
+            // const searchInputId = location === 'local2' ? 'sale-product-search-2' : 'sale-product-search';
+            document.getElementById(searchInputId).value = '';
+            // populateSaleCategoryDropdown(location);
         } catch (e) { 
             showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error");
         } finally {
