@@ -297,11 +297,10 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <div id="initial-loading-container" class="flex-grow flex items-center justify-center p-4">
+    <div id="initial-loading-container" class="hidden flex-grow flex items-center justify-center p-4">
         <div>
             <div class="animate-spin rounded-full h-12 w-12 border-b-4 mx-auto" style="border-color: var(--accent-color);"></div>
-            <h1 class="mt-4 text-xl font-bold text-red-500 text-center">SISTEMA EN MANTENIMIENTO</h1>
-            <p class="mt-2 text-lg text-red-400 text-center">Por favor, contacta a soporte por falta de pago.</p>
+            <h1 class="mt-4 text-xl font-bold text-red-500 text-center">Cargando...</h1>
         </div>
     </div>
 
@@ -341,52 +340,40 @@
 
         <div id="app" class="flex-grow p-4 md:p-8">
             <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700 mb-6 rounded-xl">
-                   <div class="flex items-center space-x-4">
-                       <div id="store-logo-container" title="Haz clic para cambiar el logo">
-                         <img id="store-logo-img" src="https://placehold.co/240x80/1f2937/d97706?text=MRPHONE" alt="Store Logo"
-                                 class="h-full w-full object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105">
+                    <div class="flex items-center space-x-4">
+                        <div id="store-logo-container" title="Haz clic para cambiar el logo">
+                           <img id="store-logo-img" src="https://placehold.co/240x80/1f2937/d97706?text=MRPHONE" alt="Store Logo"
+                                     class="h-full w-full object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105">
+                        </div>
+                        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">
+                            <span class="text-indigo-400">MRPHONE</span> PRODUCTOS
+                        </h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                       <div id="daily-sales-summary" class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
+                             <p class="text-white font-bold text-base">TOTAL (Principal)</p>
+                             <p>Vendido HOY: <span id="today-sold-total" class="font-bold text-green-400">$0.00</span></p>
+                             <p>Pagado HOY: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
+                             <p class="pr-2 border-r border-gray-600">Gastos HOY: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
                        </div>
-                       <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">
-                           <span class="text-indigo-400">MRPHONE</span> PRODUCTOS
-                       </h1>
-                   </div>
-                   
-                   <div class="flex items-center space-x-4">
-                     <div id="daily-sales-summary" class="flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
-                          <p class="text-white font-bold text-base">TOTAL (Principal)</p>
-                          <p>Vendido HOY: <span id="today-sold-total" class="font-bold text-green-400">$0.00</span></p>
-                          <p>Pagado HOY: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
-                          <p class="pr-2 border-r border-gray-600">Gastos HOY: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
-                      </div>
 
-                       <div class="flex items-center space-x-2">
-                            <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
-                            <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
-                                <option value="theme-dark">Predeterminado</option>
-                                <option value="theme-infernal">Fuego Infernal</option>
-                                <option value="theme-gold">Luxury Gold</option>
-                                <option value="theme-cyber">Cyber Neon</option>
-                                <option value="theme-galactic">Galactic Horizon</option>
-                            </select>
-                       </div>
-                       <button id="logout-button" class="px-4 py-2 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-red-600 hover:bg-red-700 text-white text-sm">
-                           Salir
-                       </button>
-                   </div>
+                        <div class="flex items-center space-x-2">
+                             <label for="theme-selector" class="text-sm text-gray-400">Tema:</label>
+                             <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
+                                 <option value="theme-dark">Predeterminado</option>
+                                 <option value="theme-infernal">Fuego Infernal</option>
+                                 <option value="theme-gold">Luxury Gold</option>
+                                 <option value="theme-cyber">Cyber Neon</option>
+                                 <option value="theme-galactic">Galactic Horizon</option>
+                             </select>
+                        </div>
+                        <button id="logout-button" class="px-4 py-2 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-red-600 hover:bg-red-700 text-white text-sm">
+                            Salir
+                        </button>
+                    </div>
             </header>
 
-            <div class="p-4 rounded-xl shadow-lg mb-6 border-l-4" style="background-color: color-mix(in srgb, var(--accent-color-dark) 10%, var(--bg-secondary)); border-color: var(--accent-color-dark);">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 mr-3" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                        <p class="font-bold text-lg" style="color: var(--accent-color);">Aviso de Pago Pendiente</p>
-                    </div>
-                    <p class="text-xl font-extrabold" style="color: var(--accent-color-dark);">$25.00</p>
-                </div>
-                <p class="mt-2 text-sm text-gray-300">Factura pendiente por pagar. **Fecha de Vencimiento: 12 de Noviembre de 2025**.</p>
-            </div>
             <nav class="flex justify-around space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6">
                 <button onclick="changeView('inventory')" id="nav-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
                     📦 Inventario
@@ -417,16 +404,16 @@
                         <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
                             <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Principal</h2>
                             <div class="flex items-center space-x-2">
-                                 <div class="relative w-full md:w-72">
-                                     <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
-                                            class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
-                                     <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                     </svg>
-                                 </div>
-                                 <button onclick="openAddProductModal('local1')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
-                                     Añadir
-                                 </button>
+                                    <div class="relative w-full md:w-72">
+                                       <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
+                                                class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                       <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                       </svg>
+                                    </div>
+                                    <button onclick="openAddProductModal('local1')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
+                                        Añadir
+                                    </button>
                             </div>
                         </div>
                         <div id="inventory-list" class="space-y-8">
@@ -450,11 +437,11 @@
                                 <label for="sale-product-search" class="block text-sm font-medium">Buscar Producto</label>
                                 <div class="relative mt-1">
                                     <input type="text" id="sale-product-search" oninput="filterSaleProducts('local1')" placeholder="Escribe para filtrar..."
-                                            class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
-                                            style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
-                                            autocomplete="off">
+                                                class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
+                                                style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
+                                                autocomplete="off">
                                     <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                 </div>
                             </div>
@@ -481,12 +468,12 @@
                                 <input type="number" id="sale-price" required min="0.01" step="0.01" value="0.00" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                             </div>
                              <div>
-                                <label for="sale-status" class="block text-sm font-medium">Estado de Pago</label>
-                                <select id="sale-status" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                    <option value="Pagado">Pagado</option>
-                                    <option value="Pendiente">Pendiente</option>
-                                </select>
-                            </div>
+                                 <label for="sale-status" class="block text-sm font-medium">Estado de Pago</label>
+                                 <select id="sale-status" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                     <option value="Pagado">Pagado</option>
+                                     <option value="Pendiente">Pendiente</option>
+                                 </select>
+                             </div>
                             <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">
                                 Confirmar Venta
                             </button>
@@ -542,17 +529,17 @@
                         <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Ventas (Principal)</h2>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-700">
-                                   <thead>
-                                       <tr class="bg-gray-700/50">
-                                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
-                                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
-                                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
-                                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                           <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
-                                           <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                       </tr>
-                                   </thead>
-                                   <tbody id="sales-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+                                    <thead>
+                                        <tr class="bg-gray-700/50">
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sales-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
                             </table>
                         </div>
                     </div>
@@ -584,16 +571,16 @@
                             <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
                                 <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Local 2</h2>
                                 <div class="flex items-center space-x-2">
-                                     <div class="relative w-full md:w-72">
-                                         <input type="text" id="search-inventory-2" oninput="filterInventory2()" placeholder="Buscar producto en Local 2..."
-                                                class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
-                                         <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                         </svg>
-                                     </div>
-                                     <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
-                                         Añadir
-                                     </button>
+                                    <div class="relative w-full md:w-72">
+                                          <input type="text" id="search-inventory-2" oninput="filterInventory2()" placeholder="Buscar producto en Local 2..."
+                                                 class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                          <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                          </svg>
+                                    </div>
+                                    <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
+                                        Añadir
+                                    </button>
                                 </div>
                             </div>
                             <div id="inventory-list-2" class="space-y-8"></div>
@@ -613,9 +600,9 @@
                                         <label for="sale-product-search-2" class="block text-sm font-medium">Buscar Producto</label>
                                         <div class="relative mt-1">
                                             <input type="text" id="sale-product-search-2" oninput="filterSaleProducts('local2')" placeholder="Escribe para filtrar..."
-                                                    class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
-                                                    style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
-                                                    autocomplete="off">
+                                                         class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
+                                                         style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
+                                                         autocomplete="off">
                                             <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
@@ -702,17 +689,17 @@
                             <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Ventas (Local 2)</h2>
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-700">
-                                       <thead>
-                                           <tr class="bg-gray-700/50">
-                                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
-                                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
-                                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
-                                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
-                                               <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                           </tr>
-                                       </thead>
-                                       <tbody id="sales-history-body-2" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+                                        <thead>
+                                            <tr class="bg-gray-700/50">
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="sales-history-body-2" class="bg-gray-800 divide-y divide-gray-700"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -873,29 +860,35 @@
     const authError = document.getElementById('auth-error');
 
     // ====================================================================
-    // INICIO DEL PARCHE: Forzar el modo de MANTENIMIENTO
-    // Reemplazamos la lógica de autenticación para solo mostrar el loader.
+    // INICIO DEL PARCHE: Forzar el modo de MANTENIMIENTO (ELIMINADO)
+    // Se revierte la lógica a la original de Supabase.
     // ====================================================================
 
-    // Forzar la visualización del contenedor de carga al inicio y ocultar todo lo demás
-    authContainer.classList.add('hidden');
-    appContainer.classList.add('hidden');
-    initialLoadingContainer.classList.remove('hidden');
+    // Función para manejar el cambio de estado de autenticación (ORIGINAL)
+    const handleAuthChange = (event, session) => {
+        initialLoadingContainer.classList.add('hidden');
+        if (session) {
+            authContainer.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            initializeApp();
+        } else {
+            appContainer.classList.add('hidden');
+            authContainer.classList.remove('hidden');
+        }
+    };
 
-    // Desactivar el detector de cambios de autenticación original de Supabase
-    // Al reemplazar el onAuthStateChange original con esta función vacía/de parche,
-    // garantizamos que la app no intente inicializar ni mostrar el login.
-    supabase.auth.onAuthStateChange = () => { /* No hacer nada, se queda en el loader */ };
+    // Suscribirse a los cambios de autenticación (ORIGINAL)
+    supabase.auth.onAuthStateChange(handleAuthChange);
     
-    // Si la app intentó inicializarse antes de esta sección, reiniciamos el estado visual
-    document.addEventListener('DOMContentLoaded', () => {
-        authContainer.classList.add('hidden');
-        appContainer.classList.add('hidden');
-        initialLoadingContainer.classList.remove('hidden');
+    // Al cargar, verificar el estado de la sesión (para no mostrar flash de login si ya está logueado)
+    document.addEventListener('DOMContentLoaded', async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            initialLoadingContainer.classList.add('hidden');
+            authContainer.classList.remove('hidden');
+            appContainer.classList.add('hidden');
+        }
     });
-
-    // Se mantiene el resto del código JS (funciones de la app) para que si se revierte el
-    // parche, la aplicación funcione de nuevo.
 
     // ====================================================================
     // FIN DEL PARCHE: MANTENIMIENTO
@@ -903,8 +896,7 @@
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        // CÓDIGO COMENTADO - Deshabilitar intento de inicio de sesión
-        /*
+        // CÓDIGO RESTAURADO
         const email = e.target.email.value;
         const password = e.target.password.value;
         authError.classList.add('hidden');
@@ -915,14 +907,10 @@
         } else {
             loginForm.reset();
         }
-        */
-        authError.textContent = "Error: La aplicación está en mantenimiento.";
-        authError.classList.remove('hidden');
     });
 
     registerButton.addEventListener('click', async () => {
-        // CÓDIGO COMENTADO - Deshabilitar intento de registro
-        /*
+        // CÓDIGO RESTAURADO
         const email = loginForm.email.value;
         const password = loginForm.password.value;
         authError.classList.add('hidden');
@@ -939,40 +927,30 @@
             showModal("Registro Exitoso", "Revisa tu correo para verificar tu cuenta antes de iniciar sesión.", "success");
             loginForm.reset();
         }
-        */
-        authError.textContent = "Error: La aplicación está en mantenimiento. No se permiten registros.";
-        authError.classList.remove('hidden');
     });
 
     logoutButton.addEventListener('click', async () => {
-        // CÓDIGO COMENTADO - Deshabilitar intento de cierre de sesión
-        // await supabase.auth.signOut();
-        alert("La aplicación está en mantenimiento.");
+        // CÓDIGO RESTAURADO
+        await supabase.auth.signOut();
     });
 
     const getCurrentUserId = async () => {
-        // Bloquea la obtención del usuario
-        return null;
-        /*
+        // LÓGICA RESTAURADA
         const { data: { user } } = await supabase.auth.getUser();
         return user ? user.id : null;
-        */
     };
     
     const initializeApp = () => {
-        // CÓDIGO COMENTADO - No inicializar la app
-        /*
+        // LÓGICA RESTAURADA
         const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
         document.getElementById('theme-selector').value = savedTheme;
         applyTheme(savedTheme);
         loadAllData(true);
-        */
+        changeView('inventory'); // Asegurar que se muestre una vista inicial al cargar
     };
     
     // ====================================================================
     // FUNCIÓN CORREGIDA: Llama a la Edge Function 'upload-to-r2'
-    // Se mantiene la función completa pero al ser inaccesible por el parche
-    // de inicialización, no debería ejecutarse.
     // ====================================================================
     const uploadToR2 = async (file) => {
         if (!file) return null;
@@ -1183,8 +1161,8 @@
         finally { loadingSpinner.classList.add('hidden'); if (showSpinner) { changeView('inventory'); } }
     }
     
-    async function loadInventory() { const { data, error } = await supabase.from('inventory').select('*').order('created_at', { ascending: false }); if (error) throw error; inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase()); }
-    async function loadInventory2() { const { data, error } = await supabase.from('inventory2').select('*').order('created_at', { ascending: false }); if (error) throw error; inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory2, 'inventory-list-2', 'local2', document.getElementById('search-inventory-2').value.toLowerCase()); }
+    async function loadInventory() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('inventory').select('*').eq('user_id', userId).order('created_at', { ascending: false }); if (error) throw error; inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase()); }
+    async function loadInventory2() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('inventory2').select('*').eq('user_id', userId).order('created_at', { ascending: false }); if (error) throw error; inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory2, 'inventory-list-2', 'local2', document.getElementById('search-inventory-2').value.toLowerCase()); }
     async function loadSalesHistory() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('sales').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory = data || []; renderSalesHistory(salesHistory, 'sales-history-body', 'local1'); }
     async function loadSalesHistory2() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('sales2').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory2 = data || []; renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2'); }
     async function loadExpenses() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('gastos').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; expensesHistory = data || []; renderExpenses(); }
@@ -1318,6 +1296,7 @@
         const table = location === 'local2' ? 'inventory2' : 'inventory';
         const loadFunction = location === 'local2' ? loadInventory2 : loadInventory;
         const inventorySource = location === 'local2' ? inventory2 : inventory;
+        const userId = await getCurrentUserId(); if (!userId) return showModal("Error de sesión", "Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error");
         const form = { name: document.getElementById('product-name').value.trim(), category: document.getElementById('product-category').value, quantity: parseInt(document.getElementById('product-quantity').value, 10), price: parseFloat(document.getElementById('product-price-initial').value), file: document.getElementById('product-image-file').files[0] };
         if (!form.name || !form.category || form.quantity <= 0 || form.price <= 0) { return showModal("Error", "Nombre, categoría, cantidad y precio son obligatorios.", "error"); }
         submitButton.disabled = true; submitButton.innerHTML = `<div class="flex items-center justify-center"><div class="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 mr-3"></div><span>Guardando...</span></div>`;
@@ -1330,7 +1309,7 @@
                 if (error) throw error;
                 showModal("Cantidad Actualizada", `Se añadieron ${form.quantity} unidades a ${form.name}.`, "success");
             } else {
-                const newProductData = { name: form.name, category: form.category, quantity: form.quantity, price: form.price, image_url: imageData };
+                const newProductData = { user_id: userId, name: form.name, category: form.category, quantity: form.quantity, price: form.price, image_url: imageData };
                 const { error } = await supabase.from(table).insert([newProductData]);
                 if (error) throw error;
                 showModal("Producto Agregado", `El producto '${form.name}' fue añadido con éxito.`, "success");
@@ -1418,8 +1397,8 @@
         }
     }
 
-    async function handleRecordExpense(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
-    async function handleRecordExpense2(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description-2').value.trim(); const amount = parseFloat(document.getElementById('expense-amount-2').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos2').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado (Local 2)", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form-2').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }
+    async function handleRecordExpense(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return showModal("Error de sesión", "Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error"); const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
+    async function handleRecordExpense2(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return showModal("Error de sesión", "Tu sesión ha expirado, por favor inicia sesión de nuevo.", "error"); const description = document.getElementById('expense-description-2').value.trim(); const amount = parseFloat(document.getElementById('expense-amount-2').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos2').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado (Local 2)", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form-2').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }
     async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
     
     window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
