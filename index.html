@@ -365,6 +365,7 @@
                       </button>
                  </div>
             </header>
+            
             <nav class="flex justify-around space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6">
                 <button onclick="changeView('inventory')" id="nav-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
                     📦 Inventario
@@ -839,6 +840,7 @@
     // =========== VARIABLES GLOBALES Y ESTADO DE LA APP ===========
     let inventory = [], salesHistory = [], expensesHistory = [];
     let inventory2 = [], salesHistory2 = [], expensesHistory2 = [];
+    let isInitialized = false; // Bandera para evitar doble inicialización
 
     // =========== ELEMENTOS DEL DOM ===========
     const initialLoadingContainer = document.getElementById('initial-loading-container');
@@ -849,8 +851,53 @@
     const logoutButton = document.getElementById('logout-button');
     const authError = document.getElementById('auth-error');
 
-    // =========== GESTIÓN DE AUTENTICACIÓN (CORREGIDA) ===========
-    // Se mueve el manejo de la sesión al final del script para que todos los event listeners estén listos.
+    // =================================================================================
+    // GESTIÓN DE AUTENTICACIÓN Y ESTADO INICIAL (CORREGIDO PARA INICIALIZACIÓN RÁPIDA)
+    // =================================================================================
+    
+    const handleAuthChange = (session) => {
+        initialLoadingContainer.classList.add('hidden');
+        if (session) {
+            authContainer.classList.add('hidden');
+            if (!isInitialized) {
+                initializeApp(session);
+                isInitialized = true;
+            }
+        } else {
+            appContainer.classList.add('hidden');
+            authContainer.classList.remove('hidden');
+            isInitialized = false;
+        }
+    };
+
+    const initializeApp = (session) => {
+        const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
+        document.getElementById('theme-selector').value = savedTheme;
+        applyTheme(savedTheme);
+        appContainer.classList.remove('hidden');
+        loadAllData(true);
+    };
+
+    const checkSessionAndInit = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            handleAuthChange(session);
+        } catch (error) {
+            console.error("Error al obtener sesión forzada:", error);
+            handleAuthChange(null); // Forzar a la pantalla de login si falla
+        }
+    };
+
+    // Listener para cambios de estado (incluye sign_in, sign_out)
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+            handleAuthChange(session);
+        }
+    });
+
+    // =================================================================================
+    // LOGIN/REGISTRO/LOGOUT
+    // =================================================================================
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -894,34 +941,18 @@
         return user ? user.id : null;
     };
     
-    const initializeApp = (session) => {
-        const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-        document.getElementById('theme-selector').value = savedTheme;
-        applyTheme(savedTheme);
-        // Ocultar la pantalla de carga e ir a la de la app
-        initialLoadingContainer.classList.add('hidden');
-        authContainer.classList.add('hidden');
-        appContainer.classList.remove('hidden');
-        loadAllData(true);
-    };
-    
     // ====================================================================
-    // FUNCIÓN CORREGIDA: Llama a la Edge Function 'upload-to-r2'
+    // FUNCIÓN DE SUBIDA A R2
     // ====================================================================
     const uploadToR2 = async (file) => {
         if (!file) return null;
         try {
-            // Endpoint de tu Edge Function
             const url = `${supabaseUrl}/functions/v1/upload-to-r2`;
-            
-            // La ANON KEY está definida en el scope del módulo (supabaseAnonKey)
             const anonKey = supabaseAnonKey; 
 
-            // Prepara los datos para enviarlos como un formulario multipart (necesario para la función Edge)
             const formData = new FormData();
             formData.append('file', file);
 
-            // 1. Llama a la Edge Function (el proxy a R2)
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -938,7 +969,6 @@
             const data = await response.json();
             if (data.error) throw new Error(data.error);
 
-            // 2. Retorna la URL de R2 que la función retorna (data.url)
             return data.url; 
             
         } catch (error) { 
@@ -947,8 +977,9 @@
             return null;
         }
     };
+    
     // ====================================================================
-    // FIN DE LA FUNCIÓN CORREGIDA
+    // UTILIDADES GENERALES
     // ====================================================================
 
     window.applyTheme = (theme) => { document.documentElement.className = theme; };
@@ -1014,6 +1045,10 @@
         if (subViewId === 'local2-sales') populateSaleCategoryDropdown('local2');
     };
     
+    // ====================================================================
+    // RENDERIZADO DE DATOS Y CARGA
+    // ====================================================================
+
     const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
         const listContainer = document.getElementById(containerId);
         listContainer.innerHTML = '';
@@ -1208,7 +1243,7 @@
     const renderExpenses2 = () => { const tbody = document.getElementById('expenses-history-body-2'); tbody.innerHTML = ''; expensesHistory2.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense2('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory2.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti en Local 2.</td></tr>'; } };
     
     // ==================================================
-    // INICIO: FUNCIONES JS CORREGIDAS PARA LA BÚSQUEDA
+    // FUNCIONES DE VENTA Y MANEJO DE STOCK
     // ==================================================
     
     const populateSaleCategoryDropdown = (location) => { 
@@ -1263,9 +1298,7 @@
         const productSelect = document.getElementById(productSelectId); 
         const priceInput = document.getElementById(priceInputId); 
         
-        // --- INICIO DE CORRECCIÓN: Guardar el valor seleccionado ---
         const previouslySelectedId = productSelect.value;
-        // --- FIN DE CORRECCIÓN ---
 
         productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; 
         
@@ -1300,26 +1333,17 @@
             priceInput.value = '0.00';
         } 
 
-        // --- INICIO DE CORRECCIÓN 2: Lógica de auto-selección y preservación ---
-        if (productSelect.options.length === 2) { // (1 real + 1 "Selecciona un producto")
-            productSelect.selectedIndex = 1; // Selecciona el primer producto real
-            // Dispara el evento 'change' para que se actualice el precio
+        // Lógica de auto-selección y preservación
+        if (productSelect.options.length === 2) { 
+            productSelect.selectedIndex = 1; 
             productSelect.dispatchEvent(new Event('change'));
         } else if (previouslySelectedId && Array.from(productSelect.options).some(opt => opt.value === previouslySelectedId)) {
-            // Si el producto que estaba seleccionado ANTES de filtrar sigue en la lista,
-            // mantenerlo seleccionado y actualizar el precio.
             productSelect.value = previouslySelectedId;
-            productSelect.dispatchEvent(new Event('change')); // Mantiene el precio actualizado
+            productSelect.dispatchEvent(new Event('change')); 
         } else {
-             // Si el producto seleccionado ya no está o no se ha seleccionado nada, limpiar el precio
              priceInput.value = '0.00';
         }
-        // --- FIN DE CORRECCIÓN 2 ---
     };
-
-    // ================================================
-    // FIN: FUNCIONES JS CORREGIDAS PARA LA BÚSQUEDA
-    // ================================================
     
     async function handleAddProduct(event) {
         event.preventDefault();
@@ -1609,17 +1633,9 @@
         } 
     }); 
     
-    // =========== GESTIÓN DE AUTENTICACIÓN: Detectar la sesión al final ===========
-    // Esto asegura que todo el DOM y las funciones estén cargadas antes de reaccionar a la sesión.
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (session) {
-            initializeApp(session);
-        } else {
-            initialLoadingContainer.classList.add('hidden');
-            appContainer.classList.add('hidden');
-            authContainer.classList.remove('hidden');
-        }
-    });
+    // =========== INICIO DE LA APLICACIÓN ===========
+    // Llama a la comprobación de sesión inmediatamente al cargar el script.
+    checkSessionAndInit();
 
 </script>
 </body>
