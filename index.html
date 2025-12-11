@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500;700;900&family=Orbitron:wght@700&display=swap" rel="stylesheet">
     
     <script>
-        // Función de aplicación de tema al inicio
         (function() {
             try {
                 const theme = localStorage.getItem('selectedTheme');
@@ -197,7 +196,7 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-image: linear-gradient(180deg, rgba(10, 15, 30, 0.9) 0%, rgba(28, 37, 65, 0.9) 100%),
-                             url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"%3E%3Cfilter id="f"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" stitchTiles="stitch"/%3E%3CfeColorMatrix values="0 0 0 0 0, 0 0 0 0 0, 0 0 0 0 0, 0 0 0 -0.5 1.2"/%3E%3C/filter%3E%3Crect width="100%" height="100%" filter="url(%23f)"/%3E%3C/svg%3E');
+                              url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"%3E%3Cfilter id="f"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" stitchTiles="stitch"/%3E%3CfeColorMatrix values="0 0 0 0 0, 0 0 0 0 0, 0 0 0 0 0, 0 0 0 -0.5 1.2"/%3E%3C/filter%3E%3Crect width="100%" height="100%" filter="url(%23f)"/%3E%3C/svg%3E');
             background-size: cover;
             z-index: -2;
         }
@@ -292,7 +291,7 @@
     <div id="initial-loading-container" class="flex-grow flex items-center justify-center p-4">
         <div>
             <div class="animate-spin rounded-full h-12 w-12 border-b-4 mx-auto" style="border-color: var(--accent-color);"></div>
-            <p class="mt-4 text-lg" style="color: var(--accent-color);">Verificando sesión...</p>
+            <p id="loading-text" class="mt-4 text-lg" style="color: var(--accent-color);">Verificando sesión...</p>
         </div>
     </div>
 
@@ -334,62 +333,74 @@
             <header class="sticky top-0 z-10 bg-gray-800 shadow-lg p-4 flex items-center justify-between border-b border-gray-700 mb-6 rounded-xl">
                  <div class="flex items-center space-x-4">
                      <div id="store-logo-container" title="Haz clic para cambiar el logo">
-                         <img id="store-logo-img" src="https://placehold.co/240x80/1f2937/d97706?text=MRPHONE" alt="Store Logo"
+                        <img id="store-logo-img" src="https://placehold.co/240x80/1f2937/d97706?text=MRPHONE" alt="Store Logo"
                              class="h-full w-full object-cover rounded-full border-2 border-indigo-500 shadow-md transition transform hover:scale-105">
                      </div>
                      <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">
-                         <span class="text-indigo-400">MRPHONE</span> PRODUCTOS
+                        <span class="text-indigo-400">MRPHONE</span> PRODUCTOS
                      </h1>
                  </div>
                  
                  <div class="flex items-center space-x-4">
-                     <div id="daily-sales-summary" class="hidden md:flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
-                         <p class="text-white font-bold text-base">TOTAL (Principal)</p>
-                         <p>Vendido HOY: <span id="today-sold-total" class="font-bold text-green-400">$0.00</span></p>
-                         <p>Pagado HOY: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
-                         <p class="pr-2 border-r border-gray-600">Gastos HOY: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
-                     </div>
+                    <div id="daily-sales-summary" class="hidden md:flex items-center space-x-4 text-sm bg-gray-900/50 p-2 rounded-lg">
+                        <p class="text-white font-bold text-base">TOTAL (Principal)</p>
+                        <p>Vendido: <span id="today-sold-total" class="font-bold text-green-400">$0.00</span></p>
+                        <p>Pagado: <span id="today-paid-total" class="font-bold text-green-500">$0.00</span></p>
+                        <p class="pr-2 border-r border-gray-600">Gastos: <span id="today-expenses-total" class="font-bold text-red-400">$0.00</span></p>
+                    </div>
 
-                     <div class="flex items-center space-x-2">
-                          <label for="theme-selector" class="text-sm text-gray-400 hidden sm:block">Tema:</label>
-                          <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
-                              <option value="theme-dark">Predeterminado</option>
-                              <option value="theme-infernal">Fuego Infernal</option>
-                              <option value="theme-gold">Luxury Gold</option>
-                              <option value="theme-cyber">Cyber Neon</option>
-                              <option value="theme-galactic">Galactic Horizon</option>
-                          </select>
-                      </div>
-                      <button id="logout-button" class="px-4 py-2 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-red-600 hover:bg-red-700 text-white text-sm">
-                          Salir
-                      </button>
+                    <div class="flex items-center space-x-2">
+                         <label for="theme-selector" class="text-sm text-gray-400 hidden sm:block">Tema:</label>
+                         <select id="theme-selector" onchange="changeTheme(this.value)" class="bg-gray-600 border border-gray-500 text-white text-sm rounded-lg p-1.5">
+                             <option value="theme-dark">Predeterminado</option>
+                             <option value="theme-infernal">Fuego Infernal</option>
+                             <option value="theme-gold">Luxury Gold</option>
+                             <option value="theme-cyber">Cyber Neon</option>
+                             <option value="theme-galactic">Galactic Horizon</option>
+                         </select>
+                     </div>
+                     <button id="logout-button" class="px-4 py-2 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-red-600 hover:bg-red-700 text-white text-sm">
+                        Salir
+                    </button>
                  </div>
             </header>
-            
-            <nav class="flex justify-around space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6">
-                <button onclick="changeView('inventory')" id="nav-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
+
+            <div class="p-4 rounded-xl shadow-lg mb-6 border-l-4" style="background-color: color-mix(in srgb, var(--accent-color-dark) 10%, var(--bg-secondary)); border-color: var(--accent-color-dark);">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <p class="font-bold text-lg" style="color: var(--accent-color);">Aviso de Pago Pendiente</p>
+                    </div>
+                    <p class="text-xl font-extrabold" style="color: var(--accent-color-dark);">$25.00</p>
+                </div>
+                <p class="mt-2 text-sm text-gray-300">Factura pendiente por pagar. **Fecha de Vencimiento: 12 de Noviembre de 2025**.</p>
+            </div>
+            <nav class="flex justify-around space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6 overflow-x-auto">
+                <button onclick="changeView('inventory')" id="nav-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
                     📦 Inventario
                 </button>
-                <button onclick="changeView('sales')" id="nav-sales" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
+                <button onclick="changeView('sales')" id="nav-sales" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
                     💰 Registrar Venta
                 </button>
-                <button onclick="changeView('expenses')" id="nav-expenses" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
+                <button onclick="changeView('expenses')" id="nav-expenses" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
                     💸 Gastos
                 </button>
-                <button onclick="changeView('history')" id="nav-history" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                    📊 Historial Ventas
+                <button onclick="changeView('history')" id="nav-history" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
+                    📊 Historial
                 </button>
-                <button onclick="changeView('local2')" id="nav-local2" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
+                <button onclick="changeView('local2')" id="nav-local2" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
                     🚚 LOCAL 2
                 </button>
             </nav>
 
             <main>
-                <div id="loading-spinner" class="text-center p-8">
+                <div id="loading-spinner" class="text-center p-8 hidden">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-4 mx-auto" style="border-color: var(--accent-color);"></div>
                     <p class="mt-4" style="color: var(--accent-color);">Conectando a Supabase y sincronizando datos...</p>
                 </div>
-                <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden"></div>
+                <div id="error-message" class="text-center p-4 bg-red-900/50 text-red-300 rounded-lg shadow-md hidden border border-red-800"></div>
 
                 <section id="view-inventory" class="view-content hidden">
                     <div class="bg-gray-800 rounded-lg shadow-xl p-6">
@@ -397,15 +408,15 @@
                             <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Principal</h2>
                             <div class="flex items-center space-x-2">
                                  <div class="relative w-full md:w-72">
-                                     <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
-                                            class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
-                                     <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                     </svg>
-                                 </div>
+                                    <input type="text" id="search-inventory" oninput="filterInventory()" placeholder="Buscar producto..."
+                                           class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
                                  <button onclick="openAddProductModal('local1')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
-                                     Añadir
-                                 </button>
+                                    Añadir
+                                </button>
                             </div>
                         </div>
                         <div id="inventory-list" class="space-y-8">
@@ -429,9 +440,9 @@
                                 <label for="sale-product-search" class="block text-sm font-medium">Buscar Producto</label>
                                 <div class="relative mt-1">
                                     <input type="text" id="sale-product-search" oninput="filterSaleProducts('local1')" placeholder="Escribe para filtrar..."
-                                            class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
-                                            style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
-                                            autocomplete="off">
+                                           class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
+                                           style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
+                                           autocomplete="off">
                                     <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
@@ -460,12 +471,12 @@
                                 <input type="number" id="sale-price" required min="0.01" step="0.01" value="0.00" class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                             </div>
                              <div>
-                                 <label for="sale-status" class="block text-sm font-medium">Estado de Pago</label>
-                                 <select id="sale-status" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                     <option value="Pagado">Pagado</option>
-                                     <option value="Pendiente">Pendiente</option>
-                                 </select>
-                             </div>
+                                <label for="sale-status" class="block text-sm font-medium">Estado de Pago</label>
+                                <select id="sale-status" required class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                    <option value="Pagado">Pagado</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                </select>
+                            </div>
                             <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">
                                 Confirmar Venta
                             </button>
@@ -482,12 +493,12 @@
                                     <div>
                                         <label for="expense-description" class="block text-sm font-medium">Descripción del Gasto</label>
                                         <input type="text" id="expense-description" required placeholder="Ej: Alquiler, Salario, Compra de Herramientas"
-                                             class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                            class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                                     </div>
                                     <div>
                                         <label for="expense-amount" class="block text-sm font-medium">Monto del Gasto ($)</label>
                                         <input type="number" id="expense-amount" required min="0.01" step="0.01" value="0.00"
-                                             class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                            class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
                                     </div>
                                     <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">
                                         Confirmar Gasto
@@ -500,15 +511,15 @@
                                 <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Gastos (Principal)</h2>
                                 <div class="overflow-x-auto">
                                     <table class="min-w-full divide-y divide-gray-700">
-                                         <thead>
-                                             <tr class="bg-gray-700/50">
-                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descripción</th>
-                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Monto</th>
-                                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                             </tr>
-                                         </thead>
-                                         <tbody id="expenses-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+                                        <thead>
+                                            <tr class="bg-gray-700/50">
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descripción</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Monto</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="expenses-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -522,16 +533,16 @@
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-700">
                                  <thead>
-                                     <tr class="bg-gray-700/50">
-                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
-                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
-                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
-                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
-                                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                     </tr>
-                                 </thead>
-                                 <tbody id="sales-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+                                    <tr class="bg-gray-700/50">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sales-history-body" class="bg-gray-800 divide-y divide-gray-700"></tbody>
                             </table>
                         </div>
                     </div>
@@ -539,40 +550,40 @@
                 
                 <section id="view-local2" class="view-content hidden">
                     <div class="bg-gray-800 rounded-lg shadow-xl p-6">
-                        <nav class="flex justify-center space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6">
-                            <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
+                        <nav class="flex justify-center space-x-2 p-1 rounded-lg border border-gray-700 bg-black/20 mb-6 overflow-x-auto">
+                            <button onclick="changeSubView('local2-inventory')" id="nav-local2-inventory" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
                                 📦 Inventario
                             </button>
-                            <button onclick="changeSubView('local2-sales')" id="nav-local2-sales" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
+                            <button onclick="changeSubView('local2-sales')" id="nav-local2-sales" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
                                 💰 Registrar Venta
                             </button>
-                            <button onclick="changeSubView('local2-expenses')" id="nav-local2-expenses" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
+                            <button onclick="changeSubView('local2-expenses')" id="nav-local2-expenses" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
                                 💸 Gastos
                             </button>
-                            <button onclick="changeSubView('local2-history')" id="nav-local2-history" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full">
-                                📊 Historial de Ventas
+                            <button onclick="changeSubView('local2-history')" id="nav-local2-history" class="py-1.5 px-3 font-medium text-center transition-all duration-200 text-gray-300 hover:text-white rounded-lg text-sm w-full whitespace-nowrap">
+                                📊 Historial
                             </button>
                         </nav>
 
-                        <div id="daily-sales-summary-local2" class="flex items-center justify-center space-x-6 text-base bg-gray-900/50 p-3 rounded-lg mb-6 border border-gray-700">
-                            <p>Vendido HOY (L2): <span id="today-sold-total-local2" class="font-bold text-green-400">$0.00</span></p>
-                            <p>Pagado HOY (L2): <span id="today-paid-total-local2" class="font-bold text-green-500">$0.00</span></p>
-                            <p>Gastos HOY (L2): <span id="today-expenses-total-local2" class="font-bold text-red-400">$0.00</span></p>
+                        <div id="daily-sales-summary-local2" class="flex flex-wrap items-center justify-center gap-3 text-base bg-gray-900/50 p-3 rounded-lg mb-6 border border-gray-700">
+                            <p>Vendido (L2): <span id="today-sold-total-local2" class="font-bold text-green-400">$0.00</span></p>
+                            <p>Pagado (L2): <span id="today-paid-total-local2" class="font-bold text-green-500">$0.00</span></p>
+                            <p>Gastos (L2): <span id="today-expenses-total-local2" class="font-bold text-red-400">$0.00</span></p>
                         </div>
                         <div id="subview-local2-inventory" class="subview-content">
                             <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
                                 <h2 class="text-2xl font-bold mb-4 md:mb-0 text-indigo-300">Inventario Local 2</h2>
                                 <div class="flex items-center space-x-2">
-                                    <div class="relative w-full md:w-72">
-                                         <input type="text" id="search-inventory-2" oninput="filterInventory2()" placeholder="Buscar producto en Local 2..."
-                                                 class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
-                                         <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                         </svg>
-                                     </div>
-                                     <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
-                                         Añadir
-                                     </button>
+                                     <div class="relative w-full md:w-72">
+                                        <input type="text" id="search-inventory-2" oninput="filterInventory2()" placeholder="Buscar producto en Local 2..."
+                                               class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border">
+                                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                    <button onclick="openAddProductModal('local2')" class="px-4 py-3 rounded-lg font-bold transition-colors shadow-lg whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white">
+                                        Añadir
+                                    </button>
                                 </div>
                             </div>
                             <div id="inventory-list-2" class="space-y-8"></div>
@@ -592,13 +603,13 @@
                                         <label for="sale-product-search-2" class="block text-sm font-medium">Buscar Producto</label>
                                         <div class="relative mt-1">
                                             <input type="text" id="sale-product-search-2" oninput="filterSaleProducts('local2')" placeholder="Escribe para filtrar..."
-                                                     class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
-                                                     style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
-                                                     autocomplete="off">
-                                             <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                             </svg>
-                                         </div>
+                                                   class="w-full rounded-lg text-white shadow-sm p-3 pl-10 border"
+                                                   style="background-color: var(--bg-secondary) !important; border-color: var(--border-color);"
+                                                   autocomplete="off">
+                                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                     <div>
                                         <label for="sale-product-id-2" class="block text-sm font-medium">Producto (Resultados)</label>
@@ -636,62 +647,62 @@
                             </div>
                         </div>
                          <div id="subview-local2-expenses" class="subview-content hidden">
-                             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                                 <div class="lg:col-span-2">
-                                     <div class="p-6 bg-gray-800 rounded-xl shadow-xl">
-                                         <h2 class="text-2xl font-bold mb-6 text-indigo-300">Registrar Gasto (Local 2)</h2>
-                                         <form id="record-expense-form-2" class="space-y-4">
-                                             <div>
-                                                 <label for="expense-description-2" class="block text-sm font-medium">Descripción del Gasto</label>
-                                                 <input type="text" id="expense-description-2" required placeholder="Ej: Pasajes, Comida, Insumos"
-                                                      class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                             </div>
-                                             <div>
-                                                 <label for="expense-amount-2" class="block text-sm font-medium">Monto del Gasto ($)</label>
-                                                 <input type="number" id="expense-amount-2" required min="0.01" step="0.01" value="0.00"
-                                                      class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
-                                             </div>
-                                             <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">
-                                                 Confirmar Gasto (Local 2)
-                                             </button>
-                                         </form>
-                                     </div>
-                                 </div>
-                                 <div class="lg:col-span-3">
-                                     <div class="p-6 bg-gray-800 rounded-xl shadow-xl">
-                                         <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Gastos (Local 2)</h2>
-                                         <div class="overflow-x-auto">
-                                             <table class="min-w-full divide-y divide-gray-700">
-                                                  <thead>
-                                                      <tr class="bg-gray-700/50">
-                                                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descripción</th>
-                                                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Monto</th>
-                                                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                                          <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                                      </tr>
-                                                  </thead>
-                                                  <tbody id="expenses-history-body-2" class="bg-gray-800 divide-y divide-gray-700"></tbody>
-                                             </table>
-                                         </div>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
+                            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                                <div class="lg:col-span-2">
+                                    <div class="p-6 bg-gray-800 rounded-xl shadow-xl">
+                                        <h2 class="text-2xl font-bold mb-6 text-indigo-300">Registrar Gasto (Local 2)</h2>
+                                        <form id="record-expense-form-2" class="space-y-4">
+                                            <div>
+                                                <label for="expense-description-2" class="block text-sm font-medium">Descripción del Gasto</label>
+                                                <input type="text" id="expense-description-2" required placeholder="Ej: Pasajes, Comida, Insumos"
+                                                    class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                            </div>
+                                            <div>
+                                                <label for="expense-amount-2" class="block text-sm font-medium">Monto del Gasto ($)</label>
+                                                <input type="number" id="expense-amount-2" required min="0.01" step="0.01" value="0.00"
+                                                    class="mt-1 block w-full rounded-lg text-white shadow-sm p-3 border">
+                                            </div>
+                                            <button type="submit" class="w-full text-white p-3 rounded-lg font-bold transition-colors shadow-lg">
+                                                Confirmar Gasto (Local 2)
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="lg:col-span-3">
+                                    <div class="p-6 bg-gray-800 rounded-xl shadow-xl">
+                                        <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Gastos (Local 2)</h2>
+                                        <div class="overflow-x-auto">
+                                            <table class="min-w-full divide-y divide-gray-700">
+                                                <thead>
+                                                    <tr class="bg-gray-700/50">
+                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descripción</th>
+                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Monto</th>
+                                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                                                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="expenses-history-body-2" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div id="subview-local2-history" class="subview-content hidden">
                             <h2 class="text-2xl font-bold mb-6 text-indigo-300">Historial de Ventas (Local 2)</h2>
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-700">
                                      <thead>
-                                         <tr class="bg-gray-700/50">
-                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
-                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
-                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
-                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
-                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
-                                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
-                                         </tr>
-                                     </thead>
-                                     <tbody id="sales-history-body-2" class="bg-gray-800 divide-y divide-gray-700"></tbody>
+                                        <tr class="bg-gray-700/50">
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Producto</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Destinatario</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Precio</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sales-history-body-2" class="bg-gray-800 divide-y divide-gray-700"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -712,7 +723,7 @@
         </div>
         
         <div id="edit-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-            <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all bg-gray-800 border-l-4 border-indigo-500">
+            <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all bg-gray-800 border-l-4 border-indigo-500 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-2xl font-bold mb-4 text-indigo-300">Editar Producto</h3>
                 <form id="edit-product-form" class="space-y-4">
                     <input type="hidden" id="edit-product-id">
@@ -774,7 +785,7 @@
             </div>
         </div>
         <div id="add-product-modal-container" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-            <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all bg-gray-800 border-l-4 border-indigo-500">
+            <div class="p-6 rounded-xl shadow-2xl max-w-lg w-full transform transition-all bg-gray-800 border-l-4 border-indigo-500 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-2xl font-bold mb-4 text-indigo-300">Añadir Nuevo Producto</h3>
                 <form id="add-product-form" class="space-y-4">
                     <input type="hidden" id="add-product-location">
@@ -830,17 +841,18 @@
     </div>
 
 <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
     // =========== CONFIGURACIÓN DE SUPABASE ===========
     const supabaseUrl = 'https://osqrggvtthczsxoovyps.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcXJnZ3Z0dGhjenN4b292eXBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQ2OTUsImV4cCI6MjA3NTQ4MDY5NX0.yvCMoyMhuHkuKB_uA1P33rSC7U30MnixgTQNIEEp-dQ';
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    
+    let supabase;
+    let isAppInitialized = false;
 
     // =========== VARIABLES GLOBALES Y ESTADO DE LA APP ===========
     let inventory = [], salesHistory = [], expensesHistory = [];
     let inventory2 = [], salesHistory2 = [], expensesHistory2 = [];
-    let isInitialized = false; // Bandera para evitar doble inicialización
 
     // =========== ELEMENTOS DEL DOM ===========
     const initialLoadingContainer = document.getElementById('initial-loading-container');
@@ -851,54 +863,70 @@
     const logoutButton = document.getElementById('logout-button');
     const authError = document.getElementById('auth-error');
 
-    // =================================================================================
-    // GESTIÓN DE AUTENTICACIÓN Y ESTADO INICIAL (CORREGIDO PARA INICIALIZACIÓN RÁPIDA)
-    // =================================================================================
-    
-    const handleAuthChange = (session) => {
+    // =========== INICIO SEGURO ===========
+    try {
+        supabase = createClient(supabaseUrl, supabaseAnonKey);
+        initAuthLogic();
+    } catch (err) {
+        console.error("Error crítico inicializando Supabase:", err);
+        fallbackToError("Error de conexión con el servidor. Por favor recarga la página.");
+    }
+
+    function handleSessionState(session) {
+        if (isAppInitialized && session) return; // Evita recargas si ya está listo
+        
         initialLoadingContainer.classList.add('hidden');
         if (session) {
             authContainer.classList.add('hidden');
-            if (!isInitialized) {
-                initializeApp(session);
-                isInitialized = true;
-            }
+            appContainer.classList.remove('hidden');
+            initializeApp();
         } else {
             appContainer.classList.add('hidden');
             authContainer.classList.remove('hidden');
-            isInitialized = false;
         }
-    };
+        isAppInitialized = true;
+    }
 
-    const initializeApp = (session) => {
-        const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
-        document.getElementById('theme-selector').value = savedTheme;
-        applyTheme(savedTheme);
-        appContainer.classList.remove('hidden');
-        loadAllData(true);
-    };
+    function initAuthLogic() {
+        // 1. Escuchar cambios de estado
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log("Auth Event:", event);
+            handleSessionState(session);
+        });
 
-    const checkSessionAndInit = async () => {
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            handleAuthChange(session);
-        } catch (error) {
-            console.error("Error al obtener sesión forzada:", error);
-            handleAuthChange(null); // Forzar a la pantalla de login si falla
-        }
-    };
+        // 2. Verificar estado inicial explícitamente (Doble check)
+        supabase.auth.getSession().then(({ data, error }) => {
+            if (error) {
+                console.warn("Error obteniendo sesión inicial:", error);
+                handleSessionState(null); // Asumir logout si hay error
+            } else {
+                handleSessionState(data.session);
+            }
+        });
 
-    // Listener para cambios de estado (incluye sign_in, sign_out)
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-            handleAuthChange(session);
-        }
-    });
+        // 3. Temporizador de seguridad (TIMEOUT FALLBACK)
+        // Si en 3 segundos no ha pasado nada, forzar pantalla de login
+        setTimeout(() => {
+            if (!isAppInitialized) {
+                console.warn("Tiempo de espera agotado, forzando pantalla de login...");
+                handleSessionState(null);
+            }
+        }, 3000);
+    }
 
-    // =================================================================================
-    // LOGIN/REGISTRO/LOGOUT
-    // =================================================================================
+    function fallbackToError(msg) {
+        initialLoadingContainer.classList.add('hidden');
+        const errDiv = document.createElement('div');
+        errDiv.className = "fixed inset-0 flex items-center justify-center bg-gray-900 text-white p-4 z-50";
+        errDiv.innerHTML = `<div class="bg-red-900 p-6 rounded-lg max-w-md text-center">
+            <h3 class="text-xl font-bold mb-2">Error de Carga</h3>
+            <p>${msg}</p>
+            <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-white text-red-900 rounded font-bold">Recargar</button>
+        </div>`;
+        document.body.appendChild(errDiv);
+    }
 
+    // =========== GESTIÓN DE EVENTOS DE LOGIN ===========
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = e.target.email.value;
@@ -934,6 +962,8 @@
 
     logoutButton.addEventListener('click', async () => {
         await supabase.auth.signOut();
+        isAppInitialized = false; // Resetear estado al salir
+        location.reload(); // Recargar para limpiar memoria
     });
 
     const getCurrentUserId = async () => {
@@ -941,23 +971,27 @@
         return user ? user.id : null;
     };
     
+    const initializeApp = () => {
+        const savedTheme = localStorage.getItem('selectedTheme') || 'theme-dark';
+        document.getElementById('theme-selector').value = savedTheme;
+        applyTheme(savedTheme);
+        loadAllData(true);
+    };
+    
     // ====================================================================
-    // FUNCIÓN DE SUBIDA A R2
+    // FUNCIÓN EDGE FUNCTION (Upload)
     // ====================================================================
     const uploadToR2 = async (file) => {
         if (!file) return null;
         try {
             const url = `${supabaseUrl}/functions/v1/upload-to-r2`;
             const anonKey = supabaseAnonKey; 
-
             const formData = new FormData();
             formData.append('file', file);
 
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${anonKey}` 
-                },
+                headers: { 'Authorization': `Bearer ${anonKey}` },
                 body: formData
             });
 
@@ -965,22 +999,15 @@
                  const errorText = await response.text();
                  throw new Error(`Error en la Edge Function: ${response.status} - ${errorText}`);
             }
-            
             const data = await response.json();
             if (data.error) throw new Error(data.error);
-
             return data.url; 
-            
         } catch (error) { 
             console.error('Error subiendo archivo:', error); 
             showModal("Error de subida", `No se pudo subir la imagen a R2. Mensaje: ${error.message || "Error desconocido."}`, "error");
             return null;
         }
     };
-    
-    // ====================================================================
-    // UTILIDADES GENERALES
-    // ====================================================================
 
     window.applyTheme = (theme) => { document.documentElement.className = theme; };
     window.changeTheme = (theme) => { applyTheme(theme); localStorage.setItem('selectedTheme', theme); };
@@ -1045,10 +1072,6 @@
         if (subViewId === 'local2-sales') populateSaleCategoryDropdown('local2');
     };
     
-    // ====================================================================
-    // RENDERIZADO DE DATOS Y CARGA
-    // ====================================================================
-
     const renderInventoryList = (inventorySource, containerId, location, searchTerm = '') => {
         const listContainer = document.getElementById(containerId);
         listContainer.innerHTML = '';
@@ -1081,7 +1104,7 @@
                 const imageUrl = p.image_url || `https://placehold.co/150x100/4f46e5/ffffff?text=${p.name.substring(0,3).toUpperCase()}`;
                 const escapedName = p.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 card.innerHTML = `
-                    <button onclick="openEditModal('${p.id}', '${location}')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+                    <button onclick="openEditModal('${p.id}', '${location}')" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-400 transition p-1 rounded-full bg-gray-700/70 shadow-sm" title="Editar nombre y precio"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
                     <div class="h-40 bg-gray-600 rounded flex items-center justify-center mb-3 overflow-hidden cursor-pointer" onclick="openImageModal('${p.image_url || 'https://placehold.co/400x300/1f2937/ffffff?text=No+Imagen'}')">
                         <img src="${imageUrl}" class="object-contain h-full w-full" loading="lazy" alt="${p.name}">
                     </div>
@@ -1143,93 +1166,22 @@
     };
 
     async function loadAllData(showSpinner = false) {
-        const loadingSpinner = document.getElementById('loading-spinner'); 
-        if (showSpinner) loadingSpinner.classList.remove('hidden');
+        const loadingSpinner = document.getElementById('loading-spinner'); if (showSpinner) loadingSpinner.classList.remove('hidden');
         try {
-            // Carga todos los datos
-            await Promise.all([ 
-                loadInventory(), 
-                loadInventory2(), 
-                loadSalesHistory(), 
-                loadSalesHistory2(), 
-                loadExpenses(), 
-                loadExpenses2(), 
-                loadSettings() 
-            ]);
-            
-            // Renderiza los resúmenes de encabezado
+            await Promise.all([ loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2(), loadExpenses(), loadExpenses2(), loadSettings() ]);
             renderHeaderSummary();
             renderLocal2HeaderSummary();
-        } catch (e) { 
-            console.error("Error cargando datos:", e); 
-            document.getElementById('error-message').textContent = `Error al cargar datos. Mensaje: ${e.message}`; 
-            document.getElementById('error-message').classList.remove('hidden'); 
-        } finally { 
-            loadingSpinner.classList.add('hidden'); 
-            if (showSpinner) { 
-                changeView('inventory'); // Asegura que inicie en la vista de inventario
-            } 
-        }
+        } catch (e) { console.error("Error cargando datos:", e); document.getElementById('error-message').textContent = `Error al cargar datos. Mensaje: ${e.message}`; document.getElementById('error-message').classList.remove('hidden'); }
+        finally { loadingSpinner.classList.add('hidden'); if (showSpinner) { changeView('inventory'); } }
     }
     
-    async function fetchTableData(tableName, location = 'local1') {
-        const userId = await getCurrentUserId(); 
-        if (!userId) return [];
-        const { data, error } = await supabase.from(tableName).select('*').eq('user_id', userId).order('created_at', { ascending: false });
-        // Manejar el caso de "no data found" que Supabase retorna como error PGRST116
-        if (error && error.code !== 'PGRST116') throw error; 
-        return (data || []);
-    }
-
-    async function loadInventory() { 
-        try {
-            const data = await fetchTableData('inventory');
-            inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); 
-            renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase());
-        } catch(error) { console.error("Error cargando inventario principal:", error); throw error; }
-    }
-    async function loadInventory2() { 
-        try {
-            const data = await fetchTableData('inventory2');
-            inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); 
-            renderInventoryList(inventory2, 'inventory-list-2', 'local2', document.getElementById('search-inventory-2').value.toLowerCase());
-        } catch(error) { console.error("Error cargando inventario 2:", error); throw error; }
-    }
-    async function loadSalesHistory() { 
-        try {
-            const data = await fetchTableData('sales');
-            salesHistory = data || []; 
-            renderSalesHistory(salesHistory, 'sales-history-body', 'local1'); 
-        } catch(error) { console.error("Error cargando historial de ventas:", error); throw error; }
-    }
-    async function loadSalesHistory2() { 
-        try {
-            const data = await fetchTableData('sales2');
-            salesHistory2 = data || []; 
-            renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2'); 
-        } catch(error) { console.error("Error cargando historial de ventas 2:", error); throw error; }
-    }
-    async function loadExpenses() { 
-        try {
-            const data = await fetchTableData('gastos');
-            expensesHistory = data || []; 
-            renderExpenses(); 
-        } catch(error) { console.error("Error cargando gastos:", error); throw error; }
-    }
-    async function loadExpenses2() { 
-        try {
-            const data = await fetchTableData('gastos2');
-            expensesHistory2 = data || []; 
-            renderExpenses2(); 
-        } catch(error) { console.error("Error cargando gastos 2:", error); throw error; }
-    }
-    async function loadSettings() { 
-        const userId = await getCurrentUserId(); 
-        if (!userId) return; 
-        const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', userId).single(); 
-        if (error && error.code !== 'PGRST116') console.error("Error cargando settings:", error); 
-        if (data?.store_logo_url) renderStoreLogo(data.store_logo_url); 
-    }
+    async function loadInventory() { const { data, error } = await supabase.from('inventory').select('*').order('created_at', { ascending: false }); if (error) throw error; inventory = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory, 'inventory-list', 'local1', document.getElementById('search-inventory').value.toLowerCase()); }
+    async function loadInventory2() { const { data, error } = await supabase.from('inventory2').select('*').order('created_at', { ascending: false }); if (error) throw error; inventory2 = (data || []).map(p => ({ ...p, price: p.price ?? 0.01 })); renderInventoryList(inventory2, 'inventory-list-2', 'local2', document.getElementById('search-inventory-2').value.toLowerCase()); }
+    async function loadSalesHistory() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('sales').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory = data || []; renderSalesHistory(salesHistory, 'sales-history-body', 'local1'); }
+    async function loadSalesHistory2() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('sales2').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; salesHistory2 = data || []; renderSalesHistory(salesHistory2, 'sales-history-body-2', 'local2'); }
+    async function loadExpenses() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('gastos').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; expensesHistory = data || []; renderExpenses(); }
+    async function loadExpenses2() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('gastos2').select('*').eq('user_id', userId).order('timestamp', { ascending: false }); if (error) throw error; expensesHistory2 = data || []; renderExpenses2(); }
+    async function loadSettings() { const userId = await getCurrentUserId(); if (!userId) return; const { data, error } = await supabase.from('settings').select('store_logo_url').eq('user_id', userId).single(); if (error && error.code !== 'PGRST116') console.error("Error cargando settings:", error); if (data?.store_logo_url) renderStoreLogo(data.store_logo_url); }
     
     const renderStoreLogo = (url) => { const logoImg = document.getElementById('store-logo-img'); const placeholder = "https://placehold.co/240x80/1f2937/d97706?text=MRPHONE"; logoImg.src = url || placeholder; logoImg.onerror = () => { logoImg.src = placeholder; }; };
     
@@ -1243,7 +1195,7 @@
     const renderExpenses2 = () => { const tbody = document.getElementById('expenses-history-body-2'); tbody.innerHTML = ''; expensesHistory2.forEach(expense => { const date = new Date(expense.timestamp).toLocaleDateString(); const row = tbody.insertRow(); row.className = 'hover:bg-gray-900/50 transition-colors'; row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${expense.description}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-red-400 font-bold">$${parseFloat(expense.amount).toFixed(2)}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">${date}</td><td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><button onclick="deleteExpense2('${expense.id}', '${expense.description.replace(/'/g, "\\'")}' )" class="text-red-500 hover:text-red-300">Eliminar</button></td>`; }); if (expensesHistory2.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">No hay gastos registrados por ti en Local 2.</td></tr>'; } };
     
     // ==================================================
-    // FUNCIONES DE VENTA Y MANEJO DE STOCK
+    // FUNCIONES BÚSQUEDA CORREGIDAS
     // ==================================================
     
     const populateSaleCategoryDropdown = (location) => { 
@@ -1254,11 +1206,8 @@
         const categorySelect = document.getElementById(categorySelectId); 
         const productSelect = document.getElementById(productSelectId); 
         
-        // Limpiar búsqueda, productos y precio
         const searchInput = document.getElementById(`sale-product-search${formSuffix}`);
-        const priceInput = document.getElementById(`sale-price${formSuffix}`);
         if (searchInput) searchInput.value = '';
-        if (priceInput) priceInput.value = '0.00';
         
         productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; 
         productSelect.disabled = true; 
@@ -1274,15 +1223,11 @@
         }); 
     };
 
-    // Función para disparar el filtrado desde el input de búsqueda
     window.filterSaleProducts = (location) => {
         const formSuffix = location === 'local2' ? '-2' : '';
         const category = document.getElementById(`sale-category${formSuffix}`).value;
-        // Solo filtra si ya hay una categoría seleccionada
         if (category) {
             populateSaleProductDropdown(category, location);
-        } else {
-            showModal("Selecciona Categoría", "Por favor, selecciona una categoría antes de buscar.", "error");
         }
     };
 
@@ -1302,9 +1247,12 @@
 
         productSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto</option>'; 
         
+        if (searchTerm === '' && productSelect.options.length <= 1) {
+             priceInput.value = '0.00';
+        }
+        
         if (!category) { 
             productSelect.disabled = true; 
-            priceInput.value = '0.00';
             return; 
         } 
         
@@ -1319,7 +1267,7 @@
             productsInCategory.forEach(product => { 
                 const option = document.createElement('option'); 
                 option.value = product.id; 
-                option.textContent = `${product.name} (${product.quantity} disponibles) - $${Number(product.price).toFixed(2)}`; 
+                option.textContent = `${product.name} (${product.quantity} disponibles)`; 
                 productSelect.appendChild(option); 
             }); 
             productSelect.disabled = false;
@@ -1330,18 +1278,13 @@
                 productSelect.innerHTML = '<option value="" disabled selected>No hay stock</option>';
             }
             productSelect.disabled = true; 
-            priceInput.value = '0.00';
         } 
 
-        // Lógica de auto-selección y preservación
         if (productSelect.options.length === 2) { 
             productSelect.selectedIndex = 1; 
             productSelect.dispatchEvent(new Event('change'));
         } else if (previouslySelectedId && Array.from(productSelect.options).some(opt => opt.value === previouslySelectedId)) {
             productSelect.value = previouslySelectedId;
-            productSelect.dispatchEvent(new Event('change')); 
-        } else {
-             priceInput.value = '0.00';
         }
     };
     
@@ -1447,91 +1390,27 @@
         } catch (e) { 
             showModal("Error de Venta", `No se pudo completar la transacción. Error: ${e.message}.`, "error");
         } finally {
-            if (location === 'local2') { 
-                await loadInventory2(); await loadSalesHistory2(); renderLocal2HeaderSummary(); 
-            } else { 
-                await loadInventory(); await loadSalesHistory(); renderHeaderSummary(); 
-            }
+            if (location === 'local2') { await loadInventory2(); await loadSalesHistory2(); renderLocal2HeaderSummary(); } 
+            else { await loadInventory(); await loadSalesHistory(); renderHeaderSummary(); }
         }
     }
 
     async function handleRecordExpense(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description').value.trim(); const amount = parseFloat(document.getElementById('expense-amount').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }
     async function handleRecordExpense2(event) { event.preventDefault(); const userId = await getCurrentUserId(); if (!userId) return; const description = document.getElementById('expense-description-2').value.trim(); const amount = parseFloat(document.getElementById('expense-amount-2').value); if (!description || !amount || amount <= 0) { return showModal("Datos Incompletos", "La descripción y un monto válido son obligatorios.", "error"); } try { const { error } = await supabase.from('gastos2').insert([{ user_id: userId, description: description, amount: amount, timestamp: new Date() }]); if (error) throw error; showModal("Gasto Registrado (Local 2)", `El gasto '${description}' por $${amount.toFixed(2)} fue guardado.`, "success"); document.getElementById('record-expense-form-2').reset(); } catch (e) { showModal("Error al Registrar Gasto", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }
-    async function updateSaleStatus(saleId, newStatus, location = 'local1') { 
-        const historySource = location === 'local2' ? salesHistory2 : salesHistory; 
-        const inventorySource = location === 'local2' ? inventory2 : inventory; 
-        const salesTable = location === 'local2' ? 'sales2' : 'sales'; 
-        const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; 
-        const sale = historySource.find(s => s.id === saleId); 
-        if (!sale) return showModal("Error", "Venta no encontrada.", "error"); 
-        
-        const oldStatus = sale.status || 'Pagado'; 
-        if (oldStatus === newStatus) return; 
-
-        try { 
-            // Manejo de Stock: Devolución (añade stock) o reactivación (quita stock)
-            if (sale.product_id) { 
-                const product = inventorySource.find(p => p.id === sale.product_id); 
-                const saleQuantity = sale.quantity || 1; 
-                let stockChange = 0; 
-                
-                if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') {
-                    // Si se marca como Devuelto, se suma la cantidad al stock
-                    stockChange = saleQuantity; 
-                } else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') {
-                    // Si se revierte de Devuelto, se resta la cantidad del stock (asumiendo que se vuelve a Pagado/Pendiente)
-                    stockChange = -saleQuantity;
-                }
-                
-                if (stockChange !== 0 && product) { 
-                    if (product.quantity + stockChange < 0) { 
-                        throw new Error(`No hay stock suficiente para realizar esta operación.`); 
-                    } 
-                    const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); 
-                    if (stockError) throw stockError; 
-                } 
-            } 
-            
-            // Actualizar el estado de la venta
-            const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); 
-            if (updateError) throw updateError; 
-            
-            showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); 
-        } catch (e) { 
-            showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); 
-        } finally { 
-            // Recarga todos los datos para reflejar los cambios en todas las vistas
-            await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); 
-            renderHeaderSummary(); 
-            renderLocal2HeaderSummary(); 
-        } 
-    }
+    async function updateSaleStatus(saleId, newStatus, location = 'local1') { const historySource = location === 'local2' ? salesHistory2 : salesHistory; const inventorySource = location === 'local2' ? inventory2 : inventory; const salesTable = location === 'local2' ? 'sales2' : 'sales'; const inventoryTable = location === 'local2' ? 'inventory2' : 'inventory'; const sale = historySource.find(s => s.id === saleId); if (!sale) return showModal("Error", "Venta no encontrada.", "error"); const oldStatus = sale.status || 'Pagado'; if (oldStatus === newStatus) return; try { if (sale.product_id) { const product = inventorySource.find(p => p.id === sale.product_id); const saleQuantity = sale.quantity || 1; let stockChange = 0; if (newStatus === 'Devuelto' && oldStatus !== 'Devuelto') stockChange = saleQuantity; else if (oldStatus === 'Devuelto' && newStatus !== 'Devuelto') stockChange = -saleQuantity; if (stockChange !== 0 && product) { if (product.quantity + stockChange < 0) { throw new Error(`No hay stock suficiente para esta operación.`); } const { error: stockError } = await supabase.from(inventoryTable).update({ quantity: product.quantity + stockChange }).eq('id', product.id); if (stockError) throw stockError; } } const { error: updateError } = await supabase.from(salesTable).update({ status: newStatus }).eq('id', saleId); if (updateError) throw updateError; showModal("Éxito", `Estado de la venta actualizado a ${newStatus}.`, "success"); } catch (e) { showModal("Error al Actualizar Estado", `No se pudo completar la operación. Error: ${e.message}`, "error"); } finally { await Promise.all([loadInventory(), loadInventory2(), loadSalesHistory(), loadSalesHistory2()]); renderHeaderSummary(); renderLocal2HeaderSummary(); } }
     
     window.updateInventoryQuantity = async (button, id, delta, location = 'local1') => {
         const inventorySource = location === 'local2' ? inventory2 : inventory;
         const table = location === 'local2' ? 'inventory2' : 'inventory';
         const product = inventorySource.find(p => p.id === id); if (!product) return;
-        const originalQty = product.quantity; const newQty = originalQty + Number(delta); 
-        if (newQty < 0) return;
-        
-        const productCard = button.closest('[data-product-id]'); 
-        const quantityElement = productCard.querySelector('.product-quantity');
-        
-        // Optimistic UI Update
+        const originalQty = product.quantity; const newQty = originalQty + Number(delta); if (newQty < 0) return;
+        const productCard = button.closest('[data-product-id]'); const quantityElement = productCard.querySelector('.product-quantity');
         quantityElement.textContent = `Stock: ${newQty}`; product.quantity = newQty;
-        const subtractButton = productCard.querySelector('.stock-decrement-btn'); 
-        subtractButton.disabled = newQty <= 0;
-        
+        const subtractButton = productCard.querySelector('button'); subtractButton.disabled = newQty <= 0;
         try {
             const { error } = await supabase.from(table).update({ quantity: newQty }).eq('id', id);
             if (error) throw error;
-        } catch (e) { 
-            // Revertir UI Update en caso de error
-            product.quantity = originalQty; 
-            quantityElement.textContent = `Stock: ${originalQty}`; 
-            subtractButton.disabled = originalQty <= 0; 
-            showModal("Error de Sincronización", `No se pudo guardar el cambio. ${e.message}`, "error"); 
-        }
+        } catch (e) { product.quantity = originalQty; quantityElement.textContent = `Stock: ${originalQty}`; subtractButton.disabled = originalQty <= 0; showModal("Error de Sincronización", `No se pudo guardar el cambio. ${e.message}`, "error"); }
     };
 
     window.deleteProduct = (id, name, location = 'local1') => {
@@ -1551,52 +1430,10 @@
         cancelButton.classList.remove('hidden');
     };
 
-    window.deleteSale = async (id, name, location = 'local1') => { 
-        const userId = await getCurrentUserId(); if(!userId) return; 
-        const table = location === 'local2' ? 'sales2' : 'sales'; 
-        const loadFunction = location === 'local2' ? loadSalesHistory2 : loadSalesHistory; 
-        showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar la venta de '${name}' del historial?`, "error"); 
-        const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); 
-        confirmButton.textContent = 'Confirmar Eliminación'; 
-        confirmButton.onclick = async () => { 
-            try { 
-                const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', userId); 
-                if (error) throw error; 
-                showModal("Venta Eliminada", "La venta fue eliminada del historial.", "success"); 
-            } catch(e) { showModal("Error", e.message, "error"); } finally { await loadFunction(); if(location === 'local1') renderHeaderSummary(); else renderLocal2HeaderSummary(); } 
-        }; 
-        cancelButton.classList.remove('hidden'); 
-    };
-    window.deleteExpense = async (id, description) => { 
-        const userId = await getCurrentUserId(); if(!userId) return; 
-        showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial?`, "error"); 
-        const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); 
-        confirmButton.textContent = 'Confirmar Eliminación'; 
-        confirmButton.onclick = async () => { 
-            try { 
-                const { error } = await supabase.from('gastos').delete().eq('id', id).eq('user_id', userId); 
-                if (error) throw error; 
-                showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success"); 
-            } catch(e) { showModal("Error", e.message, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } 
-        }; 
-        cancelButton.classList.remove('hidden'); 
-    };
-    window.deleteExpense2 = async (id, description) => { 
-        const userId = await getCurrentUserId(); if(!userId) return; 
-        showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial de Local 2?`, "error"); 
-        const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); 
-        confirmButton.textContent = 'Confirmar Eliminación'; 
-        confirmButton.onclick = async () => { 
-            try { 
-                const { error } = await supabase.from('gastos2').delete().eq('id', id).eq('user_id', userId); 
-                if (error) throw error; 
-                showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success"); 
-            } catch(e) { showModal("Error", e.message, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } 
-        }; 
-        cancelButton.classList.remove('hidden'); 
-    };
+    window.deleteSale = async (id, name, location = 'local1') => { const userId = await getCurrentUserId(); if(!userId) return; const table = location === 'local2' ? 'sales2' : 'sales'; const loadFunction = location === 'local2' ? loadSalesHistory2 : loadSalesHistory; showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar la venta de '${name}' del historial?`, "error"); const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); confirmButton.textContent = 'Confirmar Eliminación'; confirmButton.onclick = async () => { try { const { error } = await supabase.from(table).delete().eq('id', id).eq('user_id', userId); if (error) throw error; showModal("Venta Eliminada", "La venta fue eliminada del historial.", "success"); } catch(e) { showModal("Error", e.message, "error"); } finally { await loadFunction(); if(location === 'local1') renderHeaderSummary(); else renderLocal2HeaderSummary(); } }; cancelButton.classList.remove('hidden'); };
+    window.deleteExpense = async (id, description) => { const userId = await getCurrentUserId(); if(!userId) return; showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial?`, "error"); const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); confirmButton.textContent = 'Confirmar Eliminación'; confirmButton.onclick = async () => { try { const { error } = await supabase.from('gastos').delete().eq('id', id).eq('user_id', userId); if (error) throw error; showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success"); } catch(e) { showModal("Error", e.message, "error"); } finally { await loadExpenses(); renderHeaderSummary(); } }; cancelButton.classList.remove('hidden'); };
+    window.deleteExpense2 = async (id, description) => { const userId = await getCurrentUserId(); if(!userId) return; showModal("Confirmar Eliminación", `¿Seguro que quieres eliminar el gasto '${description}' del historial de Local 2?`, "error"); const confirmButton = document.getElementById('modal-button'); const cancelButton = document.getElementById('modal-cancel-button'); confirmButton.textContent = 'Confirmar Eliminación'; confirmButton.onclick = async () => { try { const { error } = await supabase.from('gastos2').delete().eq('id', id).eq('user_id', userId); if (error) throw error; showModal("Gasto Eliminado", "El gasto fue eliminado del historial.", "success"); } catch(e) { showModal("Error", e.message, "error"); } finally { await loadExpenses2(); renderLocal2HeaderSummary(); } }; cancelButton.classList.remove('hidden'); };
 
-    // Event Listeners
     document.getElementById('add-product-form').addEventListener('submit', handleAddProduct); 
     document.getElementById('edit-product-form').addEventListener('submit', handleEditProduct); 
     document.getElementById('record-sale-form').addEventListener('submit', (e) => handleRecordSale(e, 'local1')); 
@@ -1606,36 +1443,17 @@
     document.getElementById('store-logo-img').addEventListener('click', () => document.getElementById('logo-file-input').click()); 
     document.getElementById('logo-file-input').addEventListener('change', handleLogoFileSelect); 
     
-    // --- Event Listeners para la búsqueda en ventas ---
     document.getElementById('sale-category').addEventListener('change', (e) => {
         populateSaleProductDropdown(e.target.value, 'local1');
     });
-    document.getElementById('sale-product-id').addEventListener('change', (e) => { 
-        const selectedProduct = inventory.find(p => String(p.id) === e.target.value); 
-        if (selectedProduct) document.getElementById('sale-price').value = parseFloat(selectedProduct.price).toFixed(2); 
-    }); 
+    document.getElementById('sale-product-id').addEventListener('change', (e) => { const selectedProduct = inventory.find(p => String(p.id) === e.target.value); if (selectedProduct) document.getElementById('sale-price').value = parseFloat(selectedProduct.price).toFixed(2); }); 
     
     document.getElementById('sale-category-2').addEventListener('change', (e) => {
         populateSaleProductDropdown(e.target.value, 'local2');
     }); 
-    document.getElementById('sale-product-id-2').addEventListener('change', (e) => { 
-        const selectedProduct = inventory2.find(p => String(p.id) === e.target.value); 
-        if (selectedProduct) document.getElementById('sale-price-2').value = parseFloat(selectedProduct.price).toFixed(2); 
-    }); 
-    // --- Fin de Event Listeners para búsqueda ---
+    document.getElementById('sale-product-id-2').addEventListener('change', (e) => { const selectedProduct = inventory2.find(p => String(p.id) === e.target.value); if (selectedProduct) document.getElementById('sale-price-2').value = parseFloat(selectedProduct.price).toFixed(2); }); 
 
-    document.getElementById('edit-product-image-file').addEventListener('change', (event) => { 
-        const file = event.target.files[0]; 
-        if (file) { 
-            const reader = new FileReader(); 
-            reader.onload = (e) => { document.getElementById('edit-product-image-preview').src = e.target.result; }; 
-            reader.readAsDataURL(file); 
-        } 
-    }); 
-    
-    // =========== INICIO DE LA APLICACIÓN ===========
-    // Llama a la comprobación de sesión inmediatamente al cargar el script.
-    checkSessionAndInit();
+    document.getElementById('edit-product-image-file').addEventListener('change', (event) => { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { document.getElementById('edit-product-image-preview').src = e.target.result; }; reader.readAsDataURL(file); } }); 
 
 </script>
 </body>
